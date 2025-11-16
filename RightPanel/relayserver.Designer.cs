@@ -83,6 +83,7 @@
             // 
             // button2
             // 
+            this.button2.Enabled = false;
             this.button2.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button2.IconSvg = "ExperimentOutlined";
             this.button2.Location = new System.Drawing.Point(0, 120);
@@ -154,6 +155,7 @@
             // 
             this.materialCheckBox2.AutoSize = true;
             this.materialCheckBox2.Depth = 0;
+            this.materialCheckBox2.Enabled = false;
             this.materialCheckBox2.Font = new System.Drawing.Font("Roboto", 10F);
             this.materialCheckBox2.Location = new System.Drawing.Point(281, 94);
             this.materialCheckBox2.Margin = new System.Windows.Forms.Padding(0);

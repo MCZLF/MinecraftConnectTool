@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.props" Condition="Exists('packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.props')" />
+  <Import Project="packages\ILMerge.3.0.41\build\ILMerge.props" Condition="Exists('packages\ILMerge.3.0.41\build\ILMerge.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{641D35DD-BDAF-43DC-B711-2384C5B6BA7E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>MinecraftConnectTool</RootNamespace>
+    <AssemblyName>MinecraftConnectTool</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>IconGroup3000.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>B0B293571D959F81432143070C1E7D6FFD57559C</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>MinecraftConnectTool_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AntdUI, Version=1.8.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\AntdUI.1.8.9\lib\net46\AntdUI.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialSkin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MaterialSkin.0.2.1\lib\MaterialSkin.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.CodeDom, Version=9.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.CodeDom.9.0.3\lib\net462\System.CodeDom.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Plugins\Probe.cs" />
+    <Compile Include="RightPanel\infoEdit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RightPanel\infoEdit.Designer.cs">
+      <DependentUpon>infoEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RightPanel\AdvancedSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RightPanel\AdvancedSettings.Designer.cs">
+      <DependentUpon>AdvancedSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Extension.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Extension.Designer.cs">
+      <DependentUpon>Extension.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExtensionUI\InteractiveModal.cs" />
+    <Compile Include="bar\wheather.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="bar\wheather.Designer.cs">
+      <DependentUpon>wheather.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\Help.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\Help.Designer.cs">
+      <DependentUpon>Help.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RightPanel\relayserver.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RightPanel\relayserver.Designer.cs">
+      <DependentUpon>relayserver.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RightPanel\compatibility.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RightPanel\compatibility.Designer.cs">
+      <DependentUpon>compatibility.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="bar\lan.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="bar\lan.Designer.cs">
+      <DependentUpon>lan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="bar\lanload.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="bar\lanload.Designer.cs">
+      <DependentUpon>lanload.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\P2PQNA.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\P2PQNA.Designer.cs">
+      <DependentUpon>P2PQNA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugins\Server_Post.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Panel\P2PMode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\P2PMode.Designer.cs">
+      <DependentUpon>P2PMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\P2PLog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\P2PLog.Designer.cs">
+      <DependentUpon>P2PLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\Update.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\Update.Designer.cs">
+      <DependentUpon>Update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\Settings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\ZTLobby.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\ZTLobby.Designer.cs">
+      <DependentUpon>ZTLobby.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugins\TcpPing.cs" />
+    <EmbeddedResource Include="bar\wheather.resx">
+      <DependentUpon>wheather.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Extension.resx">
+      <DependentUpon>Extension.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\Help.resx">
+      <DependentUpon>Help.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RightPanel\AdvancedSettings.resx">
+      <DependentUpon>AdvancedSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RightPanel\compatibility.resx">
+      <DependentUpon>compatibility.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="bar\lanload.resx">
+      <DependentUpon>lanload.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\P2PMode.resx">
+      <DependentUpon>P2PMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\P2PQNA.resx">
+      <DependentUpon>P2PQNA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\Update.resx">
+      <DependentUpon>Update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\ZTLobby.resx">
+      <DependentUpon>ZTLobby.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Panel\P2PLog.resx">
+      <DependentUpon>P2PLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RightPanel\infoEdit.resx">
+      <DependentUpon>infoEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RightPanel\relayserver.resx">
+      <DependentUpon>relayserver.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="ILMerge.props" />
+    <None Include="MinecraftConnectTool_TemporaryKey.pfx" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IconGroup3000.ico" />
+    <Content Include="ILMergeOrder.txt" />
+    <None Include="Resources\wanjia.PNG" />
+    <None Include="Resources\fangzhu.PNG" />
+    <None Include="Resources\icon.ico" />
+    <None Include="Resources\close.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILMerge.3.0.41\build\ILMerge.props'))" />
+    <Error Condition="!Exists('packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.props'))" />
+    <Error Condition="!Exists('packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.targets'))" />
+  </Target>
+  <Import Project="packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.targets" Condition="Exists('packages\MSBuild.ILMerge.Task.1.1.3\build\MSBuild.ILMerge.Task.targets')" />
+</Project>

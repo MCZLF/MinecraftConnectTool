@@ -50,7 +50,7 @@ namespace MinecraftConnectTool
                 string json = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
 
                 TcpClient tcp = new TcpClient();
-                await tcp.ConnectAsync("1.12.59.122", 17502);
+                await tcp.ConnectAsync("mctservice.mczlf.loft.games", 17502);
                 NetworkStream stream = tcp.GetStream();
                 byte[] buffer = Encoding.UTF8.GetBytes(json);
                 await stream.WriteAsync(buffer, 0, buffer.Length);
@@ -140,7 +140,7 @@ namespace MinecraftConnectTool
             {
                 using (var tcp = new System.Net.Sockets.TcpClient())
                 {
-                    await tcp.ConnectAsync("1.12.59.122", 17502);
+                    await tcp.ConnectAsync("mctservice.mczlf.loft.games", 17502);
                     using (var stream = tcp.GetStream())
                     {
                         byte[] buf = System.Text.Encoding.UTF8.GetBytes(json);

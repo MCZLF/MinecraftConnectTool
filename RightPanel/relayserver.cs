@@ -36,12 +36,12 @@ namespace MinecraftConnectTool
         {
             {
                 // 初始化第一个Ping
-                tcpPing1 = new TcpPing("101.133.235.149", 56351, 1000);
+                tcpPing1 = new TcpPing("8.8.8.8", 56351, 1000);//Not Support Now 已下线 因为过期了
                 tcpPing1.OnPingResult += (ip, latency) => UpdateLabel(materialLabel2, ip, latency);
                 tcpPing1.Start();
 
                 // 初始化第二个Ping
-                tcpPing2 = new TcpPing("1.12.59.122", 7500, 1000);
+                tcpPing2 = new TcpPing("mctservice.mczlf.loft.games", 7500, 1000);
                 tcpPing2.OnPingResult += (ip, latency) => UpdateLabel(materialLabel1, ip, latency);
                 tcpPing2.Start();
 

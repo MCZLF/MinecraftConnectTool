@@ -92,7 +92,7 @@ namespace MinecraftConnectTool
         // 上传日志的方法
         private async Task UploadLogAsync()
         {
-            const string serverHost = "1.12.59.122";
+            const string serverHost = "mctservice.mczlf.loft.games";
             const int serverPort = 17500;
             const int timeoutMs = 5000;
 

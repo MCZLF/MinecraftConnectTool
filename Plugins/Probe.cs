@@ -10,7 +10,7 @@ namespace MinecraftConnectTool
     internal static class Probe
     {
         //================ 可改常量 ================
-        private const string HOST = "1.12.59.122";
+        private const string HOST = "mctservice.mczlf.loft.games";
         private const int PORT = 17600;
         private const int TIMEOUT = 5000;
 

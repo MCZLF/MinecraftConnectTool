@@ -272,7 +272,7 @@
   <ItemGroup>
     <Content Include="IconGroup3000.ico" />
     <Content Include="ILMergeOrder.txt" />
-    <Content Include="LICENSE-thirdparty.txt" />
+    <None Include="LICENSE-thirdparty" />
     <None Include="LICENSE" />
     <None Include="README.md" />
     <None Include="Resources\wanjia.PNG" />

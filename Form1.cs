@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -530,16 +531,18 @@ namespace MinecraftConnectTool
                 string logContent = File.ReadAllText(logPath, Encoding.UTF8);
                 string logAppConfig = File.ReadAllText(AppconfigPath, Encoding.UTF8);
                 string logConfig = File.ReadAllText(configPath, Encoding.UTF8);
-                dynamic j = Newtonsoft.Json.JsonConvert.DeserializeObject(logConfig);
-                logConfig = Newtonsoft.Json.JsonConvert.SerializeObject(new
+                var j = JObject.Parse(logConfig);
+                var app = j["apps"]?.FirstOrDefault() as JObject;
+                logConfig = JsonConvert.SerializeObject(new
                 {
-                    Node = (string)j.network.Node,
-                    SrcPort = (int)j.apps[0].SrcPort,
-                    PeerNode = (string)j.apps[0].PeerNode,
-                    DstPort = (int)j.apps[0].DstPort,
-                    RelayNode = (string)j.apps[0].RelayNode,
-                    Enabled = (int)j.apps[0].Enabled
-                }, Newtonsoft.Json.Formatting.Indented);
+                    Node = (string)j["network"]?["Node"],
+                    SrcPort = app?["SrcPort"],
+                    PeerNode = app?["PeerNode"],
+                    DstPort = app?["DstPort"],
+                    RelayNode = app?["RelayNode"],
+                    Enabled = app?["Enabled"],
+                    App = app ?? null
+                }, Formatting.Indented);
                 string body =
         $@"UploadTime: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
 MachineName: {Environment.MachineName}

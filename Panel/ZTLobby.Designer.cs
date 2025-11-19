@@ -46,6 +46,7 @@
             this.createroom = new AntdUI.Button();
             this.button2 = new AntdUI.Button();
             this.button3 = new AntdUI.Button();
+            this.divider1 = new AntdUI.Divider();
             this.SuspendLayout();
             // 
             // create
@@ -266,10 +267,21 @@
             this.button3.TabIndex = 54;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // divider1
+            // 
+            this.divider1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.divider1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.divider1.Location = new System.Drawing.Point(574, 242);
+            this.divider1.Name = "divider1";
+            this.divider1.Size = new System.Drawing.Size(188, 31);
+            this.divider1.TabIndex = 31;
+            this.divider1.Text = "大概率废了,Candy效果不太行";
+            // 
             // ZTLobby
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.divider1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -314,5 +326,6 @@
         private AntdUI.Button createroom;
         private AntdUI.Button button2;
         private AntdUI.Button button3;
+        private AntdUI.Divider divider1;
     }
 }

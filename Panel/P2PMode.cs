@@ -1139,17 +1139,29 @@ namespace MinecraftConnectTool
 
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
         {
+            string url;
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
             Directory.CreateDirectory(customDirectory);
             Directory.SetCurrentDirectory(customDirectory);
-            string fileName = "main.exe";
-            string fileMd5 = "08160296509deac13e7d12c8754de9ef";
-            string fileMd532 = "e8f1007a43eb520eecf9c0fade0300b0";
+            if (Environment.Is64BitOperatingSystem)
+            {
+                if (admin)
+                { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/main32413.exe"; }
+                else { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew.exe"; }//new  
+            }
+            else
+            {
+                url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew32.exe";
+            }
+            string fileName = Path.Combine(customDirectory, "main.exe");
+            string fileMd5;
+            if (admin) { fileMd5 = "29d76fc2626c66925621d475f3a6827a"; } else { fileMd5 = "08160296509deac13e7d12c8754de9ef"; }
+            ;
+            string fileMd532 = "640ffdaa2a7b249d9c301102419a69cb";
             bool needsDownload = false;
-
             if (File.Exists(fileName))
             {
                 string md5Hash = GetFileMD5Hash(fileName);
@@ -1166,8 +1178,18 @@ namespace MinecraftConnectTool
                     }
                     else
                     {
-                        log("核心不存在或安全校验不通过,重新Download中");
-                        needsDownload = true;
+                        if (md5Hash == null)
+                        {
+                            log("出现错误，进程终止");
+                            role = "0";  //未开启或是重置状态
+                            badge3.Visible = false; badge3.State = TState.Default; badge3.Text = "Null";
+                            return;
+                        }
+                        else
+                        {
+                            log("核心不存在或安全校验不通过,重新Download中");
+                            needsDownload = true;
+                        }
                     }
 
                 }
@@ -1177,28 +1199,50 @@ namespace MinecraftConnectTool
                 log("核心不存在或安全校验不通过,重新Download中");
                 needsDownload = true;
             }
+            //Download
             if (needsDownload)
             {
-                string downloadUrl = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/CoreDownloadernew.exe";
-                string tempPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "MCZLFAPP", "Temp");
-                string filePath = Path.Combine(tempPath, "CoreDownloader.exe");
-                if (!Directory.Exists(tempPath))
+                progress1.ShowInTaskbar = true;
+                progress1.Visible = true;
+                progress1.Value = 0;
+                // 下载
+                log("Downloader启动");
+                using (var unityClient = new HttpClient())
+                using (var response = await unityClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
-                    Directory.CreateDirectory(tempPath);
-                }
-                try
-                {
-                    using (WebClient client = new WebClient())
+                    response.EnsureSuccessStatusCode();
+
+                    long totalBytes = response.Content.Headers.ContentLength ?? 0;
+                    long downloadedBytes = 0;
+
+                    using (var httpStream = await response.Content.ReadAsStreamAsync())
+                    using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Write, bufferSize: 8192, useAsync: true))
                     {
-                        client.DownloadFile(downloadUrl, filePath);
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+
+                        while ((bytesRead = await httpStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            await fileStream.WriteAsync(buffer, 0, bytesRead);
+                            downloadedBytes += bytesRead;
+
+                            if (totalBytes > 0)
+                            {
+                                int progress = (int)((downloadedBytes * 100) / totalBytes);
+                                progress1.Value = progress;
+                            }
+                        }
                     }
-                    Process.Start(filePath);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"下载或打开文件时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                progress1.Visible = false;
+                progress1.Value = 0;
+                progress1.ShowInTaskbar = false;
+                log("Success");
             }
+            //清除状态
+            progress1.Visible = false;
+            progress1.Value = 0;
+            progress1.ShowInTaskbar = false;
         }
         private bool IsWindows7OrLower()
         {

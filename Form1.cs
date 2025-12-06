@@ -26,7 +26,7 @@ namespace MinecraftConnectTool
             AntdUI.Config.ShowInWindow = true;
             AntdUI.Config.IsDark = false;
         }
-        public static readonly string version = "0.0.6.091";
+        public static readonly string version = "0.0.6.092";
         public static readonly string designation = "黎那汐塔的终章_摘自 鸣潮2.7";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变

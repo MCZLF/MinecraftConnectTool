@@ -925,7 +925,7 @@ namespace MinecraftConnectTool
             if (EnableDST) { TopText.Text = "您正在使用P2P模式进行联机ヾ(≧▽≦*)o(DST)"; DSTFill(); }
             bool EnableRelay = Form1.config.read<bool>("EnableRelay", false);
             if (EnableRelay) { badge5.Visible = true; }
-            bool TCP = Form1.config.read<bool>("TCP", false);
+            bool TCP = Form1.config.read<bool>("TCP", true);
             if (!TCP) { TopText.Text = "您正在使用P2P模式进行联机ヾ(≧▽≦*)o(UDP)"; }
             bool Testchannel = Form1.config.read<bool>("Testchannel", false);
             if (Testchannel) { TopText.Text = "您正在使用P2P模式进行联机ヾ(≧▽≦*)o(测试)";

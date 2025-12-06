@@ -30,7 +30,7 @@ namespace MinecraftConnectTool
         }
         private void ZTLobby_Load(object sender, EventArgs e)
         {
-
+            log("大概率废了，效果一直不达预期");
         }
 
         private async void create_Click(object sender, EventArgs e)

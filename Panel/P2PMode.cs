@@ -1,19 +1,20 @@
-﻿using System;
+﻿using AntdUI;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AntdUI;
-using System.Threading;
-using System.Linq;
 
 namespace MinecraftConnectTool
 {
@@ -26,6 +27,7 @@ namespace MinecraftConnectTool
             materialSingleLineTextField3.LostFocus += new EventHandler(materialSingleLineTextField3_LostFocus);
             alert1.Visible = false;
             infobutton.Visible = false;
+            ReadPeerConfig();
         }
         public string tokenNormal = "17073157824633806511";
         public string tokenTest = "7196174974940052261";
@@ -942,6 +944,48 @@ namespace MinecraftConnectTool
             }
         }
 
+        private void ReadPeerConfig()
+        {
+            log("ReadPeerConfig 被调用");
+            //读取开关配置
+            try
+            {
+                string configPath = Path.Combine(
+                    Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
+                    "MCZLFAPP", "Temp", "config.json");
+
+                log($"configPath={configPath}");
+                if (!File.Exists(configPath))
+                {
+                    log("config.json 不存在，直接返回");
+                    return;
+                }
+                string json = File.ReadAllText(configPath, Encoding.UTF8);
+                log($"json长度={json.Length}");
+                var root = JObject.Parse(json);
+                var app = root["apps"]?[0];
+                log($"apps[0]为null? {app == null}");
+                if (app == null) return;
+
+                string peerNode = app["PeerNode"]?.Value<string>();
+                int? dstPort = app["DstPort"]?.Value<int>();
+
+                log($"peerNode={peerNode}, dstPort={dstPort}");
+
+                if (!string.IsNullOrWhiteSpace(peerNode) && dstPort.HasValue)
+                {
+                    port = dstPort.Value.ToString();
+                    user = peerNode;
+
+                    materialSingleLineTextField2.Text = user;
+                    materialSingleLineTextField3.Text = port;
+                }
+            }
+            catch (Exception ex)
+            {
+                log($"ReadPeerConfig 异常：{ex}");
+            }
+        }
         private void richTextBoxLog_TextChanged_1(object sender, EventArgs e)
         {
 

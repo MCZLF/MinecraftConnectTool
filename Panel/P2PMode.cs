@@ -325,6 +325,13 @@ namespace MinecraftConnectTool
             else if (string.IsNullOrEmpty(user) || user.Trim().Equals("输入提示码", StringComparison.OrdinalIgnoreCase))
             { AntdUI.Message.warn(Program.MainForm, "你好像没有填写或确认[提示码]哦", autoClose: 5, font: P2PFont); log("user无赋值内容"); return;
             } else { log("User&Port OK"); }
+            //二次校验端口合法性
+            if (!int.TryParse(port, out int p) || p < 1 || p > 65535)
+            {
+                log("端口不合法");
+                AntdUI.Message.error(Program.MainForm, "[端口]是不是填错了...[1-65535]", autoClose: 5, font: P2PFont);
+                return;
+            }
             //正常启动
             //获取默认Node
             badge3.Visible = true; badge3.State = TState.Processing; badge3.Text = "正在处理中...";
@@ -698,12 +705,14 @@ namespace MinecraftConnectTool
                         {
                             AntdUI.Message.error(Program.MainForm, "端口超出范围(1~65535)", autoClose: 5, font: P2PFont);
                             log("端口超出范围");
+                            return;
                         }
                     }
                     else
                     {
                         AntdUI.Message.error(Program.MainForm, "端口错误(1~65535)", autoClose: 5, font: P2PFont);
                         log("端口错误,非1-65535的数字");
+                        return;
                     }
                 }
             }
@@ -750,7 +759,7 @@ namespace MinecraftConnectTool
         { "16947733", "690625244" },
         { "openp2p.cn@gmail.com", "admin@mczlf.xyz" },
         { "openp2p start", "Powered by OpenP2P" }
-    };
+        };
             foreach (var pair in replacements)
             {
                 message = Regex.Replace(message, @"\b" + Regex.Escape(pair.Key) + @"\b", pair.Value);
@@ -794,6 +803,8 @@ namespace MinecraftConnectTool
         { "no such host", () => Program.alerterror("程序未能够连接到HOST,可能是防火墙拦截,或是根本没有授予网络访问权限")},
         { "it will auto reconnect when peer node online", () => Program.alerterror("房间不在线,请检查是否有输入错误,或好友是否正确的启动了房间")},
         { "peer offline", () => {badge3.State = TState.Error;badge3.Text = "对方不在线";Program.alerterror("对方不在线,请检查是否有输入错误,或好友是否正确的启动了房间");  } },
+        { "Usage:", () => {stopp2p();badge3.State = TState.Error;badge3.Text = "触发Usage_Bug";Program.alerterror("这是一个Bug,你可以反馈一下发生了什么吗?\n请不要直接对着这个窗口拍照，请上传完整日志");  } },
+
      };
             // 检查消息中是否包含特定字符
             foreach (var pair in methodMap)

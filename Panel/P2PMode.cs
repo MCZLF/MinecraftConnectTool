@@ -705,14 +705,12 @@ namespace MinecraftConnectTool
                         {
                             AntdUI.Message.error(Program.MainForm, "端口超出范围(1~65535)", autoClose: 5, font: P2PFont);
                             log("端口超出范围");
-                            return;
                         }
                     }
                     else
                     {
                         AntdUI.Message.error(Program.MainForm, "端口错误(1~65535)", autoClose: 5, font: P2PFont);
                         log("端口错误,非1-65535的数字");
-                        return;
                     }
                 }
             }

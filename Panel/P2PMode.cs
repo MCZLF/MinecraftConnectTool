@@ -976,7 +976,8 @@ namespace MinecraftConnectTool
                 {
                     port = dstPort.Value.ToString();
                     user = peerNode;
-
+                    //判断是否是[非每次更新]的选项决定是否赋值
+                    //...咕咕咕，先留个注释，这周没空了
                     materialSingleLineTextField2.Text = user;
                     materialSingleLineTextField3.Text = port;
                 }

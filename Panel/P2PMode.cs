@@ -979,7 +979,7 @@ namespace MinecraftConnectTool
                     user = peerNode;
                     materialSingleLineTextField2.Text = user;
                     materialSingleLineTextField3.Text = port;
-                    log($"已读取到固定配置,提示码{user}|端口{port}");
+                    log($"已读取到上次的联机配置,提示码{user}|端口{port}");
                 }
             }
             catch (Exception ex)

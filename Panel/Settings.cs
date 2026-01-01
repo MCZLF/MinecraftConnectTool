@@ -473,6 +473,11 @@ namespace MinecraftConnectTool
         //Set加载
         private void Settings_Load(object sender, EventArgs e)
         {
+            bool EnableVersionCheck = Form1.config.read<bool>("EnableVersionCheck", true);
+            if (EnableVersionCheck)
+            {
+                switch6.Checked = true;
+            }
             bool EnableServerPost = Form1.config.read<bool>("ServerPostEnable", true);
             if (EnableServerPost)
             {
@@ -1124,6 +1129,20 @@ Version: {Form1.version}
             {
                 MessageBox.Show($"上传失败：{ex.Message}", "云日志上传", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 button_mclogs.Loading = false;
+            }
+        }
+
+        private void switch6_CheckedChanged(object sender, BoolEventArgs e)
+        {
+            if (switch4.Checked)
+            {
+                Form1.config.write("EnableVersionCheck", true);
+                switch6.Checked = true;
+            }
+            else
+            {
+                Form1.config.write("EnableVersionCheck", false);
+                switch6.Checked = false;
             }
         }
     }

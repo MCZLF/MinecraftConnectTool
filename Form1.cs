@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MinecraftConnectTool
@@ -26,10 +27,11 @@ namespace MinecraftConnectTool
             AntdUI.Config.ShowInWindow = true;
             AntdUI.Config.IsDark = false;
         }
-        public static readonly string version = "0.0.6.092";
+        public static readonly string version = "0.0.6.104";
         public static readonly string designation = "黎那汐塔的终章_摘自 鸣潮2.7";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变
+        public static readonly bool dark = false; //临时开关
         public static readonly bool ISNMode = false;
         public static readonly bool EnableReceiveNMode = false;
         public static Dictionary<Type, Control> GlobalCache = new Dictionary<Type, Control>(); //缓存字典
@@ -100,7 +102,13 @@ namespace MinecraftConnectTool
             }
             if (!File.Exists(Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "Probe")))
                 _ = Probe.SendAsync();
+            bool EnableVersionCheck = Form1.config.read<bool>("EnableVersionCheck", true);
+            if (EnableVersionCheck)
+            {
+                Task.Run(() => supportcheck.Check());
+            }
         }
+        
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
         {
             string tag;

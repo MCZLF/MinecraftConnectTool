@@ -198,6 +198,7 @@
       <DependentUpon>ZTLobby.cs</DependentUpon>
     </Compile>
     <Compile Include="Plugins\TcpPing.cs" />
+    <Compile Include="supportcheck.cs" />
     <EmbeddedResource Include="bar\wheather.resx">
       <DependentUpon>wheather.cs</DependentUpon>
     </EmbeddedResource>

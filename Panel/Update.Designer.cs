@@ -33,13 +33,13 @@
             this.alert1 = new AntdUI.Alert();
             this.label1 = new AntdUI.Label();
             this.alert2 = new AntdUI.Alert();
+            this.button5 = new AntdUI.Button();
+            this.button4 = new AntdUI.Button();
             this.label2 = new AntdUI.Label();
             this.label3 = new AntdUI.Label();
             this.label4 = new AntdUI.Label();
             this.button3 = new AntdUI.Button();
             this.progress1 = new AntdUI.Progress();
-            this.button4 = new AntdUI.Button();
-            this.button5 = new AntdUI.Button();
             this.alert2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,6 +115,30 @@
             this.alert2.TextTitle = "";
             this.alert2.Click += new System.EventHandler(this.alert2_Click);
             // 
+            // button5
+            // 
+            this.button5.Ghost = true;
+            this.button5.IconRatio = 0.8F;
+            this.button5.IconSvg = "DownCircleOutlined";
+            this.button5.Location = new System.Drawing.Point(366, 302);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(32, 32);
+            this.button5.TabIndex = 46;
+            this.button5.Visible = false;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button4
+            // 
+            this.button4.Ghost = true;
+            this.button4.IconRatio = 0.8F;
+            this.button4.IconSvg = "UpCircleOutlined";
+            this.button4.Location = new System.Drawing.Point(366, 271);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(32, 32);
+            this.button4.TabIndex = 0;
+            this.button4.Visible = false;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // label2
             // 
             this.label2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -172,30 +196,6 @@
             this.progress1.TabIndex = 45;
             this.progress1.Text = "progress1";
             this.progress1.Visible = false;
-            // 
-            // button4
-            // 
-            this.button4.Ghost = true;
-            this.button4.IconRatio = 0.8F;
-            this.button4.IconSvg = "UpCircleOutlined";
-            this.button4.Location = new System.Drawing.Point(366, 271);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(32, 32);
-            this.button4.TabIndex = 0;
-            this.button4.Visible = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // button5
-            // 
-            this.button5.Ghost = true;
-            this.button5.IconRatio = 0.8F;
-            this.button5.IconSvg = "DownCircleOutlined";
-            this.button5.Location = new System.Drawing.Point(366, 302);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(32, 32);
-            this.button5.TabIndex = 46;
-            this.button5.Visible = false;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // Update
             // 

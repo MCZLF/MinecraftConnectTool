@@ -67,6 +67,8 @@
             this.button16 = new AntdUI.Button();
             this.button18 = new AntdUI.Button();
             this.button_mclogs = new AntdUI.Button();
+            this.label6 = new AntdUI.Label();
+            this.switch6 = new AntdUI.Switch();
             this.SuspendLayout();
             // 
             // alert1
@@ -342,7 +344,7 @@
             this.button9.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button9.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button9.IconSvg = "SafetyCertificateOutlined";
-            this.button9.Location = new System.Drawing.Point(310, 158);
+            this.button9.Location = new System.Drawing.Point(310, 180);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(152, 50);
             this.button9.TabIndex = 38;
@@ -376,7 +378,7 @@
             this.button10.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button10.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button10.IconSvg = "BuildFilled";
-            this.button10.Location = new System.Drawing.Point(310, 214);
+            this.button10.Location = new System.Drawing.Point(310, 233);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(152, 50);
             this.button10.TabIndex = 41;
@@ -389,7 +391,7 @@
             this.button11.DefaultBack = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(121)))));
             this.button11.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button11.IconSvg = "PoweroffOutlined";
-            this.button11.Location = new System.Drawing.Point(462, 220);
+            this.button11.Location = new System.Drawing.Point(462, 239);
             this.button11.Name = "button11";
             this.button11.Radius = 50;
             this.button11.Size = new System.Drawing.Size(43, 40);
@@ -566,10 +568,32 @@
             this.button_mclogs.Visible = false;
             this.button_mclogs.Click += new System.EventHandler(this.button_mclogs_Click);
             // 
+            // label6
+            // 
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(350, 156);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(122, 23);
+            this.label6.TabIndex = 59;
+            this.label6.Text = "启用检查版本支持";
+            // 
+            // switch6
+            // 
+            this.switch6.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch6.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch6.Location = new System.Drawing.Point(310, 156);
+            this.switch6.Name = "switch6";
+            this.switch6.Size = new System.Drawing.Size(34, 23);
+            this.switch6.TabIndex = 58;
+            this.switch6.UnCheckedText = "";
+            this.switch6.CheckedChanged += new AntdUI.BoolEventHandler(this.switch6_CheckedChanged);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.switch6);
             this.Controls.Add(this.button_mclogs);
             this.Controls.Add(this.button18);
             this.Controls.Add(this.button16);
@@ -656,5 +680,7 @@
         private AntdUI.Button button16;
         private AntdUI.Button button18;
         private AntdUI.Button button_mclogs;
+        private AntdUI.Label label6;
+        private AntdUI.Switch switch6;
     }
 }

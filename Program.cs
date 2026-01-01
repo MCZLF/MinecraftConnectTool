@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -59,7 +60,7 @@ namespace MinecraftConnectTool
             Application.Run(MainForm);
         }
 
-        // 全局变量定义
+        // 全局方法
         public static int admin = 0;
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {

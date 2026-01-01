@@ -946,7 +946,7 @@ namespace MinecraftConnectTool
 
         private void ReadPeerConfig()
         {
-            log("ReadPeerConfig 被调用");
+            //log("ReadPeerConfig 被调用");
             //读取开关配置
             try
             {
@@ -954,37 +954,37 @@ namespace MinecraftConnectTool
                     Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
                     "MCZLFAPP", "Temp", "config.json");
 
-                log($"configPath={configPath}");
+                //log($"configPath={configPath}");
                 if (!File.Exists(configPath))
                 {
-                    log("config.json 不存在，直接返回");
+                    //log("config.json 不存在，直接返回");
                     return;
                 }
                 string json = File.ReadAllText(configPath, Encoding.UTF8);
-                log($"json长度={json.Length}");
+                //log($"json长度={json.Length}");
                 var root = JObject.Parse(json);
                 var app = root["apps"]?[0];
-                log($"apps[0]为null? {app == null}");
+                //log($"apps[0]为null? {app == null}");
                 if (app == null) return;
 
                 string peerNode = app["PeerNode"]?.Value<string>();
                 int? dstPort = app["DstPort"]?.Value<int>();
 
-                log($"peerNode={peerNode}, dstPort={dstPort}");
+                //log($"peerNode={peerNode}, dstPort={dstPort}");
 
                 if (!string.IsNullOrWhiteSpace(peerNode) && dstPort.HasValue)
                 {
+                    if (!peerNode.TrimEnd().EndsWith("FO") && !peerNode.TrimEnd().EndsWith("HH") && !peerNode.TrimEnd().EndsWith("DD")) return;
                     port = dstPort.Value.ToString();
                     user = peerNode;
-                    //判断是否是[非每次更新]的选项决定是否赋值
-                    //...咕咕咕，先留个注释，这周没空了
                     materialSingleLineTextField2.Text = user;
                     materialSingleLineTextField3.Text = port;
+                    log($"已读取到固定配置,提示码{user}|端口{port}");
                 }
             }
             catch (Exception ex)
             {
-                log($"ReadPeerConfig 异常：{ex}");
+                try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini"), $"ReadPeerConfig 异常：{ex}"); } catch { }
             }
         }
         private void richTextBoxLog_TextChanged_1(object sender, EventArgs e)

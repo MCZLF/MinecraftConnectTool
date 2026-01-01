@@ -42,6 +42,7 @@
             this.input1 = new AntdUI.Input();
             this.label2 = new AntdUI.Label();
             this.switch1 = new AntdUI.Switch();
+            this.button1 = new AntdUI.Button();
             this.divider1.SuspendLayout();
             this.divider2.SuspendLayout();
             this.SuspendLayout();
@@ -240,10 +241,21 @@
             this.switch1.UnCheckedText = "";
             this.switch1.CheckedChanged += new AntdUI.BoolEventHandler(this.switch1_CheckedChanged);
             // 
-            // infoEdit
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button1.Location = new System.Drawing.Point(132, 95);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(23, 23);
+            this.button1.TabIndex = 62;
+            this.button1.Text = "?";
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // InviteinfoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.savebut);
             this.Controls.Add(this.input1);
@@ -256,7 +268,7 @@
             this.Controls.Add(this.dropdown1);
             this.Controls.Add(this.divider1);
             this.Controls.Add(this.materialFlatButton1);
-            this.Name = "infoEdit";
+            this.Name = "InviteinfoEdit";
             this.Size = new System.Drawing.Size(307, 455);
             this.Load += new System.EventHandler(this.infoEdit_Load);
             this.divider1.ResumeLayout(false);
@@ -282,5 +294,6 @@
         private AntdUI.Input input1;
         private AntdUI.Label label2;
         private AntdUI.Switch switch1;
+        private AntdUI.Button button1;
     }
 }

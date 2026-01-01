@@ -156,9 +156,8 @@ namespace MinecraftConnectTool
                 {
                     AntdUI.Message.error(Program.MainForm, $"网络异常", autoClose: 5, font: Program.AlertFont); return;
                 }
-
                 Form1.config.write("usecustomnode", true);
-                Form1.config.write("customnode", input2.Text);
+                Form1.config.write("customnode", $"{input2.Text}FO");
             }
             else if (dropdown1.Text == "永久")
             {
@@ -247,5 +246,17 @@ namespace MinecraftConnectTool
             savebut.Visible = false;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Info", "自定义加入方的端口\n开启后可将提示码固定为[输入的文本FO]\n\nFO是选项[永久]的标记符,于0.0.6.103版本加入强制FO结尾\n可在编辑配置文件中手动去除FO,但对应的自动识别永久提示码功能也将失效", AntdUI.TType.Info)
+            {
+                CloseIcon = true,
+                Font = Program.AlertFont,
+                Draggable = false,
+                CancelText = null,
+                OkText = "好的"
+            });
+
+        }
     }
 }

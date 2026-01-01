@@ -65,7 +65,7 @@ namespace MinecraftConnectTool
                 int codeupate = Form1.config.read<int>("codeupdate", 1);//自定义提示码更新时间
                 if (codeupate == 1)
                 { tsm = $"{localName}{randomPort}"; }
-                else if (codeupate == 2) { tsm = $"{localName}{DateTime.Now:yyyyMMddHH}H"; } else if (codeupate == 3) { tsm = $"{localName}{DateTime.Now:yyyyMMdd}D"; }
+                else if (codeupate == 2) { tsm = $"{localName}{DateTime.Now:yyyyMMddHH}HH"; } else if (codeupate == 3) { tsm = $"{localName}{DateTime.Now:yyyyMMdd}DD"; }
                 else if (codeupate == 4) //永久
                 {
                     if (Form1.config.read<bool>("usecustomnode", false))

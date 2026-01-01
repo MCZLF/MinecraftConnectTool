@@ -97,11 +97,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Plugins\Probe.cs" />
-    <Compile Include="RightPanel\infoEdit.cs">
+    <Compile Include="RightPanel\InviteinfoEdit.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="RightPanel\infoEdit.Designer.cs">
-      <DependentUpon>infoEdit.cs</DependentUpon>
+    <Compile Include="RightPanel\InviteinfoEdit.Designer.cs">
+      <DependentUpon>InviteinfoEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="RightPanel\AdvancedSettings.cs">
       <SubType>UserControl</SubType>
@@ -247,8 +247,8 @@
     <EmbeddedResource Include="Panel\P2PLog.resx">
       <DependentUpon>P2PLog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="RightPanel\infoEdit.resx">
-      <DependentUpon>infoEdit.cs</DependentUpon>
+    <EmbeddedResource Include="RightPanel\InviteinfoEdit.resx">
+      <DependentUpon>InviteinfoEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RightPanel\relayserver.resx">
       <DependentUpon>relayserver.cs</DependentUpon>

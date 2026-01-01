@@ -1,6 +1,6 @@
 ﻿namespace MinecraftConnectTool
 {
-    partial class infoEdit
+    partial class InviteinfoEdit
     {
         /// <summary> 
         /// 必需的设计器变量。

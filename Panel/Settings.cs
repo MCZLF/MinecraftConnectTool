@@ -1052,7 +1052,7 @@ namespace MinecraftConnectTool
 
         private void button18_Click(object sender, EventArgs e)
         {
-            AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, new infoEdit() { Size = new Size(307, 455) })
+            AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, new InviteinfoEdit() { Size = new Size(307, 455) })
             {
                 Align = TAlignMini.Right,
                 Mask = true,

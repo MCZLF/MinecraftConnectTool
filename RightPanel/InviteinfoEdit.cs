@@ -12,9 +12,9 @@ using System.Windows.Forms;
 
 namespace MinecraftConnectTool
 {
-    public partial class infoEdit : UserControl
+    public partial class InviteinfoEdit : UserControl
     {
-        public infoEdit()
+        public InviteinfoEdit()
         {
             InitializeComponent();
             InitializeDropdown();

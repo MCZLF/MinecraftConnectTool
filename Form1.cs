@@ -26,8 +26,8 @@ namespace MinecraftConnectTool
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
         }
-        public static readonly string version = "0.0.6.104ColorTest";
-        public static readonly string designation = "黎那汐塔的终章_摘自 鸣潮2.7";
+        public static readonly string version = "0.0.6.103";
+        public static readonly string designation = "我们生而眺望_摘自 鸣潮3.0";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变
         public static readonly bool dark = false; //临时开关

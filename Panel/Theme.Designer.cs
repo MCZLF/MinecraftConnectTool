@@ -62,6 +62,7 @@
             this.label14 = new AntdUI.Label();
             this.label15 = new AntdUI.Label();
             this.switch6 = new AntdUI.Switch();
+            this.button17 = new AntdUI.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -413,10 +414,27 @@
             this.switch6.UnCheckedText = "";
             this.switch6.CheckedChanged += new AntdUI.BoolEventHandler(this.switch6_CheckedChanged);
             // 
+            // button17
+            // 
+            this.button17.BackHover = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(188)))), ((int)(((byte)(188)))));
+            this.button17.BadgeAlign = AntdUI.TAlignFrom.Bottom;
+            this.button17.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button17.DefaultBack = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(212)))), ((int)(((byte)(224)))));
+            this.button17.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button17.IconRatio = 0.75F;
+            this.button17.IconSvg = "EditOutlined";
+            this.button17.Location = new System.Drawing.Point(277, 240);
+            this.button17.Name = "button17";
+            this.button17.Size = new System.Drawing.Size(200, 50);
+            this.button17.TabIndex = 62;
+            this.button17.Text = "编辑主题文件";
+            this.button17.Click += new System.EventHandler(this.button17_Click);
+            // 
             // Theme
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.button17);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.switch6);
             this.Controls.Add(this.label14);
@@ -495,5 +513,6 @@
         private AntdUI.Label label14;
         private AntdUI.Label label15;
         private AntdUI.Switch switch6;
+        private AntdUI.Button button17;
     }
 }

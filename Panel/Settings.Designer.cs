@@ -595,12 +595,13 @@
             this.button17.BadgeAlign = AntdUI.TAlignFrom.Bottom;
             this.button17.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button17.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button17.IconSvg = "SettingOutlined";
+            this.button17.IconRatio = 0.75F;
+            this.button17.IconSvg = "BgColorsOutlined";
             this.button17.Location = new System.Drawing.Point(44, 241);
             this.button17.Name = "button17";
             this.button17.Size = new System.Drawing.Size(200, 50);
             this.button17.TabIndex = 60;
-            this.button17.Text = "高级设置";
+            this.button17.Text = "主题自定义";
             this.button17.Click += new System.EventHandler(this.button17_Click);
             // 
             // Settings

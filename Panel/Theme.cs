@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace MinecraftConnectTool
@@ -187,6 +188,24 @@ namespace MinecraftConnectTool
             {
                 Form1.config.write("EnableATDDark", false);
                 switch6.Checked = false;
+            }
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var dir = Path.Combine(Path.GetTempPath(), "MCZLFAPP");
+                Directory.CreateDirectory(dir);
+                var json = Path.Combine(dir, "theme.json");
+
+                if (!File.Exists(json)) File.WriteAllText(json, "{}", Encoding.UTF8);
+                Process.Start("notepad.exe", json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("打开配置文件失败：\n" + ex.Message,
+                               "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -25,7 +25,6 @@ namespace MinecraftConnectTool
             this.Shown += new EventHandler(Form1_Shown);
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
-            AntdUI.Config.IsDark = false; //临时true
         }
         public static readonly string version = "0.0.6.104ColorTest";
         public static readonly string designation = "黎那汐塔的终章_摘自 鸣潮2.7";
@@ -113,7 +112,11 @@ namespace MinecraftConnectTool
                 MessageBox.Show($"主题加载失败：\n{ex}",
                                 "启动错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-        }
+            bool EnableATDDark = Form1.config.read<bool>("EnableATDDark", false);
+            if (EnableATDDark)
+            {
+                AntdUI.Config.IsDark = true; }
+            }
 
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
         {

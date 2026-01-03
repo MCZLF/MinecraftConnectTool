@@ -576,6 +576,7 @@
             this.label6.Size = new System.Drawing.Size(122, 23);
             this.label6.TabIndex = 59;
             this.label6.Text = "启用检查版本支持";
+            this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
             // switch6
             // 

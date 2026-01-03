@@ -60,6 +60,8 @@
             this.label13 = new AntdUI.Label();
             this.switch2 = new AntdUI.Switch();
             this.label14 = new AntdUI.Label();
+            this.label15 = new AntdUI.Label();
+            this.switch6 = new AntdUI.Switch();
             this.SuspendLayout();
             // 
             // label1
@@ -391,10 +393,32 @@
             this.label14.TabIndex = 31;
             this.label14.Text = "启用自定义主题";
             // 
+            // label15
+            // 
+            this.label15.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label15.Location = new System.Drawing.Point(303, 17);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(153, 23);
+            this.label15.TabIndex = 61;
+            this.label15.Text = "AntdUI.Dark(实验性)";
+            // 
+            // switch6
+            // 
+            this.switch6.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch6.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch6.Location = new System.Drawing.Point(263, 17);
+            this.switch6.Name = "switch6";
+            this.switch6.Size = new System.Drawing.Size(34, 23);
+            this.switch6.TabIndex = 60;
+            this.switch6.UnCheckedText = "";
+            this.switch6.CheckedChanged += new AntdUI.BoolEventHandler(this.switch6_CheckedChanged);
+            // 
             // Theme
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.switch6);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.switch2);
             this.Controls.Add(this.colorPicker13);
@@ -469,5 +493,7 @@
         private AntdUI.Label label13;
         private AntdUI.Switch switch2;
         private AntdUI.Label label14;
+        private AntdUI.Label label15;
+        private AntdUI.Switch switch6;
     }
 }

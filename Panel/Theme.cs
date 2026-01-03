@@ -91,6 +91,11 @@ namespace MinecraftConnectTool
             colorPicker12.Value = ShowConfig.Read("UpdateButton");
             colorPicker11.Value = ShowConfig.Read("CandyButton");
             colorPicker13.Value = ShowConfig.Read("CandyInput");
+            bool EnableATDDark = Form1.config.read<bool>("EnableATDDark", false);
+            if (EnableATDDark)
+            {
+                switch6.Checked = true;
+            }
         }
 
         private void colorPicker2_ValueChanged(object sender, ColorEventArgs e)
@@ -168,6 +173,20 @@ namespace MinecraftConnectTool
                 Form1.config.write("EnableColor", false);
                 switch2.Checked = false;
                 label14.Visible = true;
+            }
+        }
+
+        private void switch6_CheckedChanged(object sender, BoolEventArgs e)
+        {
+            if (switch6.Checked)
+            {
+                Form1.config.write("EnableATDDark", true);
+                switch6.Checked = true;
+            }
+            else
+            {
+                Form1.config.write("EnableATDDark", false);
+                switch6.Checked = false;
             }
         }
     }

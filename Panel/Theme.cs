@@ -140,12 +140,14 @@ namespace MinecraftConnectTool
         {
             if (switch1.Checked)
             {
+                colorPicker4.Enabled = false;
                 uploadDragger1.Visible = true;
                 ThemeConfig.Write("BackPNG", "True");
                 switch1.Checked = true;
             }
             else
             {
+                colorPicker4.Enabled = true;
                 switch1.Checked = false;
                 ThemeConfig.Write("BackPNG", "False");
                 ThemeConfig.Write("BackPNGAdd", "");

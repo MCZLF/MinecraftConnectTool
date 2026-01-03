@@ -1,19 +1,20 @@
-﻿using System;
+﻿using AntdUI;
+using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Management;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using AntdUI;
-using System.IO;
-using System.Net;
-using System.Security.Cryptography;
-using System.Drawing;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
-using System.Net.Sockets;
 
 namespace MinecraftConnectTool
 {
@@ -473,6 +474,7 @@ namespace MinecraftConnectTool
         //Set加载
         private void Settings_Load(object sender, EventArgs e)
         {
+            color();
             bool EnableVersionCheck = Form1.config.read<bool>("EnableVersionCheck", true);
             if (EnableVersionCheck)
             {
@@ -540,6 +542,7 @@ namespace MinecraftConnectTool
                 AntdUI.Message.error(Program.MainForm, $"[调试信息]Bar = {barload}，Bar不显示", autoClose: 5, font: P2PFont);
                 badge1.State = TState.Error;
             }
+            color();
         }
 
         private void checkbox1_CheckedChanged(object sender, BoolEventArgs e)
@@ -1134,7 +1137,7 @@ Version: {Form1.version}
 
         private void switch6_CheckedChanged(object sender, BoolEventArgs e)
         {
-            if (switch4.Checked)
+            if (switch6.Checked)
             {
                 Form1.config.write("EnableVersionCheck", true);
                 switch6.Checked = true;
@@ -1144,6 +1147,61 @@ Version: {Form1.version}
                 Form1.config.write("EnableVersionCheck", false);
                 switch6.Checked = false;
             }
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, new Theme() { Size = new Size(730, 445) })
+            {
+                Align = TAlignMini.Right,
+                Mask = true,
+                MaskClosable = true,
+                DisplayDelay = 0
+            });
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
+            {var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
+            foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+            {
+                ApplyColor("UpdateButton", c => btn.BackColor = c);
+                ApplyColor("UpdateButton", c => btn.DefaultBack = c);
+            }
+            }
+            
         }
     }
 }

@@ -25,9 +25,9 @@ namespace MinecraftConnectTool
             this.Shown += new EventHandler(Form1_Shown);
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
-            AntdUI.Config.IsDark = false;
+            AntdUI.Config.IsDark = false; //临时true
         }
-        public static readonly string version = "0.0.6.104";
+        public static readonly string version = "0.0.6.104ColorTest";
         public static readonly string designation = "黎那汐塔的终章_摘自 鸣潮2.7";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变
@@ -50,9 +50,9 @@ namespace MinecraftConnectTool
             bool nonotifywhenstart = Form1.config.read<bool>("nonotifywhenstart", false);
             if (nonotifywhenstart) { }
             else
-            {   
-            AntdUI.Notification.info((Form)this, "info", "欢迎使用Minecraft Connect Tool~", align: AntdUI.TAlignFrom.BR, font: formfont);
-            //AntdUI.Notification.success((Form)this, "info", "成功的加载了ToastNotification3", align: AntdUI.TAlignFrom.BR, font: formfont);
+            {
+                AntdUI.Notification.info((Form)this, "info", "欢迎使用Minecraft Connect Tool~", align: AntdUI.TAlignFrom.BR, font: formfont);
+                //AntdUI.Notification.success((Form)this, "info", "成功的加载了ToastNotification3", align: AntdUI.TAlignFrom.BR, font: formfont);
             }
             if (version.Contains("测试版本"))
             {
@@ -107,8 +107,14 @@ namespace MinecraftConnectTool
             {
                 Task.Run(() => supportcheck.Check());
             }
+            try { color(); }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"主题加载失败：\n{ex}",
+                                "启动错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
-        
+
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
         {
             string tag;
@@ -136,6 +142,7 @@ namespace MinecraftConnectTool
                 case "ZTHome":
                     LoadPanel(panel, typeof(ZTLobby));
                     AntdUI.Message.warn(Program.MainForm, $"当前服务UI尚未完成,功能能用但也尚未完善", autoClose: 5, font: formfont);
+                    AntdUI.Message.warn(Program.MainForm, $"有空一定做(咕咕咕)", autoClose: 5, font: formfont);
                     break;
                 case "Update":
                     LoadPanel(panel, typeof(Update));
@@ -183,18 +190,18 @@ namespace MinecraftConnectTool
         private void Form1_Load(object sender, EventArgs e)
         {
             PageHeader.SubText = version;
-            if(Program.admin == 2)
+            if (Program.admin == 2)
             { Console.WriteLine("非管理员启动"); }
             else { Console.WriteLine("管理员模式"); }
             ;
             bool goupd = config.read<bool>("goupdatewhenstart");
             int bar = config.read<int>("Bar", 1);
             if (goupd)
-            {            
-            LoadPanel(panel, typeof(Update));
-            }            
-            else            
-            {LoadPanel(panel, typeof(P2PMode));}
+            {
+                LoadPanel(panel, typeof(Update));
+            }
+            else
+            { LoadPanel(panel, typeof(P2PMode)); }
             if (bar == 1)
             {
                 LoadPanel(panelbar, typeof(lanload));
@@ -235,7 +242,7 @@ namespace MinecraftConnectTool
                 Enabled = true,
                 Loading = false
                 }}, _ => stopp2p())
-                {
+            {
                 Align = TAlign.BR,
                 Vertical = true,
                 TopMost = false,
@@ -418,7 +425,7 @@ namespace MinecraftConnectTool
                         : new JObject();
                     if (config[key] != null)
                     {
-                        config.Remove(key); 
+                        config.Remove(key);
                         File.WriteAllText(ConfigFilePath, config.ToString(Formatting.Indented));
                     }
                     else
@@ -506,6 +513,7 @@ namespace MinecraftConnectTool
         {
 
         }
+
 
         private async void button_mclogs_Click(object sender, EventArgs e)
         {
@@ -597,6 +605,49 @@ SysVersion:{SystemEvVersion}
             {
                 MessageBox.Show($"上传失败：{ex.Message}", "云日志上传", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 button_mclogs.Loading = false;
+            }
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color() 
+        {
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
+            {var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
+            ApplyColor("Title", c => PageHeader.DividerColor = c);
+            ApplyColor("Title", c => PageHeader.BackColor = c);
+            ApplyColor("LeftMenu", c => input_search.BackColor = c);
+            ApplyColor("LeftMenu", c => menu1.BackColor = c);
+            ApplyColor("LeftMenuHover", c => menu1.BackHover = c);
             }
         }
     }

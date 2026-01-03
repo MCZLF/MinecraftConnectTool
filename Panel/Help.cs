@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AntdUI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AntdUI;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MinecraftConnectTool
 {
@@ -29,6 +30,7 @@ namespace MinecraftConnectTool
             string targetPath = Path.Combine(tempPath, "MCZLFAPP", "Temp");
             if (!Directory.Exists(targetPath))
             {Directory.CreateDirectory(targetPath);}
+            color();
         }
         private string GetGreetingMessage(string userName)
         {
@@ -93,5 +95,49 @@ namespace MinecraftConnectTool
             string backInfo = customModal.ShowModal(Program.MainForm, "请输入柠檬寂寞大核弹");
             MessageBox.Show("返回的输入内容为：" + backInfo); // 显示返回的输入内容
         }
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
+            {
+                var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+                if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+                {
+                    try
+                    {
+                        // 只读、不锁文件；按需缩放
+                        using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                        using (var src = Image.FromStream(fs))
+                        {
+                            // 缩到窗口大小（保持比例）
+                            var sz = this.ClientSize;
+                            this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                        }
+                    }
+                    catch { this.BackgroundImage = null; }
+                }
+                else
+                {
+                    this.BackgroundImage = null;
+                    ApplyColor("P2PBack", c => this.BackColor = c);
+                }
+                foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+                {
+                    ApplyColor("P2PButton", c => btn.BackColor = c);
+                    ApplyColor("P2PButton", c => btn.DefaultBack = c);
+                }
+            }
+        }
+
     }
 }

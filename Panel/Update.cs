@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MinecraftConnectTool
 {
@@ -25,6 +26,7 @@ namespace MinecraftConnectTool
         private void Update_Load(object sender, EventArgs e)
         {
             LoadVersion();
+            color();
             button3.Enabled = false;
             button1.PerformClick();
             bool EnableReceiveNMode = Form1.EnableReceiveNMode;
@@ -207,7 +209,7 @@ namespace MinecraftConnectTool
         // 异步方法获取云版本
         private async Task<string> FetchCloudVersionAsync()
         {
-            await Spin.open(this, config =>
+            await AntdUI.Spin.open(this, config =>
             {
                 config.Text = "正在检查更新...";
                 config.Color = Color.Blue;
@@ -236,7 +238,7 @@ namespace MinecraftConnectTool
             }
             finally
             {
-                await Spin.open(this, config => { }, end: () => { });
+                await AntdUI.Spin.open(this, config => { }, end: () => { });
             }
         }
         private void button2_Click(object sender, EventArgs e)
@@ -433,6 +435,46 @@ namespace MinecraftConnectTool
         private void label3_Click(object sender, EventArgs e)
         {
 
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
+            foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+            {
+                ApplyColor("SettingButtonColor", c => btn.BackColor = c);
+                ApplyColor("SettingButtonColor", c => btn.DefaultBack = c);
+            }
         }
     }
 }

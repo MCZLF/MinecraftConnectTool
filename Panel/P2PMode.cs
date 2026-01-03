@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MinecraftConnectTool
 {
@@ -942,6 +943,7 @@ namespace MinecraftConnectTool
             if (Testchannel) { TopText.Text = "您正在使用P2P模式进行联机ヾ(≧▽≦*)o(测试)";
             tokenNormal = "7196174974940052261";//Token重复值
             }
+            color();
         }
 
         private void ReadPeerConfig()
@@ -1715,6 +1717,61 @@ namespace MinecraftConnectTool
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
+            {//var enabled = ThemeConfig.ReadBool("BackPNG");
+            //var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            //AntdUI.Message.info(this.FindForm(),
+            //    $"[BackPNG] Enabled={enabled}\n" +
+            //    $"[BackPNG] Path={imgPath}\n" +
+            //    $"[BackPNG] FileExist={File.Exists(imgPath)}");
+            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
+            ApplyColor("P2PBack", c => TopText.BackColor = c);
+            ApplyColor("P2PButton", c => Joiner.BackColor = c);
+            ApplyColor("P2PButton", c => button1.BackColor = c);
+            ApplyColor("P2PButton", c => button1.DefaultBack = c);
+            ApplyColor("P2PButton", c => Opener.BackColor = c);
+            ApplyColor("P2PButton", c => Joiner.DefaultBack = c);
+            ApplyColor("P2PButton", c => Opener.DefaultBack = c);
+            ApplyColor("P2PMTWrite", c => materialSingleLineTextField2.BackColor = c);
+            ApplyColor("P2PMTWrite", c => materialSingleLineTextField3.BackColor = c);
+            ApplyColor("P2PLogBack", c => richTextBoxLog.BackColor = c);
+            }
+            
         }
     }
 }

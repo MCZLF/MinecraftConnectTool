@@ -31,6 +31,7 @@ namespace MinecraftConnectTool
         private void ZTLobby_Load(object sender, EventArgs e)
         {
             log("大概率废了，效果一直不达预期");
+            color();
         }
 
         private async void create_Click(object sender, EventArgs e)
@@ -505,6 +506,50 @@ namespace MinecraftConnectTool
         private void button3_Click(object sender, EventArgs e)
         {
             Process.Start("https://mct.mczlf.loft.games/quick-start/candyhelp");
+        }
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+                ApplyColor("P2PBack", c => TopText.BackColor = c);
+            }
+            foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+            {
+                ApplyColor("CandyButton", c => btn.BackColor = c);
+                ApplyColor("CandyButton", c => btn.DefaultBack = c);
+            }
+            foreach (var btn in this.Controls.OfType<AntdUI.Input>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+            {
+                ApplyColor("CandyInput", c => btn.BackColor = c);
+            }
         }
     }
 }

@@ -21,7 +21,50 @@ namespace MinecraftConnectTool
 
         private void P2PLog_Load(object sender, EventArgs e)
         {
+            color();
             LoadEntireFileToRichTextBox();
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
+            ApplyColor("P2PBack", c => button1.BackColor = c);
+            ApplyColor("P2PBack", c => button1.DefaultBack = c);
+            ApplyColor("P2PBack", c => button2.BackColor = c);
+            ApplyColor("P2PBack", c => button2.DefaultBack = c);
+            ApplyColor("P2PBack", c => button3.BackColor = c);
+            ApplyColor("P2PBack", c => button3.DefaultBack = c);
+            ApplyColor("LogPanelBack", c => richTextBox1.BackColor = c);
         }
         private void LoadEntireFileToRichTextBox()
         {

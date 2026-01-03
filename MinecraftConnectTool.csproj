@@ -198,7 +198,13 @@
       <DependentUpon>ZTLobby.cs</DependentUpon>
     </Compile>
     <Compile Include="Plugins\TcpPing.cs" />
-    <Compile Include="supportcheck.cs" />
+    <Compile Include="Plugins\supportcheck.cs" />
+    <Compile Include="Panel\Theme.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\Theme.Designer.cs">
+      <DependentUpon>Theme.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="bar\wheather.resx">
       <DependentUpon>wheather.cs</DependentUpon>
     </EmbeddedResource>
@@ -207,6 +213,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Panel\Help.resx">
       <DependentUpon>Help.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panel\Theme.resx">
+      <DependentUpon>Theme.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RightPanel\AdvancedSettings.resx">
       <DependentUpon>AdvancedSettings.cs</DependentUpon>

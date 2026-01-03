@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AntdUI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +17,7 @@ namespace MinecraftConnectTool
         public P2PQNA()
         {
             InitializeComponent();
+            color();
         }
         public static Font P2PFont { get; } = new Font("Microsoft YaHei UI", 9f);
         private void label3_Click(object sender, EventArgs e)
@@ -78,6 +80,21 @@ namespace MinecraftConnectTool
         private void collapse1_ExpandChanged(object sender, AntdUI.CollapseExpandEventArgs e)
         {
 
+        }
+        //colorUI
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+        private void color()
+        {
+            ApplyColor("P2PBack", c => this.BackColor = c);
         }
     }
 }

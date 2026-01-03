@@ -41,11 +41,11 @@
             this.panel = new AntdUI.Panel();
             this.panelbar = new AntdUI.Panel();
             this.PageHeader = new AntdUI.PageHeader();
+            this.input_search = new AntdUI.Input();
+            this.button_mclogs = new AntdUI.Button();
             this.button1 = new AntdUI.Button();
             this.button_color = new AntdUI.Button();
             this.buttonSZ = new AntdUI.Button();
-            this.button_mclogs = new AntdUI.Button();
-            this.input_search = new AntdUI.Input();
             this.PageHeader.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -138,6 +138,33 @@
             this.PageHeader.Text = "MinecraftConnectTool";
             this.PageHeader.Click += new System.EventHandler(this.PageHeader_Click);
             // 
+            // input_search
+            // 
+            this.input_search.AllowClear = true;
+            this.input_search.Dock = System.Windows.Forms.DockStyle.Right;
+            this.input_search.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            this.input_search.LocalizationPlaceholderText = "search";
+            this.input_search.Location = new System.Drawing.Point(405, 0);
+            this.input_search.Name = "input_search";
+            this.input_search.PlaceholderText = "搜索";
+            this.input_search.PrefixSvg = "SearchOutlined";
+            this.input_search.Size = new System.Drawing.Size(200, 40);
+            this.input_search.TabIndex = 8;
+            // 
+            // button_mclogs
+            // 
+            this.button_mclogs.Dock = System.Windows.Forms.DockStyle.Right;
+            this.button_mclogs.Ghost = true;
+            this.button_mclogs.IconRatio = 0.65F;
+            this.button_mclogs.IconSvg = "CloudUploadOutlined";
+            this.button_mclogs.Location = new System.Drawing.Point(605, 0);
+            this.button_mclogs.Name = "button_mclogs";
+            this.button_mclogs.Radius = 0;
+            this.button_mclogs.Size = new System.Drawing.Size(50, 40);
+            this.button_mclogs.TabIndex = 7;
+            this.button_mclogs.WaveSize = 0;
+            this.button_mclogs.Click += new System.EventHandler(this.button_mclogs_Click);
+            // 
             // button1
             // 
             this.button1.Dock = System.Windows.Forms.DockStyle.Right;
@@ -179,33 +206,6 @@
             this.buttonSZ.TabIndex = 0;
             this.buttonSZ.WaveSize = 0;
             this.buttonSZ.Click += new System.EventHandler(this.buttonSZ_Click);
-            // 
-            // button_mclogs
-            // 
-            this.button_mclogs.Dock = System.Windows.Forms.DockStyle.Right;
-            this.button_mclogs.Ghost = true;
-            this.button_mclogs.IconRatio = 0.65F;
-            this.button_mclogs.IconSvg = "CloudUploadOutlined";
-            this.button_mclogs.Location = new System.Drawing.Point(605, 0);
-            this.button_mclogs.Name = "button_mclogs";
-            this.button_mclogs.Radius = 0;
-            this.button_mclogs.Size = new System.Drawing.Size(50, 40);
-            this.button_mclogs.TabIndex = 7;
-            this.button_mclogs.WaveSize = 0;
-            this.button_mclogs.Click += new System.EventHandler(this.button_mclogs_Click);
-            // 
-            // input_search
-            // 
-            this.input_search.AllowClear = true;
-            this.input_search.Dock = System.Windows.Forms.DockStyle.Right;
-            this.input_search.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            this.input_search.LocalizationPlaceholderText = "search";
-            this.input_search.Location = new System.Drawing.Point(405, 0);
-            this.input_search.Name = "input_search";
-            this.input_search.PlaceholderText = "搜索";
-            this.input_search.PrefixSvg = "SearchOutlined";
-            this.input_search.Size = new System.Drawing.Size(200, 40);
-            this.input_search.TabIndex = 8;
             // 
             // Form1
             // 

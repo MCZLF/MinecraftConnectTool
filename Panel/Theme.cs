@@ -50,9 +50,8 @@ namespace MinecraftConnectTool
                 return;
             ThemeConfig.Write("BackPNG", "True");
             ThemeConfig.Write("BackPNGAdd", path);
-            Program.alertwarn($"DEBUG:{path}");  // 父窗口弹提示
+            //Program.alertwarn($"DEBUG:{path}");
             //GETPATHSuccess
-
         }
 
         private void colorPicker1_ValueChanged(object sender, AntdUI.ColorEventArgs e)

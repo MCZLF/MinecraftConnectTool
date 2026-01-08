@@ -374,7 +374,7 @@ namespace MinecraftConnectTool
             try
             {
                 string tempPath = Environment.GetEnvironmentVariable("TEMP");
-                string targetFolder = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+                string targetFolder = Path.Combine(tempPath, "MCZLFAPP");
 
                 // 检查目标文件夹是否存在
                 if (Directory.Exists(targetFolder))
@@ -412,17 +412,29 @@ namespace MinecraftConnectTool
                 {
                     File.SetAttributes(targetIniPath, FileAttributes.Normal);
                     File.Delete(targetIniPath);
-                    AntdUI.Message.success(Program.MainForm, "配置文件删除成功~", autoClose: 5, font: P2PFont);
+                    AntdUI.Message.success(Program.MainForm, "[APPConfig]配置文件删除成功~", autoClose: 5, font: P2PFont);
                     Application.Restart();
                 }
                 else
                 {
-                    AntdUI.Message.info(Program.MainForm, "配置文件不存在,无需删除哦~", autoClose: 5, font: P2PFont);
+                    AntdUI.Message.info(Program.MainForm, "[APPCONFIG]配置文件不存在,无需删除哦~", autoClose: 5, font: P2PFont);
+                }
+                string targetThemePath = Path.Combine(tempPath, "MCZLFAPP", "theme.json");
+                if (File.Exists(targetIniPath))
+                {
+                    File.SetAttributes(targetThemePath, FileAttributes.Normal);
+                    File.Delete(targetThemePath);
+                    AntdUI.Message.success(Program.MainForm, "[Theme]配置文件删除成功~", autoClose: 5, font: P2PFont);
+                    Application.Restart();
+                }
+                else
+                {
+                    AntdUI.Message.info(Program.MainForm, "[Theme]配置文件不存在,无需删除哦~", autoClose: 5, font: P2PFont);
                 }
             }
             catch (Exception ex)
             {
-                AntdUI.Message.error(Program.MainForm, $"删除配置文件失败,请手动删除,原因:{ex.Message}", autoClose: 5, font: P2PFont);
+                AntdUI.Message.error(Program.MainForm, $"[Theme]删除配置文件失败,请手动删除,原因:{ex.Message}", autoClose: 5, font: P2PFont);
             }
         }
         private void InitializeDropdown()

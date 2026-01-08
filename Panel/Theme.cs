@@ -227,11 +227,11 @@ namespace MinecraftConnectTool
         // 专门读颜色，自动补 #
         public static string ReadHex(string key)
         {
-            if (!File.Exists(path)) return null;
+            if (!File.Exists(path)) return "#FFC0CB";
             var d = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
             return d.TryGetValue(key, out var h) && !string.IsNullOrEmpty(h)
                    ? h.StartsWith("#") ? h : "#" + h
-                   : null;
+                   : "#FFC0CB";
         }
 
         // 专门读字符串，原样返回

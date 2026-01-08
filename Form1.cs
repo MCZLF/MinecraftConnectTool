@@ -144,8 +144,7 @@ namespace MinecraftConnectTool
                     break;
                 case "ZTHome":
                     LoadPanel(panel, typeof(ZTLobby));
-                    AntdUI.Message.warn(Program.MainForm, $"当前服务UI尚未完成,功能能用但也尚未完善", autoClose: 5, font: formfont);
-                    AntdUI.Message.warn(Program.MainForm, $"有空一定做(咕咕咕)", autoClose: 5, font: formfont);
+                    AntdUI.Message.warn(Program.MainForm, $"该未成形联机方式将在未来版本更新为其他联机方式,现不推荐使用", autoClose: 5, font: formfont);
                     break;
                 case "Update":
                     LoadPanel(panel, typeof(Update));

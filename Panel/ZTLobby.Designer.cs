@@ -135,14 +135,14 @@
             this.TopText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TopText.Cursor = System.Windows.Forms.Cursors.AppStarting;
             this.TopText.Font = new System.Drawing.Font("微软雅黑", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TopText.Location = new System.Drawing.Point(222, 15);
+            this.TopText.Location = new System.Drawing.Point(132, 15);
             this.TopText.Multiline = false;
             this.TopText.Name = "TopText";
             this.TopText.ReadOnly = true;
             this.TopText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.TopText.Size = new System.Drawing.Size(399, 32);
+            this.TopText.Size = new System.Drawing.Size(622, 32);
             this.TopText.TabIndex = 26;
-            this.TopText.Text = "您正在使用Candy模式进行联机ヾ(≧▽≦*)o";
+            this.TopText.Text = "该未成形联机方式将在未来版本更新为其他联机方式,现不推荐使用";
             // 
             // progress1
             // 

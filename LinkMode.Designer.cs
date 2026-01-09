@@ -48,6 +48,8 @@
             this.badge4 = new AntdUI.Badge();
             this.badge5 = new AntdUI.Badge();
             this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
+            this.materialSingleLineTextField1 = new MaterialSkin.Controls.MaterialSingleLineTextField();
+            this.button2 = new AntdUI.Button();
             this.alert1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -299,10 +301,40 @@
             this.materialLabel1.Text = "Ping:-1ms";
             this.materialLabel1.Visible = false;
             // 
+            // materialSingleLineTextField1
+            // 
+            this.materialSingleLineTextField1.Cursor = System.Windows.Forms.Cursors.UpArrow;
+            this.materialSingleLineTextField1.Depth = 0;
+            this.materialSingleLineTextField1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.materialSingleLineTextField1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.materialSingleLineTextField1.Hint = "";
+            this.materialSingleLineTextField1.Location = new System.Drawing.Point(600, 15);
+            this.materialSingleLineTextField1.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialSingleLineTextField1.Name = "materialSingleLineTextField1";
+            this.materialSingleLineTextField1.PasswordChar = '\0';
+            this.materialSingleLineTextField1.SelectedText = "";
+            this.materialSingleLineTextField1.SelectionLength = 0;
+            this.materialSingleLineTextField1.SelectionStart = 0;
+            this.materialSingleLineTextField1.Size = new System.Drawing.Size(157, 23);
+            this.materialSingleLineTextField1.TabIndex = 72;
+            this.materialSingleLineTextField1.Text = "指令";
+            this.materialSingleLineTextField1.UseSystemPasswordChar = false;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(724, 15);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(30, 23);
+            this.button2.TabIndex = 73;
+            this.button2.Text = "发";
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // LinkMode
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.materialSingleLineTextField1);
             this.Controls.Add(this.badge1);
             this.Controls.Add(this.badge5);
             this.Controls.Add(this.materialLabel1);
@@ -354,5 +386,7 @@
         private AntdUI.Badge badge4;
         private AntdUI.Badge badge5;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
+        private MaterialSkin.Controls.MaterialSingleLineTextField materialSingleLineTextField1;
+        private AntdUI.Button button2;
     }
 }

@@ -599,5 +599,11 @@ namespace MinecraftConnectTool
                 OkText = "确定"
             });
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string command = materialSingleLineTextField1.Text;
+            _linkProcess.StandardInput.WriteLine(command);
+        }
     }
 }

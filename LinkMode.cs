@@ -34,7 +34,7 @@ namespace MinecraftConnectTool
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
             log("检查P2PMode核心中..");
-            string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/link.exe"; //OnlySupport AMD64
+            string url = "http://mczlf.loft.games/API/link.exe"; //OnlySupport AMD64
             string fileName = Path.Combine(customDirectory, "link.exe");
             string fileMd5 = "559a28f9d51dcbec970d2dbc7f2fd8aa";
             bool needsDownload = false;
@@ -229,7 +229,7 @@ namespace MinecraftConnectTool
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
             log("检查P2PMode核心中..");
-            string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/link.exe"; //OnlySupport AMD64
+            string url = "http://mczlf.loft.games/API/link.exe"; //OnlySupport AMD64
             string fileName = Path.Combine(customDirectory, "link.exe");
             string fileMd5 = "559a28f9d51dcbec970d2dbc7f2fd8aa";
             bool needsDownload = false;

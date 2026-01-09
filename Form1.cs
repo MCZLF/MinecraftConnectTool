@@ -143,7 +143,7 @@ namespace MinecraftConnectTool
                     LoadPanel(panel, typeof(P2PLog));
                     break;
                 case "ZTHome":
-                    LoadPanel(panel, typeof(ZTLobby));
+                    LoadPanel(panel, typeof(LinkMode));
                     AntdUI.Message.warn(Program.MainForm, $"该未成形联机方式将在未来版本更新为其他联机方式,现不推荐使用", autoClose: 5, font: formfont);
                     break;
                 case "Update":

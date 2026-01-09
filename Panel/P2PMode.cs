@@ -256,6 +256,8 @@ namespace MinecraftConnectTool
                 else
                 {
                     Process process = new Process();
+                    process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                    process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
                     process.StartInfo.FileName = fileName;
                     process.StartInfo.Arguments = arguments;
                     process.StartInfo.UseShellExecute = false; // 关闭外壳程序以支持重定向

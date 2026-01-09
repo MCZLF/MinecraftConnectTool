@@ -96,6 +96,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinkMode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LinkMode.Designer.cs">
+      <DependentUpon>LinkMode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Plugins\Probe.cs" />
     <Compile Include="RightPanel\InviteinfoEdit.cs">
       <SubType>UserControl</SubType>
@@ -210,6 +216,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Extension.resx">
       <DependentUpon>Extension.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LinkMode.resx">
+      <DependentUpon>LinkMode.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panel\Help.resx">
       <DependentUpon>Help.cs</DependentUpon>

@@ -310,19 +310,6 @@ namespace MinecraftConnectTool
             progress1.ShowInTaskbar = false;
             log("构造启动参数中..");
             string arguments;
-            var customModal = new InteractiveModal();
-            string port = customModal.ShowModal(Program.MainForm, "请输入游戏内提示端口(例如25565)");
-            if (string.IsNullOrWhiteSpace(port))
-            {
-                log("用户取消输入端口，启动终止");
-                role = "0";
-                badge3.Visible = false;
-                badge3.State = TState.Default;
-                badge3.Text = "Null";
-                return;
-            }
-
-            log($"选定端口：{port}，准备启动核心…");
             fileName = Path.Combine(customDirectory, "link.exe");
             arguments = $"-c {user}";
 

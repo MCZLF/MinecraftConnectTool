@@ -36,7 +36,7 @@ namespace MinecraftConnectTool
             contentPanel.Controls.Add(inputBox);
 
             // 配置 Modal
-            var modalConfig = Modal.config(parentForm, "请输入游戏内提示的端口", contentPanel);
+            var modalConfig = Modal.config(parentForm, "请输入文本", contentPanel);
             modalConfig.CloseIcon = true;
             modalConfig.MaskClosable = false;
             modalConfig.Draggable = false;

@@ -228,6 +228,7 @@
             this.infobutton.Text = "materialFlatButton1";
             this.infobutton.UseVisualStyleBackColor = false;
             this.infobutton.Visible = false;
+            this.infobutton.Click += new System.EventHandler(this.infobutton_Click);
             // 
             // alert1
             // 

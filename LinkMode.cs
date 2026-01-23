@@ -632,5 +632,24 @@ namespace MinecraftConnectTool
 
             return fullText.Substring(lastColonIndex + 1).Trim();
         }
+
+        private void infobutton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Clipboard.SetText(infobutton.Text);
+            }
+            catch (Exception ex)
+            {
+                AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Oops,出了点小问题", "复制信息时出现错误\n请手动输入或在右侧日志中查找到需要复制的内容\n错误信息" + ex, AntdUI.TType.Error)
+                {
+                    CloseIcon = true,
+                    Font = Program.AlertFont,
+                    Draggable = false,
+                    CancelText = null,
+                    OkText = "好的"
+                });
+            }
+        }
     }
 }

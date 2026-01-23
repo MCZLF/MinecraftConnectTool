@@ -499,7 +499,7 @@ namespace MinecraftConnectTool
         {
         //{ "3.21.12", () => log("LogListener已成功被加载") },//Lamba表达式可以跑code
         //{ "connect", Method }//字典只能酱紫
-        { "提示码", () => { Program.alerterror($"提取结果{ExtractPromptCode(message)}"); } },
+        { "提示码", () => { Program.alerterror($"提取结果{ExtractPromptCode(message)}");alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); } },
         { "login ok", () => { badge3.State = TState.Warn; badge3.Text = "正在处理中...|与服务器交换信息"; } },
         { "P2PNetwork init start", () => log("正在尝试连接P2PNetwork") },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },

@@ -45,8 +45,6 @@
             this.alert1 = new AntdUI.Alert();
             this.badge3 = new AntdUI.Badge();
             this.progress1 = new AntdUI.Progress();
-            this.badge4 = new AntdUI.Badge();
-            this.badge5 = new AntdUI.Badge();
             this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             this.materialSingleLineTextField1 = new MaterialSkin.Controls.MaterialSingleLineTextField();
             this.button2 = new AntdUI.Button();
@@ -57,7 +55,7 @@
             // 
             this.divider2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.divider2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.divider2.Location = new System.Drawing.Point(10, 91);
+            this.divider2.Location = new System.Drawing.Point(10, 135);
             this.divider2.Name = "divider2";
             this.divider2.Size = new System.Drawing.Size(218, 23);
             this.divider2.TabIndex = 29;
@@ -67,7 +65,7 @@
             // 
             this.Divider1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Divider1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.Divider1.Location = new System.Drawing.Point(10, 215);
+            this.Divider1.Location = new System.Drawing.Point(10, 259);
             this.Divider1.Name = "Divider1";
             this.Divider1.Size = new System.Drawing.Size(218, 23);
             this.Divider1.TabIndex = 28;
@@ -115,7 +113,7 @@
             this.materialSingleLineTextField2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.materialSingleLineTextField2.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.materialSingleLineTextField2.Hint = "";
-            this.materialSingleLineTextField2.Location = new System.Drawing.Point(34, 274);
+            this.materialSingleLineTextField2.Location = new System.Drawing.Point(34, 305);
             this.materialSingleLineTextField2.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialSingleLineTextField2.Name = "materialSingleLineTextField2";
             this.materialSingleLineTextField2.PasswordChar = '\0';
@@ -130,7 +128,7 @@
             // Opener
             // 
             this.Opener.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Opener.Location = new System.Drawing.Point(34, 120);
+            this.Opener.Location = new System.Drawing.Point(34, 164);
             this.Opener.Name = "Opener";
             this.Opener.Radius = 5;
             this.Opener.Shape = AntdUI.TShape.Round;
@@ -239,7 +237,7 @@
             this.alert1.Icon = AntdUI.TType.Info;
             this.alert1.Location = new System.Drawing.Point(224, 43);
             this.alert1.Name = "alert1";
-            this.alert1.Size = new System.Drawing.Size(365, 45);
+            this.alert1.Size = new System.Drawing.Size(477, 45);
             this.alert1.TabIndex = 66;
             this.alert1.Text = "提示码";
             this.alert1.Visible = false;
@@ -264,28 +262,6 @@
             this.progress1.TabIndex = 68;
             this.progress1.Text = "progress1";
             this.progress1.Visible = false;
-            // 
-            // badge4
-            // 
-            this.badge4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.badge4.Location = new System.Drawing.Point(615, 68);
-            this.badge4.Name = "badge4";
-            this.badge4.Size = new System.Drawing.Size(139, 20);
-            this.badge4.State = AntdUI.TState.Success;
-            this.badge4.TabIndex = 69;
-            this.badge4.Text = "已启用兼容模式Olan";
-            this.badge4.Visible = false;
-            // 
-            // badge5
-            // 
-            this.badge5.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.badge5.Location = new System.Drawing.Point(590, 94);
-            this.badge5.Name = "badge5";
-            this.badge5.Size = new System.Drawing.Size(164, 20);
-            this.badge5.State = AntdUI.TState.Success;
-            this.badge5.TabIndex = 70;
-            this.badge5.Text = "已启用P2P传输优化(TEST)";
-            this.badge5.Visible = false;
             // 
             // materialLabel1
             // 
@@ -336,10 +312,8 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.materialSingleLineTextField1);
             this.Controls.Add(this.badge1);
-            this.Controls.Add(this.badge5);
             this.Controls.Add(this.materialLabel1);
             this.Controls.Add(this.badge3);
-            this.Controls.Add(this.badge4);
             this.Controls.Add(this.progress1);
             this.Controls.Add(this.alert1);
             this.Controls.Add(this.TopText);
@@ -383,8 +357,6 @@
         private AntdUI.Alert alert1;
         private AntdUI.Badge badge3;
         private AntdUI.Progress progress1;
-        private AntdUI.Badge badge4;
-        private AntdUI.Badge badge5;
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
         private MaterialSkin.Controls.MaterialSingleLineTextField materialSingleLineTextField1;
         private AntdUI.Button button2;

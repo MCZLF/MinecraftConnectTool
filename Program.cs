@@ -23,7 +23,7 @@ namespace MinecraftConnectTool
 
             bool isElevated = args.Contains("--admin");
             int admin = 0;
-
+#if 调试
             if (!isElevated)
             {
                 // 尝试以管理员权限重新启动
@@ -53,7 +53,7 @@ namespace MinecraftConnectTool
             {
                 admin = 1;
             }
-
+#endif
             // 设置全局变量（你可以根据需要改为静态字段或其他方式）
             Program.admin = admin;;
             MainForm = new Form1();

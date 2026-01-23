@@ -499,7 +499,7 @@ namespace MinecraftConnectTool
         {
         //{ "3.21.12", () => log("LogListener已成功被加载") },//Lamba表达式可以跑code
         //{ "connect", Method }//字典只能酱紫
-        { "3.21.12", () => log("LogListener已成功被加载") },
+        { "提示码", () => { Program.alerterror($"提取结果{ExtractPromptCode(message)}"); } },
         { "login ok", () => { badge3.State = TState.Warn; badge3.Text = "正在处理中...|与服务器交换信息"; } },
         { "P2PNetwork init start", () => log("正在尝试连接P2PNetwork") },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
@@ -619,6 +619,18 @@ namespace MinecraftConnectTool
         {
             string command = materialSingleLineTextField1.Text;
             _linkProcess.StandardInput.WriteLine(command);
+        }
+        private string ExtractPromptCode(string fullText)
+        {
+            if (string.IsNullOrWhiteSpace(fullText))
+                return string.Empty;
+
+            // 同时支持中文和英文冒号，取最后一个冒号后的内容
+            int lastColonIndex = fullText.LastIndexOfAny(new[] { '：', ':' });
+            if (lastColonIndex == -1)
+                return string.Empty;
+
+            return fullText.Substring(lastColonIndex + 1).Trim();
         }
     }
 }

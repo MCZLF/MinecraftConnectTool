@@ -70,6 +70,9 @@
             this.label6 = new AntdUI.Label();
             this.switch6 = new AntdUI.Switch();
             this.button17 = new AntdUI.Button();
+            this.label7 = new AntdUI.Label();
+            this.switch7 = new AntdUI.Switch();
+            this.button19 = new AntdUI.Button();
             this.SuspendLayout();
             // 
             // alert1
@@ -289,7 +292,7 @@
             // button6
             // 
             this.button6.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button6.Location = new System.Drawing.Point(439, 100);
+            this.button6.Location = new System.Drawing.Point(439, 97);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(23, 23);
             this.button6.TabIndex = 33;
@@ -299,7 +302,7 @@
             // label3
             // 
             this.label3.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(350, 100);
+            this.label3.Location = new System.Drawing.Point(350, 97);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(98, 23);
             this.label3.TabIndex = 32;
@@ -309,7 +312,7 @@
             // 
             this.switch3.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(101)))), ((int)(((byte)(40)))));
             this.switch3.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(101)))), ((int)(((byte)(40)))));
-            this.switch3.Location = new System.Drawing.Point(310, 100);
+            this.switch3.Location = new System.Drawing.Point(310, 97);
             this.switch3.Name = "switch3";
             this.switch3.Size = new System.Drawing.Size(34, 23);
             this.switch3.TabIndex = 31;
@@ -344,7 +347,7 @@
             this.button9.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button9.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button9.IconSvg = "SafetyCertificateOutlined";
-            this.button9.Location = new System.Drawing.Point(310, 180);
+            this.button9.Location = new System.Drawing.Point(310, 193);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(152, 50);
             this.button9.TabIndex = 38;
@@ -354,7 +357,7 @@
             // label4
             // 
             this.label4.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(350, 129);
+            this.label4.Location = new System.Drawing.Point(350, 122);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(122, 23);
             this.label4.TabIndex = 40;
@@ -364,7 +367,7 @@
             // 
             this.switch4.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.switch4.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.switch4.Location = new System.Drawing.Point(310, 129);
+            this.switch4.Location = new System.Drawing.Point(310, 122);
             this.switch4.Name = "switch4";
             this.switch4.Size = new System.Drawing.Size(34, 23);
             this.switch4.TabIndex = 39;
@@ -378,7 +381,7 @@
             this.button10.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button10.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button10.IconSvg = "BuildFilled";
-            this.button10.Location = new System.Drawing.Point(310, 233);
+            this.button10.Location = new System.Drawing.Point(310, 241);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(152, 50);
             this.button10.TabIndex = 41;
@@ -391,7 +394,7 @@
             this.button11.DefaultBack = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(121)))));
             this.button11.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button11.IconSvg = "PoweroffOutlined";
-            this.button11.Location = new System.Drawing.Point(462, 239);
+            this.button11.Location = new System.Drawing.Point(462, 247);
             this.button11.Name = "button11";
             this.button11.Radius = 50;
             this.button11.Size = new System.Drawing.Size(43, 40);
@@ -571,7 +574,7 @@
             // label6
             // 
             this.label6.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(350, 156);
+            this.label6.Location = new System.Drawing.Point(350, 145);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(122, 23);
             this.label6.TabIndex = 59;
@@ -582,7 +585,7 @@
             // 
             this.switch6.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.switch6.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.switch6.Location = new System.Drawing.Point(310, 156);
+            this.switch6.Location = new System.Drawing.Point(310, 145);
             this.switch6.Name = "switch6";
             this.switch6.Size = new System.Drawing.Size(34, 23);
             this.switch6.TabIndex = 58;
@@ -604,10 +607,43 @@
             this.button17.Text = "主题自定义";
             this.button17.Click += new System.EventHandler(this.button17_Click);
             // 
+            // label7
+            // 
+            this.label7.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(350, 170);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(122, 23);
+            this.label7.TabIndex = 62;
+            this.label7.Text = "流量节省(测试)";
+            // 
+            // switch7
+            // 
+            this.switch7.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch7.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.switch7.Location = new System.Drawing.Point(310, 170);
+            this.switch7.Name = "switch7";
+            this.switch7.Size = new System.Drawing.Size(34, 23);
+            this.switch7.TabIndex = 61;
+            this.switch7.UnCheckedText = "";
+            this.switch7.CheckedChanged += new AntdUI.BoolEventHandler(this.switch7_CheckedChanged);
+            // 
+            // button19
+            // 
+            this.button19.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button19.Location = new System.Drawing.Point(449, 170);
+            this.button19.Name = "button19";
+            this.button19.Size = new System.Drawing.Size(23, 23);
+            this.button19.TabIndex = 63;
+            this.button19.Text = "?";
+            this.button19.Click += new System.EventHandler(this.button19_Click);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.button19);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.switch7);
             this.Controls.Add(this.button17);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.switch6);
@@ -700,5 +736,8 @@
         private AntdUI.Label label6;
         private AntdUI.Switch switch6;
         private AntdUI.Button button17;
+        private AntdUI.Label label7;
+        private AntdUI.Switch switch7;
+        private AntdUI.Button button19;
     }
 }

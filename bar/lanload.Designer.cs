@@ -28,8 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.label1 = new AntdUI.Label();
             this.lan1 = new MinecraftConnectTool.lan();
             this.SuspendLayout();
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.Silver;
+            this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(184)))), ((int)(((byte)(83)))), ((int)(((byte)(197)))), ((int)(((byte)(100)))));
+            this.label1.Location = new System.Drawing.Point(424, 9);
+            this.label1.Name = "label1";
+            this.label1.PrefixSvg = "FilterOutlined";
+            this.label1.Size = new System.Drawing.Size(103, 21);
+            this.label1.TabIndex = 1;
+            this.label1.TabStop = false;
+            this.label1.Text = "已启用流量节省";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label1.Visible = false;
             // 
             // lan1
             // 
@@ -40,11 +56,13 @@
             this.lan1.Size = new System.Drawing.Size(762, 36);
             this.lan1.TabIndex = 0;
             this.lan1.Text = "lan1";
+            this.lan1.Click += new System.EventHandler(this.lan1_Click);
             // 
             // lanload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.lan1);
             this.Name = "lanload";
             this.Size = new System.Drawing.Size(762, 36);
@@ -55,5 +73,6 @@
         #endregion
 
         private lan lan1;
+        private AntdUI.Label label1;
     }
 }

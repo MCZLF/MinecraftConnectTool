@@ -215,7 +215,7 @@ namespace MinecraftConnectTool
                 progress1.Visible = false;
                 progress1.Value = 0;
                 progress1.ShowInTaskbar = false;
-                log("构造启动参数中..");
+                //log("构造启动参数中..");
                 log("复制邀请信息中..");
                 try
                 {
@@ -238,6 +238,9 @@ namespace MinecraftConnectTool
                 if (TCP)
                 { arguments = $"-node {tsm} -token {tokenNormal}"; }
                 else { arguments = $"-node {tsm} -protocol udp -token {tokenTest}"; }//UDP
+                bool datasaving = Form1.config.read<bool>("datasaving", false);
+                if (datasaving)
+                { arguments = arguments + " -sharebandwidth 0"; }
                 //二次校验
                 //      log(fileMd5);
                 if (!File.Exists(fileName) || !new[] { fileMd5, fileMd532 }.Contains(GetFileMD5Hash(fileName)))
@@ -541,6 +544,9 @@ namespace MinecraftConnectTool
             {
                 arguments = $"-node {localName} -appname Minecraft{randomPort} -peernode {user} -dstip 127.0.0.1 -dstport {port} -srcport {randomPort} -protocol udp -token {tokenTest}";
             }//UDP
+            bool datasaving = Form1.config.read<bool>("datasaving", false);
+            if (datasaving)
+            { arguments = arguments + " -sharebandwidth 0"; }//26.1.18 之前没想到这么写，旧的石山懒得改了
             //二次校验
             if (!File.Exists(fileName) || !new[] { fileMd5, fileMd532 }.Contains(GetFileMD5Hash(fileName)))
             { log("二次校验失败,进程已终止"); stopp2p(); return; }

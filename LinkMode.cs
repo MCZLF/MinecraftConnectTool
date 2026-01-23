@@ -228,6 +228,29 @@ namespace MinecraftConnectTool
             if (Process.GetProcessesByName("main").Length > 0) AlreadyCore();
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
+            Random random = new Random();
+            string randomPort = random.Next(1, 65536).ToString(); // 生成随机端口号并转换为字符串
+            bool usecustomport = Form1.config.read<bool>("usecustomport", false);
+            if (usecustomport)
+            {
+                string customport = Form1.config.read<string>("customport", "None");
+                if (!int.TryParse(customport, out int parsedPort) || parsedPort < 1 || parsedPort > 65535)
+                {
+                    AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow...意料之外呢", "线程小伙读取到了自定义端口信息,但是端口居然是神秘的字符\n读取到的自定义端口：" + customport, AntdUI.TType.Warn)
+                    {
+                        CloseIcon = true,
+                        Font = Program.AlertFont,
+                        Draggable = false,
+                        CancelText = null,
+                        OkText = "好的"
+                    });
+                    return;
+                }
+                else
+                {
+                    randomPort = customport; // 将 customport 的字符串值赋值给 randomPort
+                }
+            }
             log("检查P2PMode核心中..");
             string url = "http://mczlf.loft.games/API/link.exe"; //OnlySupport AMD64
             string fileName = Path.Combine(customDirectory, "link.exe");
@@ -312,7 +335,12 @@ namespace MinecraftConnectTool
             string arguments;
             fileName = Path.Combine(customDirectory, "link.exe");
             arguments = $"-c {user}";
-
+            ////输出到常驻信息
+            alert1.Text = "请在局域网世界中查看";
+            //infobutton.Text = $"请在局域网世界中查看";
+            //alert1.Visible = true;
+            //infobutton.Visible = true;
+            //AntdUI.Message.info(Program.MainForm, $"单击屏幕增强提醒右侧的信息展示按钮,即可自动复制↓", autoClose: 5, font: Program.AlertFont);
             try
             {
                 Process process = new Process();

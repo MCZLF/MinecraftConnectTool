@@ -30,7 +30,7 @@ namespace MinecraftConnectTool
             this.BackColor = Color.LightGray;
             uploadLabel = new Label
             {
-                Text = "Upload: 0 KB/s",
+                Text = "Upload/上传: 0 KB/s",
                 Location = new Point(10, 5),
                 Width = 200,
                 Height = 30,
@@ -41,7 +41,7 @@ namespace MinecraftConnectTool
 
             downloadLabel = new Label
             {
-                Text = "Download: 0 KB/s",
+                Text = "Download/下载: 0 KB/s",
                 Location = new Point(220, 5),
                 Width = 200,
                 Height = 30,

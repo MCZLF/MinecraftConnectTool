@@ -492,7 +492,10 @@ namespace MinecraftConnectTool
             {
                 switch6.Checked = true;
             }
-            bool EnableServerPost = Form1.config.read<bool>("ServerPostEnable", true);
+            bool datasaving = Form1.config.read<bool>("datasaving", false);
+            if (datasaving)
+            { switch7.Checked = true; }
+                bool EnableServerPost = Form1.config.read<bool>("ServerPostEnable", true);
             if (EnableServerPost)
             {
                 switch2.Checked = true;
@@ -1219,6 +1222,32 @@ Version: {Form1.version}
         private void label6_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button19_Click(object sender, EventArgs e)
+        {
+            AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Info", "目前流量节省只对P2PMode生效，且具体生效情况尚在测试\n开启流量节省后，将禁止其他设备无关设备连接本机，也禁止本机连接其他中转\n可能会对联机造成一定影响,如果流量重组请勿开启此选项", AntdUI.TType.Info)
+            {
+                CloseIcon = true,
+                Font = P2PFont,
+                Draggable = false,
+                CancelText = null,
+                OkText = "好的"
+            });
+        }
+
+        private void switch7_CheckedChanged(object sender, BoolEventArgs e)
+        {
+            if (switch7.Checked)
+            {
+                Form1.config.write("datasaving", true);
+                switch7.Checked = true;
+            }
+            else
+            {
+                Form1.config.write("datasaving", false);
+                switch7.Checked = false;
+            }
         }
     }
 }

@@ -15,6 +15,18 @@ namespace MinecraftConnectTool
         public lanload()
         {
             InitializeComponent();
+            this.Load += Lanload_Load;
+        }
+
+        private void lan1_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void Lanload_Load(object sender, EventArgs e)
+        {
+            bool datasaving = Form1.config.read<bool>("datasaving", false);
+            if (datasaving)
+            { label1.Visible = true; }
         }
     }
 }

@@ -48,6 +48,7 @@
             this.materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             this.materialSingleLineTextField1 = new MaterialSkin.Controls.MaterialSingleLineTextField();
             this.button2 = new AntdUI.Button();
+            this.label1 = new AntdUI.Label();
             this.alert1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +56,7 @@
             // 
             this.divider2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.divider2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.divider2.Location = new System.Drawing.Point(10, 135);
+            this.divider2.Location = new System.Drawing.Point(10, 119);
             this.divider2.Name = "divider2";
             this.divider2.Size = new System.Drawing.Size(218, 23);
             this.divider2.TabIndex = 29;
@@ -65,7 +66,7 @@
             // 
             this.Divider1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Divider1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.Divider1.Location = new System.Drawing.Point(10, 259);
+            this.Divider1.Location = new System.Drawing.Point(10, 243);
             this.Divider1.Name = "Divider1";
             this.Divider1.Size = new System.Drawing.Size(218, 23);
             this.Divider1.TabIndex = 28;
@@ -113,7 +114,7 @@
             this.materialSingleLineTextField2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.materialSingleLineTextField2.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.materialSingleLineTextField2.Hint = "";
-            this.materialSingleLineTextField2.Location = new System.Drawing.Point(34, 305);
+            this.materialSingleLineTextField2.Location = new System.Drawing.Point(34, 295);
             this.materialSingleLineTextField2.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialSingleLineTextField2.Name = "materialSingleLineTextField2";
             this.materialSingleLineTextField2.PasswordChar = '\0';
@@ -128,7 +129,7 @@
             // Opener
             // 
             this.Opener.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Opener.Location = new System.Drawing.Point(34, 164);
+            this.Opener.Location = new System.Drawing.Point(34, 148);
             this.Opener.Name = "Opener";
             this.Opener.Radius = 5;
             this.Opener.Shape = AntdUI.TShape.Round;
@@ -270,7 +271,7 @@
             this.materialLabel1.Depth = 0;
             this.materialLabel1.Font = new System.Drawing.Font("Roboto", 11F);
             this.materialLabel1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.materialLabel1.Location = new System.Drawing.Point(4, 66);
+            this.materialLabel1.Location = new System.Drawing.Point(115, 15);
             this.materialLabel1.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialLabel1.Name = "materialLabel1";
             this.materialLabel1.Size = new System.Drawing.Size(75, 19);
@@ -306,10 +307,24 @@
             this.button2.Text = "发";
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // label1
+            // 
+            this.label1.Cursor = System.Windows.Forms.Cursors.Help;
+            this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(7, 65);
+            this.label1.Name = "label1";
+            this.label1.PrefixSvg = "GlobalOutlined";
+            this.label1.Size = new System.Drawing.Size(199, 23);
+            this.label1.TabIndex = 74;
+            this.label1.TabStop = false;
+            this.label1.Text = "工作模式";
+            this.label1.Visible = false;
+            // 
             // LinkMode
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.materialSingleLineTextField1);
             this.Controls.Add(this.badge1);
@@ -361,5 +376,6 @@
         private MaterialSkin.Controls.MaterialLabel materialLabel1;
         private MaterialSkin.Controls.MaterialSingleLineTextField materialSingleLineTextField1;
         private AntdUI.Button button2;
+        private AntdUI.Label label1;
     }
 }

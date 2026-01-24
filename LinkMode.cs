@@ -177,12 +177,10 @@ namespace MinecraftConnectTool
                 _linkProcess = process;
 
                 AntdUI.Message.info(Program.MainForm,
-                                    "P2P 核心已启动，日志将输出到右侧",
+                                    "Link 核心已启动，日志将输出到右侧",
                                     autoClose: 5,
                                     font: this.Font);
                 log("link.exe 启动成功~");
-
-                // 可选：把状态灯改成绿色
                 badge3.Visible = true;
                 badge3.State = TState.Success;
                 badge3.Text = "Online";
@@ -424,6 +422,8 @@ namespace MinecraftConnectTool
                 Gap = 10,
                 Font = Program.AlertFont
             });
+            //启动轮询
+            StartStatusPolling();
         }
 
 
@@ -463,10 +463,11 @@ namespace MinecraftConnectTool
         //LOG区域
         public void log(string message)
         {
+            if ("中转模式|P2P模式".Contains(message)) return;
             var replacements = new Dictionary<string, string>
     {
         { "分享码", "提示码" }, //适应MCT本土化叫法
-        { "16947733", "690625244" },
+        { "联机码", "提示码" },
         { "openp2p.cn@gmail.com", "admin@mczlf.xyz" },
         { "openp2p start", "Powered by OpenP2P" }
         };
@@ -500,7 +501,7 @@ namespace MinecraftConnectTool
         //{ "3.21.12", () => log("LogListener已成功被加载") },//Lamba表达式可以跑code
         //{ "connect", Method }//字典只能酱紫
         { "提示码", () => { Program.alerterror($"提取结果{ExtractPromptCode(message)}");alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); } },
-        { "login ok", () => { badge3.State = TState.Warn; badge3.Text = "正在处理中...|与服务器交换信息"; } },
+        { "未通过MC流量检测，程序终止", () => { badge3.State = TState.Error; badge3.Text = "请先启动游戏后再开启房间"; Program.alerterror("请先启动游戏后再开启房间");stoplink(); } },
         { "P2PNetwork init start", () => log("正在尝试连接P2PNetwork") },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
         { "LISTEN ON PORT", () => {log("Success:成功在本地创建监听端口");badge3.State = TState.Success; badge3.Text = "已连接";} },
@@ -511,7 +512,7 @@ namespace MinecraftConnectTool
         { "i/o timeout", () => {log("i/o超时,可能是端口无法连接,也可能是运营商动手脚了,建议检查一下端口是否有误并继续等待");} },
         { "no such host", () => Program.alerterror("程序未能够连接到HOST,可能是防火墙拦截,或是根本没有授予网络访问权限")},
         { "it will auto reconnect when peer node online", () => Program.alerterror("房间不在线,请检查是否有输入错误,或好友是否正确的启动了房间")},
-        { "peer offline", () => {badge3.State = TState.Error;badge3.Text = "对方不在线";Program.alerterror("对方不在线,请检查是否有输入错误,或好友是否正确的启动了房间");  } },
+        { "房间不存在，联机失败", () => {badge3.State = TState.Error;badge3.Text = "对方不在线";Program.alerterror("对方不在线,请检查是否有输入错误,或好友是否正确的启动了房间");  } },
         { "Usage:", () => {stoplink();badge3.State = TState.Error;badge3.Text = "触发Usage_Bug";Program.alerterror("这是一个Bug,你可以反馈一下发生了什么吗?\n请不要直接对着这个窗口拍照，请上传完整日志");  } },
 
      };
@@ -582,6 +583,9 @@ namespace MinecraftConnectTool
             {
                 AntdUI.Message.error(Program.MainForm, "未找到进程", autoClose: 15, font: Program.AlertFont);
             }
+            label1.Visible = false;
+            label1.Text = null;//清空文本
+            StopStatusPolling();//结束轮询
         }
         private void ClearAllFloatButtons()
         {
@@ -651,5 +655,97 @@ namespace MinecraftConnectTool
                 });
             }
         }
+        // 轮询定时器
+        private System.Timers.Timer _statusTimer;
+
+        // 最新一次 status 命令的反馈内容（仅 success/msg）
+        private string statusCommandFeedback = string.Empty;
+        #region 状态轮询
+
+/// <summary>
+/// 启动成功后调用：开始每 1 s 查询一次连接状态
+/// </summary>
+        private void StartStatusPolling()
+        {
+            // 如果之前已经开过，先停掉
+            _statusTimer?.Stop();
+            _statusTimer?.Dispose();
+
+            _statusTimer = new System.Timers.Timer(1000) { AutoReset = true, SynchronizingObject = this };
+            _statusTimer.Elapsed += (_, __) => SendStatusCommand();
+            _statusTimer.Start();
+        }
+
+        /// <summary>
+        /// 发送 status 命令并等待回包
+        /// </summary>
+        private void SendStatusCommand()
+        {
+            if (_linkProcess == null || _linkProcess.HasExited) return;
+
+            // 用 GUID 当 id，避免重复
+            string id = Guid.NewGuid().ToString("N");
+            string cmdJson = $"{{\"id\":\"{id}\",\"order\":\"status\"}}";
+
+            // 把回包先清空，等待本次响应
+            statusCommandFeedback = string.Empty;
+
+            // 注册一次性响应过滤器
+            DataReceivedEventHandler outputFilter = null;
+            DataReceivedEventHandler errorFilter = null;
+
+            outputFilter = (s, e) => HandlePossibleResponse(e.Data, id, ref outputFilter, ref errorFilter);
+            errorFilter = (s, e) => HandlePossibleResponse(e.Data, id, ref outputFilter, ref errorFilter);
+
+            _linkProcess.OutputDataReceived += outputFilter;
+            _linkProcess.ErrorDataReceived += errorFilter;
+
+            // 发命令
+            try { _linkProcess.StandardInput.WriteLine(cmdJson);
+                label1.Visible = true;
+            }
+            catch { /* 进程已挂，忽略 */ }
+        }
+
+        /// <summary>
+        /// 只在收到对应 id 的响应时解析，解析完立即卸掉过滤器
+        /// </summary>
+        private void HandlePossibleResponse(string line,
+                                            string expectId,
+                                            ref DataReceivedEventHandler outputFilter,
+                                            ref DataReceivedEventHandler errorFilter)
+        {
+            if (string.IsNullOrWhiteSpace(line)) return;
+
+            try
+            {
+                dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(line);
+                if (obj == null || obj.id == null || (string)obj.id != expectId) return;
+
+                // 命中本次等待的 id
+                bool ok = obj.success != null && (bool)obj.success;
+                string msg = obj.msg?.ToString() ?? string.Empty;
+                statusCommandFeedback = msg ?? string.Empty;
+                label1.Text = $"工作模式:{msg}";
+                // 卸掉过滤器，避免累积
+                _linkProcess.OutputDataReceived -= outputFilter;
+                _linkProcess.ErrorDataReceived -= errorFilter;
+            }
+            catch { /* 非 JSON 行，忽略 */ }
+        }
+        /// <summary>
+        /// 外部调用：停止状态轮询
+        /// </summary>
+        public void StopStatusPolling()
+        {
+            if (_statusTimer != null)
+            {
+                _statusTimer.Stop();
+                _statusTimer.Dispose();
+                _statusTimer = null;
+                label1.Visible = false;
+            }
+        }
+        #endregion
     }
 }

@@ -144,7 +144,7 @@ namespace MinecraftConnectTool
                     break;
                 case "ZTHome":
                     LoadPanel(panel, typeof(LinkMode));
-                    AntdUI.Message.warn(Program.MainForm, $"该未成形联机方式将在未来版本更新为其他联机方式,现不推荐使用", autoClose: 5, font: formfont);
+                    //AntdUI.Message.warn(Program.MainForm, $"114514", autoClose: 5, font: formfont);
                     break;
                 case "Update":
                     LoadPanel(panel, typeof(Update));
@@ -165,9 +165,7 @@ namespace MinecraftConnectTool
         {
             if (panel == null) throw new ArgumentNullException(nameof(panel));
             if (controlType == null) throw new ArgumentNullException(nameof(controlType));
-
-            // 仅 P2PMode 和 Settings 走缓存
-            if (controlType == typeof(MinecraftConnectTool.P2PMode) || controlType == typeof(MinecraftConnectTool.Settings))
+            if (controlType == typeof(MinecraftConnectTool.P2PMode) || controlType == typeof(MinecraftConnectTool.Settings) || controlType == typeof(MinecraftConnectTool.LinkMode))
             {
                 if (!Form1.GlobalCache.TryGetValue(controlType, out var cached))
                 {

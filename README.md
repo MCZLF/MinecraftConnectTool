@@ -53,7 +53,7 @@
 
 ## 已启用的MCTServer服务项
 - LogServer
-- CandyCreateService
+- ~~CandyCreateService~~(Candy联机模式 已停止支持)
 - ProbeServer
 - Frp(OnlyServerService)
 

@@ -37,7 +37,7 @@ namespace MinecraftConnectTool
         private readonly List<object> _floatButtons = new List<object>(); //启动时监测进程的字典
         //各项子功能控制放开头的传统也不能变
         public static Font formfont { get; } = new Font("Microsoft YaHei UI", 9f);        //form1中的全局字体 714后的新字体统一使用Program中的public
-        private void Form1_Shown(object sender, EventArgs e)
+        private async void Form1_Shown(object sender, EventArgs e)
         {
             Probe.EnablePopup = false;
             //Program.alertwarn(this.CurrentAutoScaleDimensions.ToString());
@@ -104,7 +104,9 @@ namespace MinecraftConnectTool
             bool EnableVersionCheck = Form1.config.read<bool>("EnableVersionCheck", true);
             if (EnableVersionCheck)
             {
+#pragma warning disable 4014
                 Task.Run(() => supportcheck.Check());
+#pragma warning restore 4014
             }
             try { color(); }
             catch (Exception ex)
@@ -116,7 +118,8 @@ namespace MinecraftConnectTool
             if (EnableATDDark)
             {
                 AntdUI.Config.IsDark = true; }
-            }
+            await CheckAndShowAnnouncementAsync();
+        }
 
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
         {
@@ -645,10 +648,74 @@ SysVersion:{SystemEvVersion}
             }
             ApplyColor("Title", c => PageHeader.DividerColor = c);
             ApplyColor("Title", c => PageHeader.BackColor = c);
-            ApplyColor("LeftMenu", c => input_search.BackColor = c);
             ApplyColor("LeftMenu", c => menu1.BackColor = c);
             ApplyColor("LeftMenuHover", c => menu1.BackHover = c);
             }
+        }
+        private const string CloudConfigUrl = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/PanelAlert";
+        private static readonly HttpClient httpClient = new HttpClient();
+        public async Task CheckAndShowAnnouncementAsync()
+        {
+            try
+            {
+                string jsonContent = await httpClient.GetStringAsync(CloudConfigUrl);
+                JObject cloudConfig = JObject.Parse(jsonContent);
+                bool show = cloudConfig["Show"]?.ToObject<bool>() ?? false;
+                string tagId = cloudConfig["TagID"]?.ToString() ?? "";
+                string text = cloudConfig["Text"]?.ToString() ?? "";
+
+                // 如果Show为false，直接返回（不显示任何内容）
+                if (!show)
+                {
+                    return;
+                }
+
+                // 验证TagID格式
+                if (string.IsNullOrEmpty(tagId) || tagId.Length != 6)
+                {
+                    Console.WriteLine("云端TagID格式错误");
+                    return;
+                }
+
+                // 读取本地存储的历史TagID
+                string localTagId = config.read<string>("PanelAlertID", "");
+
+                // 二. 判断是否是首次查看
+                if (localTagId == tagId)
+                {
+                    button2.Visible = true;
+                }
+                else
+                {
+                    AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, new PanelAlert() { Size = new Size(307, 455) })
+                    {
+                        Align = TAlignMini.Right,
+                        Mask = true,
+                        MaskClosable = true,
+                        DisplayDelay = 0
+                    }); button2.Visible = true;
+                    config.write("PanelAlertID", tagId);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"获取云端配置失败: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"公告检查异常: {ex.Message}");
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, new PanelAlert() { Size = new Size(307, 455) })
+            {
+                Align = TAlignMini.Right,
+                Mask = true,
+                MaskClosable = true,
+                DisplayDelay = 0
+            });
         }
     }
 }

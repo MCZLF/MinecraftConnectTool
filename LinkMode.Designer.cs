@@ -39,7 +39,6 @@
             this.button1 = new AntdUI.Button();
             this.materialSingleLineTextField4 = new MaterialSkin.Controls.MaterialSingleLineTextField();
             this.badge1 = new AntdUI.Badge();
-            this.button4 = new AntdUI.Button();
             this.badge2 = new AntdUI.Badge();
             this.infobutton = new MaterialSkin.Controls.MaterialFlatButton();
             this.alert1 = new AntdUI.Alert();
@@ -125,6 +124,7 @@
             this.materialSingleLineTextField2.TabIndex = 18;
             this.materialSingleLineTextField2.Text = "输入提示码";
             this.materialSingleLineTextField2.UseSystemPasswordChar = false;
+            this.materialSingleLineTextField2.Click += new System.EventHandler(this.materialSingleLineTextField2_Click);
             // 
             // Opener
             // 
@@ -161,7 +161,8 @@
             this.button1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.button1.Size = new System.Drawing.Size(106, 44);
             this.button1.TabIndex = 61;
-            this.button1.Text = "协助调试";
+            this.button1.Text = "调试选项";
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // materialSingleLineTextField4
             // 
@@ -190,16 +191,6 @@
             this.badge1.TabIndex = 64;
             this.badge1.Text = "已启用自定义端口";
             this.badge1.Visible = false;
-            // 
-            // button4
-            // 
-            this.button4.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button4.Location = new System.Drawing.Point(657, 3);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(94, 44);
-            this.button4.TabIndex = 58;
-            this.button4.Text = "下载核心";
-            this.button4.Visible = false;
             // 
             // badge2
             // 
@@ -297,6 +288,7 @@
             this.materialSingleLineTextField1.TabIndex = 72;
             this.materialSingleLineTextField1.Text = "指令";
             this.materialSingleLineTextField1.UseSystemPasswordChar = false;
+            this.materialSingleLineTextField1.Visible = false;
             // 
             // button2
             // 
@@ -305,6 +297,7 @@
             this.button2.Size = new System.Drawing.Size(30, 23);
             this.button2.TabIndex = 73;
             this.button2.Text = "发";
+            this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // label1
@@ -338,7 +331,6 @@
             this.Controls.Add(this.materialSingleLineTextField4);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.Opener);
-            this.Controls.Add(this.button4);
             this.Controls.Add(this.divider2);
             this.Controls.Add(this.Divider1);
             this.Controls.Add(this.Joiner);
@@ -367,7 +359,6 @@
         private AntdUI.Button button1;
         private MaterialSkin.Controls.MaterialSingleLineTextField materialSingleLineTextField4;
         private AntdUI.Badge badge1;
-        private AntdUI.Button button4;
         private AntdUI.Badge badge2;
         private MaterialSkin.Controls.MaterialFlatButton infobutton;
         private AntdUI.Alert alert1;

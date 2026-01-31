@@ -102,6 +102,12 @@
     <Compile Include="LinkMode.Designer.cs">
       <DependentUpon>LinkMode.cs</DependentUpon>
     </Compile>
+    <Compile Include="PanelAlert.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PanelAlert.Designer.cs">
+      <DependentUpon>PanelAlert.cs</DependentUpon>
+    </Compile>
     <Compile Include="Plugins\Probe.cs" />
     <Compile Include="RightPanel\InviteinfoEdit.cs">
       <SubType>UserControl</SubType>
@@ -219,6 +225,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LinkMode.resx">
       <DependentUpon>LinkMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PanelAlert.resx">
+      <DependentUpon>PanelAlert.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panel\Help.resx">
       <DependentUpon>Help.cs</DependentUpon>

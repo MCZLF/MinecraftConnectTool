@@ -41,7 +41,7 @@
             this.panel = new AntdUI.Panel();
             this.panelbar = new AntdUI.Panel();
             this.PageHeader = new AntdUI.PageHeader();
-            this.input_search = new AntdUI.Input();
+            this.button2 = new AntdUI.Button();
             this.button_mclogs = new AntdUI.Button();
             this.button1 = new AntdUI.Button();
             this.button_color = new AntdUI.Button();
@@ -119,7 +119,7 @@
             // 
             // PageHeader
             // 
-            this.PageHeader.Controls.Add(this.input_search);
+            this.PageHeader.Controls.Add(this.button2);
             this.PageHeader.Controls.Add(this.button_mclogs);
             this.PageHeader.Controls.Add(this.button1);
             this.PageHeader.Controls.Add(this.button_color);
@@ -138,18 +138,20 @@
             this.PageHeader.Text = "MinecraftConnectTool";
             this.PageHeader.Click += new System.EventHandler(this.PageHeader_Click);
             // 
-            // input_search
+            // button2
             // 
-            this.input_search.AllowClear = true;
-            this.input_search.Dock = System.Windows.Forms.DockStyle.Right;
-            this.input_search.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            this.input_search.LocalizationPlaceholderText = "search";
-            this.input_search.Location = new System.Drawing.Point(405, 0);
-            this.input_search.Name = "input_search";
-            this.input_search.PlaceholderText = "搜索";
-            this.input_search.PrefixSvg = "SearchOutlined";
-            this.input_search.Size = new System.Drawing.Size(200, 40);
-            this.input_search.TabIndex = 8;
+            this.button2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.button2.Ghost = true;
+            this.button2.IconRatio = 0.65F;
+            this.button2.IconSvg = "NotificationOutlined";
+            this.button2.Location = new System.Drawing.Point(555, 0);
+            this.button2.Name = "button2";
+            this.button2.Radius = 0;
+            this.button2.Size = new System.Drawing.Size(50, 40);
+            this.button2.TabIndex = 8;
+            this.button2.Visible = false;
+            this.button2.WaveSize = 0;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button_mclogs
             // 
@@ -237,8 +239,8 @@
         private AntdUI.Panel panelbar;
         private AntdUI.Panel panel;
         private AntdUI.Button button1;
-        private AntdUI.Input input_search;
         private AntdUI.Button button_mclogs;
+        private AntdUI.Button button2;
     }
 }
 

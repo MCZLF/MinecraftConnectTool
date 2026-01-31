@@ -1,4 +1,5 @@
 ﻿using AntdUI;
+using MaterialSkin.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,10 +23,13 @@ namespace MinecraftConnectTool
         public LinkMode()
         {
             InitializeComponent();
+            materialSingleLineTextField2.LostFocus += new EventHandler(materialSingleLineTextField2_LostFocus);
+
         }
         public string role = "0"; //0=未开启  1=房主 2=加入方
         private Process _linkProcess;
         private readonly List<object> _floatButtons = new List<object>();
+
 
         private async void Opener_Click(object sender, EventArgs e)
         {
@@ -33,7 +37,7 @@ namespace MinecraftConnectTool
             if (Process.GetProcessesByName("main").Length > 0) AlreadyCore();
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
-            log("检查P2PMode核心中..");
+            log("检查LinkMode核心中..");
             string url = "http://mczlf.loft.games/API/link.exe"; //OnlySupport AMD64
             string fileName = Path.Combine(customDirectory, "link.exe");
             string fileMd5 = "559a28f9d51dcbec970d2dbc7f2fd8aa";
@@ -197,7 +201,7 @@ namespace MinecraftConnectTool
             CreateFloatButton(new FloatButton.Config(Program.MainForm, new[]{
                 new FloatButton.ConfigBtn("CloseButton", Properties.Resources.close){
                 Text = "关闭",
-                Tooltip = "关闭P2P核心-all",
+                Tooltip = "关闭Link核心-all",
                 Round = true,
                 Type = TTypeMini.Primary,
                 Radius = 6,
@@ -216,7 +220,8 @@ namespace MinecraftConnectTool
 
         private void LinkMode_Load(object sender, EventArgs e)
         {
-
+            string gonggao = $"感谢您使用Minecraft Connect Tool\n群聊 690625244       《欢迎加入ヾ(≧▽≦*)o\n仅供Minecraft联机及其他合法用途拓展使用,违法使用作者不负任何责任\n========================================================\nLinkMode功能目前可能尚不完善,若有Bug可以反馈";
+            log(gonggao);
         }
 
         private async void Joiner_Click(object sender, EventArgs e)
@@ -226,30 +231,30 @@ namespace MinecraftConnectTool
             if (Process.GetProcessesByName("main").Length > 0) AlreadyCore();
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
-            Random random = new Random();
-            string randomPort = random.Next(1, 65536).ToString(); // 生成随机端口号并转换为字符串
-            bool usecustomport = Form1.config.read<bool>("usecustomport", false);
-            if (usecustomport)
-            {
-                string customport = Form1.config.read<string>("customport", "None");
-                if (!int.TryParse(customport, out int parsedPort) || parsedPort < 1 || parsedPort > 65535)
-                {
-                    AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow...意料之外呢", "线程小伙读取到了自定义端口信息,但是端口居然是神秘的字符\n读取到的自定义端口：" + customport, AntdUI.TType.Warn)
-                    {
-                        CloseIcon = true,
-                        Font = Program.AlertFont,
-                        Draggable = false,
-                        CancelText = null,
-                        OkText = "好的"
-                    });
-                    return;
-                }
-                else
-                {
-                    randomPort = customport; // 将 customport 的字符串值赋值给 randomPort
-                }
-            }
-            log("检查P2PMode核心中..");
+            //Random random = new Random();
+            //string randomPort = random.Next(1, 65536).ToString(); // 生成随机端口号并转换为字符串
+            //bool usecustomport = Form1.config.read<bool>("usecustomport", false);
+            //if (usecustomport)
+            //{
+            //    string customport = Form1.config.read<string>("customport", "None");
+            //    if (!int.TryParse(customport, out int parsedPort) || parsedPort < 1 || parsedPort > 65535)
+            //    {
+            //        AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow...意料之外呢", "线程小伙读取到了自定义端口信息,但是端口居然是神秘的字符\n读取到的自定义端口：" + customport, AntdUI.TType.Warn)
+            //        {
+            //            CloseIcon = true,
+            //            Font = Program.AlertFont,
+            //            Draggable = false,
+            //            CancelText = null,
+            //            OkText = "好的"
+            //        });
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        randomPort = customport; // 将 customport 的字符串值赋值给 randomPort
+            //    }
+            //}
+            log("检查LinkMode核心中..");
             string url = "http://mczlf.loft.games/API/link.exe"; //OnlySupport AMD64
             string fileName = Path.Combine(customDirectory, "link.exe");
             string fileMd5 = "559a28f9d51dcbec970d2dbc7f2fd8aa";
@@ -385,9 +390,9 @@ namespace MinecraftConnectTool
                 _linkProcess = process;
 
                 AntdUI.Message.info(Program.MainForm,
-                                    "P2P 核心已启动，日志将输出到右侧",
+                                    "Link 核心已启动，日志将输出到右侧",
                                     autoClose: 5,
-                                    font: this.Font);
+                                    font: Program.AlertFont);
                 log("link.exe 启动成功~");
 
                 // 可选：把状态灯改成绿色
@@ -407,7 +412,7 @@ namespace MinecraftConnectTool
             CreateFloatButton(new FloatButton.Config(Program.MainForm, new[]{
                 new FloatButton.ConfigBtn("CloseButton", Properties.Resources.close){
                 Text = "关闭",
-                Tooltip = "关闭P2P核心-all",
+                Tooltip = "关闭Link核心-all",
                 Round = true,
                 Type = TTypeMini.Primary,
                 Radius = 6,
@@ -500,7 +505,7 @@ namespace MinecraftConnectTool
         {
         //{ "3.21.12", () => log("LogListener已成功被加载") },//Lamba表达式可以跑code
         //{ "connect", Method }//字典只能酱紫
-        { "提示码", () => { Program.alerterror($"提取结果{ExtractPromptCode(message)}");alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); } },
+        { "提示码", () => { alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); MessageBox.Show($"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", "增强提醒", MessageBoxButtons.OK, MessageBoxIcon.Information);AntdUI.Notification.info(Program.MainForm, "增强提醒", $"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", align: AntdUI.TAlignFrom.BR, font: Program.AlertFont);try{Clipboard.SetText($"邀请你加入我的Minecraft联机房间！\n提示码为 {message}\n复制时请勿带上前面的中文哦");}catch{ } } },
         { "未通过MC流量检测，程序终止", () => { badge3.State = TState.Error; badge3.Text = "请先启动游戏后再开启房间"; Program.alerterror("请先启动游戏后再开启房间");stoplink(); } },
         { "P2PNetwork init start", () => log("正在尝试连接P2PNetwork") },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
@@ -609,7 +614,7 @@ namespace MinecraftConnectTool
 
         public void AlreadyCore()
         {
-            AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow,这样真的不会出问题吗", "你貌似启动了多个P2P核心,可能会报错导致无法连接哦\n点击右下角的关闭按钮即可关闭所有已启动的核心\n如果您知道您在做什么，点击确定忽略该信息", AntdUI.TType.Warn)
+            AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow,这样真的不会出问题吗", "你貌似启动了多个Link核心,可能会报错导致无法连接哦\n点击右下角的关闭按钮即可关闭所有已启动的核心\n如果您知道您在做什么，点击确定忽略该信息", AntdUI.TType.Warn)
             {
                 CloseIcon = true,
                 Font = Program.AlertFont,
@@ -747,5 +752,30 @@ namespace MinecraftConnectTool
             }
         }
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            materialSingleLineTextField1.Visible = true;button2.Visible = true;
+        }
+        private void materialSingleLineTextField2_LostFocus(object sender, EventArgs e)
+        {
+            {
+                // 获取文本框中的内容并赋值给变量提示码
+                string text1 = materialSingleLineTextField2.Text;
+                if (string.IsNullOrWhiteSpace(text1) || text1.Equals("输入提示码"))
+                {
+                    AntdUI.Message.warn(Program.MainForm, "你好像什么都没有写哦(提示码)", autoClose: 5, font: Program.AlertFont);
+                    materialSingleLineTextField2.Text = "输入提示码";
+                }
+            }
+        }
+
+        private void materialSingleLineTextField2_Click(object sender, EventArgs e)
+        {
+            if (materialSingleLineTextField2.Text.Equals("输入提示码"))
+            {
+                materialSingleLineTextField2.Text = "";
+            }
+        }
     }
 }

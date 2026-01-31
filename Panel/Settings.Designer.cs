@@ -73,7 +73,7 @@
             this.label7 = new AntdUI.Label();
             this.switch7 = new AntdUI.Switch();
             this.button19 = new AntdUI.Button();
-            this.button20 = new AntdUI.Button();
+            this.button21 = new AntdUI.Button();
             this.SuspendLayout();
             // 
             // alert1
@@ -638,25 +638,25 @@
             this.button19.Text = "?";
             this.button19.Click += new System.EventHandler(this.button19_Click);
             // 
-            // button20
+            // button21
             // 
-            this.button20.BackHover = System.Drawing.Color.FromArgb(((int)(((byte)(174)))), ((int)(((byte)(213)))), ((int)(((byte)(229)))));
-            this.button20.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button20.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button20.IconSvg = "GithubOutlined";
-            this.button20.Location = new System.Drawing.Point(653, 0);
-            this.button20.Name = "button20";
-            this.button20.Radius = 50;
-            this.button20.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.button20.Size = new System.Drawing.Size(114, 44);
-            this.button20.TabIndex = 64;
-            this.button20.Text = "开源地址";
-            this.button20.Click += new System.EventHandler(this.button20_Click);
+            this.button21.BackHover = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(188)))), ((int)(((byte)(188)))));
+            this.button21.BadgeAlign = AntdUI.TAlignFrom.Bottom;
+            this.button21.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button21.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button21.IconSvg = "GithubOutlined";
+            this.button21.Location = new System.Drawing.Point(632, 285);
+            this.button21.Name = "button21";
+            this.button21.Size = new System.Drawing.Size(55, 29);
+            this.button21.TabIndex = 65;
+            this.button21.Text = "赞助";
+            this.button21.Click += new System.EventHandler(this.button21_Click);
             // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.button21);
             this.Controls.Add(this.button19);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.switch7);
@@ -702,7 +702,6 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.alert1);
-            this.Controls.Add(this.button20);
             this.Name = "Settings";
             this.Size = new System.Drawing.Size(762, 455);
             this.Load += new System.EventHandler(this.Settings_Load);
@@ -756,6 +755,6 @@
         private AntdUI.Label label7;
         private AntdUI.Switch switch7;
         private AntdUI.Button button19;
-        private AntdUI.Button button20;
+        private AntdUI.Button button21;
     }
 }

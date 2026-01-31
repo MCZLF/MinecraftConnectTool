@@ -535,7 +535,7 @@ namespace MinecraftConnectTool
             if (message == "连接服务器成功，分享联机码后联机！")
                     {
                         message = "连接服务器成功，将提示码分享给好友即可快速开始联机";
-                        Debug.WriteLine($"[TextReplaced] {message}"); // 或 Console.WriteLine / 你的日志方法
+                        Debug.WriteLine($"[TextReplaced] {message}"); //让Ai帮我改改排版结果给我上没用的注释
                     }//写在前面会重新触发上岛和增强提醒，所以写在这里了T_T
             richTextBoxLog.AppendText(message + Environment.NewLine);
             if (richTextBoxLog.TextLength > 0)

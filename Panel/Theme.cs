@@ -89,8 +89,9 @@ namespace MinecraftConnectTool
             colorPicker9.Value = ShowConfig.Read("SettingButtonColor");
             colorPicker10.Value = ShowConfig.Read("SettingBack");
             colorPicker12.Value = ShowConfig.Read("UpdateButton");
-            colorPicker11.Value = ShowConfig.Read("CandyButton");
-            colorPicker13.Value = ShowConfig.Read("CandyInput");
+            colorPicker11.Value = ShowConfig.Read("LinkButton");
+            colorPicker13.Value = ShowConfig.Read("LinkInput");
+            colorPicker14.Value = ShowConfig.Read("LinkLog");
             bool EnableATDDark = Form1.config.read<bool>("EnableATDDark", false);
             if (EnableATDDark)
             {
@@ -121,8 +122,9 @@ namespace MinecraftConnectTool
             ThemeConfig.Write("SettingButtonColor", colorPicker9.Value.ToHex());
             ThemeConfig.Write("SettingBack", colorPicker10.Value.ToHex());
             ThemeConfig.Write("UpdateButton", colorPicker12.Value.ToHex());
-            ThemeConfig.Write("CandyButton", colorPicker11.Value.ToHex());
-            ThemeConfig.Write("CandyInput", colorPicker13.Value.ToHex());
+            ThemeConfig.Write("LinkButton", colorPicker11.Value.ToHex());
+            ThemeConfig.Write("LinkInput", colorPicker13.Value.ToHex());
+            ThemeConfig.Write("LinkLog", colorPicker14.Value.ToHex());
             Application.Restart();
         }
 

@@ -63,6 +63,8 @@
             this.label15 = new AntdUI.Label();
             this.switch6 = new AntdUI.Switch();
             this.button17 = new AntdUI.Button();
+            this.colorPicker14 = new AntdUI.ColorPicker();
+            this.label16 = new AntdUI.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -341,7 +343,7 @@
             // colorPicker11
             // 
             this.colorPicker11.DisabledAlpha = true;
-            this.colorPicker11.Location = new System.Drawing.Point(407, 180);
+            this.colorPicker11.Location = new System.Drawing.Point(407, 182);
             this.colorPicker11.Name = "colorPicker11";
             this.colorPicker11.Size = new System.Drawing.Size(36, 23);
             this.colorPicker11.TabIndex = 27;
@@ -351,11 +353,11 @@
             // label11
             // 
             this.label11.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label11.Location = new System.Drawing.Point(277, 180);
+            this.label11.Location = new System.Drawing.Point(277, 182);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(166, 23);
             this.label11.TabIndex = 26;
-            this.label11.Text = "Candy-按钮颜色";
+            this.label11.Text = "Link-按钮颜色";
             // 
             // colorPicker13
             // 
@@ -374,7 +376,7 @@
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(166, 23);
             this.label13.TabIndex = 28;
-            this.label13.Text = "Candy-输入框";
+            this.label13.Text = "Link-输入框";
             // 
             // switch2
             // 
@@ -423,17 +425,38 @@
             this.button17.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button17.IconRatio = 0.75F;
             this.button17.IconSvg = "EditOutlined";
-            this.button17.Location = new System.Drawing.Point(277, 240);
+            this.button17.Location = new System.Drawing.Point(277, 364);
             this.button17.Name = "button17";
             this.button17.Size = new System.Drawing.Size(200, 50);
             this.button17.TabIndex = 62;
             this.button17.Text = "编辑主题文件";
             this.button17.Click += new System.EventHandler(this.button17_Click);
             // 
+            // colorPicker14
+            // 
+            this.colorPicker14.DisabledAlpha = true;
+            this.colorPicker14.Location = new System.Drawing.Point(420, 240);
+            this.colorPicker14.Name = "colorPicker14";
+            this.colorPicker14.Size = new System.Drawing.Size(36, 23);
+            this.colorPicker14.TabIndex = 64;
+            this.colorPicker14.Text = "colorPicker14";
+            this.colorPicker14.Value = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(119)))), ((int)(((byte)(255)))));
+            // 
+            // label16
+            // 
+            this.label16.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label16.Location = new System.Drawing.Point(277, 240);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(166, 23);
+            this.label16.TabIndex = 63;
+            this.label16.Text = "Link-日志背景";
+            // 
             // Theme
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.colorPicker14);
+            this.Controls.Add(this.label16);
             this.Controls.Add(this.button17);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.switch6);
@@ -514,5 +537,7 @@
         private AntdUI.Label label15;
         private AntdUI.Switch switch6;
         private AntdUI.Button button17;
+        private AntdUI.ColorPicker colorPicker14;
+        private AntdUI.Label label16;
     }
 }

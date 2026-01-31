@@ -223,7 +223,7 @@ namespace MinecraftConnectTool
             log("MinecraftConnectTool Network Core | Tunneling via MCILM-Link | Adapted by MCZLF_Studio");
             string gonggao = $"感谢您使用Minecraft Connect Tool\n群聊 690625244       《欢迎加入ヾ(≧▽≦*)o\n仅供Minecraft联机及其他合法用途拓展使用,违法使用作者不负任何责任\n========================================================\nLinkMode功能目前可能尚不完善,若有Bug可以反馈";
             log(gonggao);
-            
+            color();
         }
 
         private async void Joiner_Click(object sender, EventArgs e)
@@ -536,16 +536,16 @@ namespace MinecraftConnectTool
                 }
             }
             if (message == "连接服务器成功，分享联机码后联机！")
-                    {
-                        message = "连接服务器成功，将提示码分享给好友即可快速开始联机";
-                        Debug.WriteLine($"[TextReplaced] {message}"); //让Ai帮我改改排版结果给我上没用的注释
-                    }//写在前面会重新触发上岛和增强提醒，所以写在这里了T_T
+            {
+                message = "连接服务器成功，将提示码分享给好友即可快速开始联机";
+                Debug.WriteLine($"[TextReplaced] {message}"); //让Ai帮我改改排版结果给我上没用的注释
+            }//写在前面会重新触发上岛和增强提醒，所以写在这里了T_T
             richTextBoxLog.AppendText(message + Environment.NewLine);
             if (richTextBoxLog.TextLength > 0)
             {
                 try
                 {
-                    
+
                     richTextBoxLog.ScrollToCaret();
                 }
                 catch (COMException ex)
@@ -677,9 +677,9 @@ namespace MinecraftConnectTool
         private string statusCommandFeedback = string.Empty;
         #region 状态轮询
 
-/// <summary>
-/// 启动成功后调用：开始每 1 s 查询一次连接状态
-/// </summary>
+        /// <summary>
+        /// 启动成功后调用：开始每 1 s 查询一次连接状态
+        /// </summary>
         private void StartStatusPolling()
         {
             // 如果之前已经开过，先停掉
@@ -716,7 +716,9 @@ namespace MinecraftConnectTool
             _linkProcess.ErrorDataReceived += errorFilter;
 
             // 发命令
-            try { _linkProcess.StandardInput.WriteLine(cmdJson);
+            try
+            {
+                _linkProcess.StandardInput.WriteLine(cmdJson);
                 label1.Visible = true;
             }
             catch { /* 进程已挂，忽略 */ }
@@ -766,7 +768,7 @@ namespace MinecraftConnectTool
 
         private void button1_Click(object sender, EventArgs e)
         {
-            materialSingleLineTextField1.Visible = true;button2.Visible = true;
+            materialSingleLineTextField1.Visible = true; button2.Visible = true;
         }
         private void materialSingleLineTextField2_LostFocus(object sender, EventArgs e)
         {
@@ -787,6 +789,52 @@ namespace MinecraftConnectTool
             {
                 materialSingleLineTextField2.Text = "";
             }
+        }
+        static void ApplyColor(string key, Action<Color> setColor)
+        {
+            var hex = ThemeConfig.ReadHex(key);
+            if (hex == null) return;
+
+            var c = ColorTranslator.FromHtml(hex);
+            if (c.A != 255) return;   // 透明色拒绝刷写
+
+            setColor(c);
+        }
+
+        private void color()
+        {
+            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            {
+                try
+                {
+                    // 只读、不锁文件；按需缩放
+                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    using (var src = Image.FromStream(fs))
+                    {
+                        // 缩到窗口大小（保持比例）
+                        var sz = this.ClientSize;
+                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                    }
+                }
+                catch { this.BackgroundImage = null; }
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                ApplyColor("P2PBack", c => this.BackColor = c);
+                ApplyColor("P2PBack", c => TopText.BackColor = c);
+            }
+            foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+            {
+                ApplyColor("LinkButton", c => btn.BackColor = c);
+                ApplyColor("LinkButton", c => btn.DefaultBack = c);
+            }
+            foreach (var btn in this.Controls.OfType<MaterialSingleLineTextField>())
+            {
+                ApplyColor("LinkInput", c => btn.BackColor = c);
+            }
+            ApplyColor("LinkLog", c => richTextBoxLog.BackColor = c);
         }
     }
 }

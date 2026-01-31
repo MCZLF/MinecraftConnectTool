@@ -73,10 +73,11 @@
             menuItem1.Sub.Add(menuItem4);
             menuItem1.Tag = "P2PHome";
             menuItem1.Text = "P2P模式";
+            menuItem5.Enabled = false;
             menuItem5.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            menuItem5.IconSvg = "CloseCircleFilled";
-            menuItem5.Tag = "ZTHome";
-            menuItem5.Text = "ETLobby(维护)";
+            menuItem5.IconSvg = "SlackCircleFilled";
+            menuItem5.Tag = "LinkMode";
+            menuItem5.Text = "Link模式";
             menuItem6.IconSvg = "BuildFilled";
             menuItem6.Tag = "Extension";
             menuItem6.Text = "拓展";

@@ -119,6 +119,7 @@ namespace MinecraftConnectTool
             {
                 AntdUI.Config.IsDark = true; }
             await CheckAndShowAnnouncementAsync();
+            await CheckThirdPartyEnableAsync();
         }
 
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
@@ -145,7 +146,7 @@ namespace MinecraftConnectTool
                 case "P2PLog":
                     LoadPanel(panel, typeof(P2PLog));
                     break;
-                case "ZTHome":
+                case "LinkMode":
                     LoadPanel(panel, typeof(LinkMode));
                     //AntdUI.Message.warn(Program.MainForm, $"114514", autoClose: 5, font: formfont);
                     break;
@@ -716,6 +717,28 @@ SysVersion:{SystemEvVersion}
                 MaskClosable = true,
                 DisplayDelay = 0
             });
+        }
+        private async Task CheckThirdPartyEnableAsync()
+        {
+            try
+            {
+                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
+                {
+                    var result = await client.GetStringAsync("https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/IsThirdPartyEnable");
+                    if (result.Trim().Equals("True", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.menu1.Items[1].Enabled = true;
+                    }
+                    else
+                    {
+                        AntdUI.Message.warn(this, "LinkMode联机模式暂不可使用,服务暂停", autoClose: 5,font:Program.AlertFont);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.alerterror($"获取第三方功能可用性时失败：\n请检查是否已连接到互联网\n{ex.Message}");
+            }
         }
     }
 }

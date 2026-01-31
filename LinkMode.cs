@@ -183,7 +183,7 @@ namespace MinecraftConnectTool
                 AntdUI.Message.info(Program.MainForm,
                                     "Link 核心已启动，日志将输出到右侧",
                                     autoClose: 5,
-                                    font: this.Font);
+                                    font: Program.AlertFont);
                 log("link.exe 启动成功~");
                 badge3.Visible = true;
                 badge3.State = TState.Success;
@@ -471,16 +471,16 @@ namespace MinecraftConnectTool
             if ("中转模式|P2P模式".Contains(message)) return;
             var replacements = new Dictionary<string, string>
     {
+
+        { "连接服务器成功，分享联机码后联机！", "连接服务器成功，将提示码分享给好友即可快速开始联机" },
         { "分享码", "提示码" }, //适应MCT本土化叫法
         { "联机码", "提示码" },
-        { "openp2p.cn@gmail.com", "admin@mczlf.xyz" },
         { "openp2p start", "Powered by OpenP2P" }
         };
             foreach (var pair in replacements)
             {
                 message = Regex.Replace(message, @"\b" + Regex.Escape(pair.Key) + @"\b", pair.Value);
             }
-
             string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "MCZLFAPP", "Temp", "APPLog.ini");
             Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
             string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
@@ -507,7 +507,7 @@ namespace MinecraftConnectTool
         //{ "connect", Method }//字典只能酱紫
         { "提示码", () => { alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); MessageBox.Show($"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", "增强提醒", MessageBoxButtons.OK, MessageBoxIcon.Information);AntdUI.Notification.info(Program.MainForm, "增强提醒", $"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", align: AntdUI.TAlignFrom.BR, font: Program.AlertFont);try{Clipboard.SetText($"邀请你加入我的Minecraft联机房间！\n提示码为 {message}\n复制时请勿带上前面的中文哦");}catch{ } } },
         { "未通过MC流量检测，程序终止", () => { badge3.State = TState.Error; badge3.Text = "请先启动游戏后再开启房间"; Program.alerterror("请先启动游戏后再开启房间");stoplink(); } },
-        { "P2PNetwork init start", () => log("正在尝试连接P2PNetwork") },
+        { "解析响应失败", () => {log("与服务器的连接受阻，可能是服务器被攻击造成离线");stoplink(); } },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
         { "LISTEN ON PORT", () => {log("Success:成功在本地创建监听端口");badge3.State = TState.Success; badge3.Text = "已连接";} },
         //{ "relay", () => badge3.State = TState.Warn},
@@ -532,11 +532,17 @@ namespace MinecraftConnectTool
                     }
                 }
             }
+            if (message == "连接服务器成功，分享联机码后联机！")
+                    {
+                        message = "连接服务器成功，将提示码分享给好友即可快速开始联机";
+                        Debug.WriteLine($"[TextReplaced] {message}"); // 或 Console.WriteLine / 你的日志方法
+                    }//写在前面会重新触发上岛和增强提醒，所以写在这里了T_T
             richTextBoxLog.AppendText(message + Environment.NewLine);
             if (richTextBoxLog.TextLength > 0)
             {
                 try
                 {
+                    
                     richTextBoxLog.ScrollToCaret();
                 }
                 catch (COMException ex)

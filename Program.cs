@@ -20,10 +20,12 @@ namespace MinecraftConnectTool
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
-
+            if (System.IO.File.Exists("debug"))
+            {
+                InitDebugConsole();
+            }
             bool isElevated = args.Contains("--admin");
             int admin = 0;
-#if 调试
             if (!isElevated)
             {
                 // 尝试以管理员权限重新启动
@@ -53,7 +55,6 @@ namespace MinecraftConnectTool
             {
                 admin = 1;
             }
-#endif
             // 设置全局变量（你可以根据需要改为静态字段或其他方式）
             Program.admin = admin;;
             MainForm = new Form1();
@@ -94,6 +95,60 @@ namespace MinecraftConnectTool
                 CancelText = null,
                 OkText = "知道了"
             });
+        }
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool AllocConsole();
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        static extern bool SetConsoleOutputCP(uint wCodePageID);
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        static extern bool SetConsoleCP(uint wCodePageID);
+
+        static void InitDebugConsole()
+        {
+            AllocConsole();
+            SetConsoleOutputCP(65001);
+            SetConsoleCP(65001);
+            System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            // 接管输出流以实现自动着色
+            System.Console.SetOut(new ColorInterceptor(System.Console.Out));
+            System.Console.SetError(new ColorInterceptor(System.Console.Error));
+        }
+
+        class ColorInterceptor : System.IO.TextWriter
+        {
+            private System.IO.TextWriter _inner;
+
+            public ColorInterceptor(System.IO.TextWriter inner) => _inner = inner;
+
+            public override System.Text.Encoding Encoding => _inner.Encoding;
+
+            public override void Write(string value)
+            {
+                if (value == null) return;
+
+                var origin = System.Console.ForegroundColor;
+
+                // 无额外字符串分配，忽略大小写检测关键词
+                if (value.IndexOf("error", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    System.Console.ForegroundColor = System.ConsoleColor.Red;
+                else if (value.IndexOf("warn", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    System.Console.ForegroundColor = System.ConsoleColor.DarkYellow; // 橙色
+                else if (value.IndexOf("success", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    System.Console.ForegroundColor = System.ConsoleColor.Green;
+
+                _inner.Write(value);
+                System.Console.ForegroundColor = origin;
+            }
+
+            public override void WriteLine(string value)
+            {
+                _inner.Write(DateTime.Now.ToString("[HH:mm:ss.fff] "));
+                Write(value);
+                _inner.WriteLine();
+            }
         }
     }
 }

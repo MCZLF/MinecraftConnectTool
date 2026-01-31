@@ -96,16 +96,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LinkMode.cs">
+    <Compile Include="Panel\LinkMode.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="LinkMode.Designer.cs">
+    <Compile Include="Panel\LinkMode.Designer.cs">
       <DependentUpon>LinkMode.cs</DependentUpon>
     </Compile>
-    <Compile Include="PanelAlert.cs">
+    <Compile Include="RightPanel\PanelAlert.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PanelAlert.Designer.cs">
+    <Compile Include="RightPanel\PanelAlert.Designer.cs">
       <DependentUpon>PanelAlert.cs</DependentUpon>
     </Compile>
     <Compile Include="Plugins\Probe.cs" />
@@ -223,10 +223,10 @@
     <EmbeddedResource Include="Extension.resx">
       <DependentUpon>Extension.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LinkMode.resx">
+    <EmbeddedResource Include="Panel\LinkMode.resx">
       <DependentUpon>LinkMode.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PanelAlert.resx">
+    <EmbeddedResource Include="RightPanel\PanelAlert.resx">
       <DependentUpon>PanelAlert.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panel\Help.resx">

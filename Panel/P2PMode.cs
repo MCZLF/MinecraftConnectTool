@@ -831,6 +831,7 @@ namespace MinecraftConnectTool
             {
                 try
                 {
+                    Console.WriteLine("P2PMode日志写入-＞"+message);
                     richTextBoxLog.ScrollToCaret();
                 }
                 catch (COMException ex)

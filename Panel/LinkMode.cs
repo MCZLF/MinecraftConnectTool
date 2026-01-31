@@ -490,6 +490,7 @@ namespace MinecraftConnectTool
             {
                 richTextBoxLog.Invoke(new Action(() =>
                 {
+                    Console.WriteLine("LinkMode日志写入-＞" + message);
                     LogToRichTextBox(message);
                 }));
             }
@@ -507,7 +508,7 @@ namespace MinecraftConnectTool
         //{ "connect", Method }//字典只能酱紫
         { "提示码", () => { alert1.Visible = true; infobutton.Visible = true;infobutton.Text=ExtractPromptCode(message); MessageBox.Show($"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", "增强提醒", MessageBoxButtons.OK, MessageBoxIcon.Information);AntdUI.Notification.info(Program.MainForm, "增强提醒", $"您的提示码为{message}\n已复制入剪切板中,快去粘贴给小伙伴吧", align: AntdUI.TAlignFrom.BR, font: Program.AlertFont);try{Clipboard.SetText($"邀请你加入我的Minecraft联机房间！\n提示码为 {message}\n复制时请勿带上前面的中文哦");}catch{ } } },
         { "未通过MC流量检测，程序终止", () => { badge3.State = TState.Error; badge3.Text = "请先启动游戏后再开启房间"; Program.alerterror("请先启动游戏后再开启房间");stoplink(); } },
-        { "解析响应失败", () => {log("与服务器的连接受阻，可能是服务器被攻击造成离线");stoplink(); } },
+        { "解析响应失败", () => {log("与服务器的连接受阻，可能是服务器被攻击造成离线，建议再试试呢");stoplink(); } },
         { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
         { "LISTEN ON PORT", () => {log("Success:成功在本地创建监听端口");badge3.State = TState.Success; badge3.Text = "已连接";} },
         //{ "relay", () => badge3.State = TState.Warn},
@@ -666,6 +667,7 @@ namespace MinecraftConnectTool
                 });
             }
         }
+        #region 轮询
         // 轮询定时器
         private System.Timers.Timer _statusTimer;
 
@@ -757,6 +759,7 @@ namespace MinecraftConnectTool
                 label1.Visible = false;
             }
         }
+        #endregion
         #endregion
 
         private void button1_Click(object sender, EventArgs e)

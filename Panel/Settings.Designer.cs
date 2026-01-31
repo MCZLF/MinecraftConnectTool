@@ -73,6 +73,7 @@
             this.label7 = new AntdUI.Label();
             this.switch7 = new AntdUI.Switch();
             this.button19 = new AntdUI.Button();
+            this.button20 = new AntdUI.Button();
             this.SuspendLayout();
             // 
             // alert1
@@ -195,7 +196,7 @@
             // 
             this.switch1.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.switch1.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.switch1.Location = new System.Drawing.Point(541, 119);
+            this.switch1.Location = new System.Drawing.Point(546, 98);
             this.switch1.Name = "switch1";
             this.switch1.Size = new System.Drawing.Size(34, 23);
             this.switch1.TabIndex = 22;
@@ -206,7 +207,7 @@
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(581, 119);
+            this.label1.Location = new System.Drawing.Point(586, 98);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 23);
             this.label1.TabIndex = 23;
@@ -218,7 +219,7 @@
             this.input1.BorderHover = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(205)))), ((int)(((byte)(255)))));
             this.input1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.input1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(116)))), ((int)(((byte)(21)))));
-            this.input1.Location = new System.Drawing.Point(538, 139);
+            this.input1.Location = new System.Drawing.Point(543, 118);
             this.input1.MaxLength = 6;
             this.input1.Name = "input1";
             this.input1.Radius = 0;
@@ -236,7 +237,7 @@
             this.savebut.DefaultBack = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(121)))));
             this.savebut.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.savebut.IconSvg = "SaveOutlined";
-            this.savebut.Location = new System.Drawing.Point(643, 139);
+            this.savebut.Location = new System.Drawing.Point(648, 118);
             this.savebut.Name = "savebut";
             this.savebut.Radius = 50;
             this.savebut.Size = new System.Drawing.Size(79, 40);
@@ -332,7 +333,7 @@
             // button8
             // 
             this.button8.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button8.Location = new System.Drawing.Point(643, 119);
+            this.button8.Location = new System.Drawing.Point(648, 98);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(23, 23);
             this.button8.TabIndex = 37;
@@ -461,7 +462,7 @@
             // button15
             // 
             this.button15.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button15.Location = new System.Drawing.Point(654, 188);
+            this.button15.Location = new System.Drawing.Point(659, 167);
             this.button15.Name = "button15";
             this.button15.Size = new System.Drawing.Size(23, 23);
             this.button15.TabIndex = 51;
@@ -475,7 +476,7 @@
             this.savebut2.DefaultBack = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(121)))));
             this.savebut2.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.savebut2.IconSvg = "SaveOutlined";
-            this.savebut2.Location = new System.Drawing.Point(683, 177);
+            this.savebut2.Location = new System.Drawing.Point(688, 156);
             this.savebut2.Name = "savebut2";
             this.savebut2.Radius = 50;
             this.savebut2.Size = new System.Drawing.Size(79, 40);
@@ -493,7 +494,7 @@
             this.input2.BorderHover = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(205)))), ((int)(((byte)(255)))));
             this.input2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.input2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(116)))), ((int)(((byte)(21)))));
-            this.input2.Location = new System.Drawing.Point(538, 214);
+            this.input2.Location = new System.Drawing.Point(543, 193);
             this.input2.MaxLength = 10;
             this.input2.Name = "input2";
             this.input2.Radius = 0;
@@ -508,7 +509,7 @@
             // label5
             // 
             this.label5.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.Location = new System.Drawing.Point(578, 188);
+            this.label5.Location = new System.Drawing.Point(583, 167);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(85, 23);
             this.label5.TabIndex = 48;
@@ -520,7 +521,7 @@
             // 
             this.switch5.Fill = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.switch5.FillHover = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.switch5.Location = new System.Drawing.Point(538, 188);
+            this.switch5.Location = new System.Drawing.Point(543, 167);
             this.switch5.Name = "switch5";
             this.switch5.Size = new System.Drawing.Size(34, 23);
             this.switch5.TabIndex = 47;
@@ -563,7 +564,7 @@
             this.button_mclogs.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button_mclogs.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button_mclogs.IconSvg = "ToTopOutlined";
-            this.button_mclogs.Location = new System.Drawing.Point(533, 260);
+            this.button_mclogs.Location = new System.Drawing.Point(538, 239);
             this.button_mclogs.Name = "button_mclogs";
             this.button_mclogs.Size = new System.Drawing.Size(130, 48);
             this.button_mclogs.TabIndex = 57;
@@ -637,6 +638,21 @@
             this.button19.Text = "?";
             this.button19.Click += new System.EventHandler(this.button19_Click);
             // 
+            // button20
+            // 
+            this.button20.BackHover = System.Drawing.Color.FromArgb(((int)(((byte)(174)))), ((int)(((byte)(213)))), ((int)(((byte)(229)))));
+            this.button20.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button20.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button20.IconSvg = "GithubOutlined";
+            this.button20.Location = new System.Drawing.Point(653, 0);
+            this.button20.Name = "button20";
+            this.button20.Radius = 50;
+            this.button20.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.button20.Size = new System.Drawing.Size(114, 44);
+            this.button20.TabIndex = 64;
+            this.button20.Text = "开源地址";
+            this.button20.Click += new System.EventHandler(this.button20_Click);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -686,6 +702,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.alert1);
+            this.Controls.Add(this.button20);
             this.Name = "Settings";
             this.Size = new System.Drawing.Size(762, 455);
             this.Load += new System.EventHandler(this.Settings_Load);
@@ -739,5 +756,6 @@
         private AntdUI.Label label7;
         private AntdUI.Switch switch7;
         private AntdUI.Button button19;
+        private AntdUI.Button button20;
     }
 }

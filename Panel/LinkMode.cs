@@ -34,7 +34,7 @@ namespace MinecraftConnectTool
         private async void Opener_Click(object sender, EventArgs e)
         {
             role = "1"; //房主
-            if (Process.GetProcessesByName("main").Length > 0) AlreadyCore();
+            if (Process.GetProcessesByName("link").Length > 0) AlreadyCore();
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
             log("检查LinkMode核心中..");
@@ -220,15 +220,17 @@ namespace MinecraftConnectTool
 
         private void LinkMode_Load(object sender, EventArgs e)
         {
+            log("MinecraftConnectTool Network Core | Tunneling via MCILM-Link | Adapted by MCZLF_Studio");
             string gonggao = $"感谢您使用Minecraft Connect Tool\n群聊 690625244       《欢迎加入ヾ(≧▽≦*)o\n仅供Minecraft联机及其他合法用途拓展使用,违法使用作者不负任何责任\n========================================================\nLinkMode功能目前可能尚不完善,若有Bug可以反馈";
             log(gonggao);
+            
         }
 
         private async void Joiner_Click(object sender, EventArgs e)
         {
             string user = materialSingleLineTextField2.Text;
             role = "2"; //加入
-            if (Process.GetProcessesByName("main").Length > 0) AlreadyCore();
+            if (Process.GetProcessesByName("link").Length > 0) AlreadyCore();
             string tempDirectory = Path.GetTempPath();
             string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
             //Random random = new Random();
@@ -239,7 +241,7 @@ namespace MinecraftConnectTool
             //    string customport = Form1.config.read<string>("customport", "None");
             //    if (!int.TryParse(customport, out int parsedPort) || parsedPort < 1 || parsedPort > 65535)
             //    {
-            //        AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Wow...意料之外呢", "线程小伙读取到了自定义端口信息,但是端口居然是神秘的字符\n读取到的自定义端口：" + customport, AntdUI.TType.Warn)
+            //        AntdUI.Modal.open(new AntdUI.Modal.Config(Program.linkForm, $"Wow...意料之外呢", "线程小伙读取到了自定义端口信息,但是端口居然是神秘的字符\n读取到的自定义端口：" + customport, AntdUI.TType.Warn)
             //        {
             //            CloseIcon = true,
             //            Font = Program.AlertFont,

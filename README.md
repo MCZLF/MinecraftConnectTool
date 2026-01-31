@@ -57,9 +57,13 @@
 - ProbeServer
 - Frp(OnlyServerService)
 
-## 开源协议
+---
+
+## 开源协议及第三方项目引用
+
 - 本项目：[MIT License](https://github.com/MCZLF/MinecraftConnectTool/blob/master/LICENSE)  
-- 底层 P2P 组件 [OpenP2P](https://github.com/openp2p-cn/openp2p)  [MIT License](https://github.com/openp2p-cn/openp2p/blob/master/LICENSE)  
+- 底层 P2P 组件 [OpenP2P](https://github.com/openp2p-cn/openp2p)：[MIT License](https://github.com/openp2p-cn/openp2p/blob/master/LICENSE)  
+- MCILM-Link：闭源组件，由 MciLm 开发组独立开发，[官网](https://link.mcilm.top/)
 
 源码地址：  
 [https://github.com/MCZLF/MinecraftConnectTool](https://github.com/MCZLF/MinecraftConnectTool)
@@ -67,9 +71,14 @@
 ---
 
 ## 致谢
-NAT 穿透P2P联机功能由 OpenP2P 提供  
-仓库地址：[https://github.com/openp2p-cn/openp2p](https://github.com/openp2p-cn/openp2p)  
-特此注明并感谢原作者。
+
+- P2PMode-**NAT 穿透 P2P 联机功能**由 OpenP2P 提供  
+  仓库地址：[https://github.com/openp2p-cn/openp2p](https://github.com/openp2p-cn/openp2p)  
+  本项目使用 OpenP2P 作为主要联机方案，特此注明并感谢原作者。
+
+- LinkMode-**Frp/P2P 混合联机功能**由 MCILM-Link 提供  
+  官网地址：[https://link.mcilm.top/](https://link.mcilm.top/)  
+  本项目使用 MCILM-Link 作为备用联机方案之一，特此注明并感谢原作者。
 
 部分内容使用Ai生成(真的懒得写)
 > [!warning]

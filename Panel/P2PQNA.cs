@@ -94,7 +94,11 @@ namespace MinecraftConnectTool
         }
         private void color()
         {
-            ApplyColor("P2PBack", c => this.BackColor = c);
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
+            {
+                ApplyColor("P2PBack", c => this.BackColor = c);
+            }
         }
     }
 }

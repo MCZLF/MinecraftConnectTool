@@ -803,38 +803,42 @@ namespace MinecraftConnectTool
 
         private void color()
         {
-            var imgPath = ThemeConfig.ReadString("BackPNGAdd");
-            if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
+            bool EnableColor = Form1.config.read<bool>("EnableColor", false);
+            if (EnableColor)
             {
-                try
+                var imgPath = ThemeConfig.ReadString("BackPNGAdd");
+                if (ThemeConfig.ReadBool("BackPNG") && File.Exists(imgPath))
                 {
-                    // 只读、不锁文件；按需缩放
-                    using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
-                    using (var src = Image.FromStream(fs))
+                    try
                     {
-                        // 缩到窗口大小（保持比例）
-                        var sz = this.ClientSize;
-                        this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                        // 只读、不锁文件；按需缩放
+                        using (var fs = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                        using (var src = Image.FromStream(fs))
+                        {
+                            // 缩到窗口大小（保持比例）
+                            var sz = this.ClientSize;
+                            this.BackgroundImage = new Bitmap(src, sz.Width, sz.Height);
+                        }
                     }
+                    catch { this.BackgroundImage = null; }
                 }
-                catch { this.BackgroundImage = null; }
+                else
+                {
+                    this.BackgroundImage = null;
+                    ApplyColor("P2PBack", c => this.BackColor = c);
+                    ApplyColor("P2PBack", c => TopText.BackColor = c);
+                }
+                foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
+                {
+                    ApplyColor("LinkButton", c => btn.BackColor = c);
+                    ApplyColor("LinkButton", c => btn.DefaultBack = c);
+                }
+                foreach (var btn in this.Controls.OfType<MaterialSingleLineTextField>())
+                {
+                    ApplyColor("LinkInput", c => btn.BackColor = c);
+                }
+                ApplyColor("LinkLog", c => richTextBoxLog.BackColor = c);
             }
-            else
-            {
-                this.BackgroundImage = null;
-                ApplyColor("P2PBack", c => this.BackColor = c);
-                ApplyColor("P2PBack", c => TopText.BackColor = c);
-            }
-            foreach (var btn in this.Controls.OfType<AntdUI.Button>())//一次性将ANTDUI.BUTTON染色,不包含其他逻辑
-            {
-                ApplyColor("LinkButton", c => btn.BackColor = c);
-                ApplyColor("LinkButton", c => btn.DefaultBack = c);
-            }
-            foreach (var btn in this.Controls.OfType<MaterialSingleLineTextField>())
-            {
-                ApplyColor("LinkInput", c => btn.BackColor = c);
-            }
-            ApplyColor("LinkLog", c => richTextBoxLog.BackColor = c);
         }
     }
 }

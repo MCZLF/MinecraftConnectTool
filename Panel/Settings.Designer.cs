@@ -649,7 +649,7 @@
             this.button21.Name = "button21";
             this.button21.Size = new System.Drawing.Size(55, 29);
             this.button21.TabIndex = 65;
-            this.button21.Text = "赞助";
+            this.button21.Text = "开源";
             this.button21.Click += new System.EventHandler(this.button21_Click);
             // 
             // Settings

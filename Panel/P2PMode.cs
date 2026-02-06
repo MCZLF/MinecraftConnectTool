@@ -68,35 +68,62 @@ namespace MinecraftConnectTool
                 { tsm = $"{localName}{randomPort}"; }
                 else if (codeupate == 2) { tsm = $"{localName}{DateTime.Now:yyyyMMddHH}HH"; } else if (codeupate == 3) { tsm = $"{localName}{DateTime.Now:yyyyMMdd}DD"; }
                 else if (codeupate == 4) //永久
-                {
                     if (Form1.config.read<bool>("usecustomnode", false))
                     {
                         tsm = Form1.config.read<string>("customnode");
                         try
                         {
-                            var j = await new System.Net.Http.HttpClient().GetStringAsync(
-                                $"https://uapis.cn/api/prohibited?text={Uri.EscapeDataString(tsm)}");
-                            var w = Newtonsoft.Json.Linq.JObject.Parse(j)["forbiddenWord"]?.ToString();
-                            if (!string.IsNullOrEmpty(w))
+                            using (var client = new System.Net.Http.HttpClient())
                             {
-                                Program.alerterror("自定义内容存在敏感词,请整改后重试\n已删除相关配置,如需重新开启请在 设置>提示码固定\n如您未修改过相关设置,请尝试清空缓存");
-                                stopp2p();
-                                Form1.config.delete("usecustomnode");
-                                Form1.config.delete("customnode");
-                                return;
+                                // 新版API使用POST + JSON Body
+                                var content = new System.Net.Http.StringContent(
+                                    Newtonsoft.Json.JsonConvert.SerializeObject(new { text = tsm }),
+                                    System.Text.Encoding.UTF8,
+                                    "application/json");
+
+                                var response = await client.PostAsync(
+                                    "https://uapis.cn/api/v1/text/profanitycheck",
+                                    content);
+
+                                response.EnsureSuccessStatusCode();
+                                var jsonString = await response.Content.ReadAsStringAsync();
+                                var result = Newtonsoft.Json.Linq.JObject.Parse(jsonString);
+
+                                // 新版API：status为"forbidden"表示包含敏感词
+                                if ((string)result["status"] == "forbidden")
+                                {
+                                    var forbiddenWords = result["forbidden_words"] as Newtonsoft.Json.Linq.JArray;
+                                    string words = forbiddenWords != null && forbiddenWords.Count > 0
+                                        ? string.Join(" | ", forbiddenWords.Select(w => w.ToString().Trim()))
+                                        : "未知";
+
+                                    Program.alerterror($"自定义内容存在敏感词 [{words}]，请整改后重试\n已删除相关配置，如需重新开启请在 设置>提示码固定\n如您未修改过相关设置，请尝试清空缓存");
+                                    stopp2p();
+                                    Form1.config.delete("usecustomnode");
+                                    Form1.config.delete("customnode");
+                                    return;
+                                }
+                                // status为"ok"时继续正常流程
                             }
+                        }
+                        catch (System.Net.Http.HttpRequestException ex)
+                        {
+                            Form1.config.delete("usecustomnode");
+                            Form1.config.delete("customnode");
+                            stopp2p();
+                            Program.alerterror($"敏感词检测失败: {ex.Message}\n已删除相关配置，如需重新开启请在 设置>提示码固定\n如您未修改过相关设置，请尝试清空缓存");
+                            return;
                         }
                         catch
                         {
                             Form1.config.delete("usecustomnode");
                             Form1.config.delete("customnode");
-                            Program.alerterror("敏感词检测失败,请检查网络是否正常\n已删除相关配置,如需重新开启请在 设置>提示码固定\n如您未修改过相关设置,请尝试清空缓存");
                             stopp2p();
+                            Program.alerterror("敏感词检测失败，请检查网络是否正常\n已删除相关配置，如需重新开启请在 设置>提示码固定\n如您未修改过相关设置，请尝试清空缓存");
                             return;
                         }
                     }
-                }
-                else tsm = $"{localName}{randomPort}";
+                    else tsm = $"{localName}{randomPort}";
 
                 if (tsm.Length <= 8)
                 {

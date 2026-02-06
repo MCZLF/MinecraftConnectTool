@@ -138,30 +138,59 @@ namespace MinecraftConnectTool
                 return;
             }
             // 敏感词检测
-            if (dropdown1.Text=="永久" && input2.Text.Length >= 8)
+            if (dropdown1.Text == "永久" && input2.Text.Length >= 8)
             {
                 try
                 {
-                    var o = Newtonsoft.Json.Linq.JObject.Parse(
-                        await new System.Net.Http.HttpClient().GetStringAsync(
-                            $"https://uapis.cn/api/prohibited?text={System.Uri.EscapeDataString(input2.Text)}"));
-                    if ((string)o["status"] == "forbidden")
+                    using (var client = new System.Net.Http.HttpClient())
                     {
-                        AntdUI.Message.error(Program.MainForm,
-                            $"包含敏感词：{(string)o["forbiddenWord"]}", autoClose: 5, font: Program.AlertFont);
-                        return;
+                        // 新版API使用POST请求
+                        var content = new System.Net.Http.StringContent(
+                            Newtonsoft.Json.JsonConvert.SerializeObject(new { text = input2.Text }),
+                            System.Text.Encoding.UTF8,
+                            "application/json");
+
+                        var response = await client.PostAsync(
+                            "https://uapis.cn/api/v1/text/profanitycheck",
+                            content);
+
+                        response.EnsureSuccessStatusCode();
+                        var jsonString = await response.Content.ReadAsStringAsync();
+                        var result = Newtonsoft.Json.Linq.JObject.Parse(jsonString);
+
+                        // 新版API：status为"forbidden"表示包含敏感词，"ok"表示通过
+                        string status = (string)result["status"];
+                        if (status == "forbidden")
+                        {
+                            var forbiddenWords = result["forbidden_words"] as Newtonsoft.Json.Linq.JArray;
+                            string words = forbiddenWords != null && forbiddenWords.Count > 0
+                                ? string.Join(" | ", forbiddenWords.Select(w => w.ToString().Trim()))
+                                : "未知敏感词";
+
+                            AntdUI.Message.error(Program.MainForm,
+                                $"包含敏感词：{words}", autoClose: 5, font: Program.AlertFont);
+                            return;
+                        }
+                        // status为"ok"时直接继续执行后续代码
                     }
+                }
+                catch (System.Net.Http.HttpRequestException ex)
+                {
+                    AntdUI.Message.error(Program.MainForm, $"网络请求失败: {ex.Message}", autoClose: 5, font: Program.AlertFont);
+                    return;
                 }
                 catch
                 {
-                    AntdUI.Message.error(Program.MainForm, $"网络异常", autoClose: 5, font: Program.AlertFont); return;
+                    AntdUI.Message.error(Program.MainForm, "网络异常", autoClose: 5, font: Program.AlertFont);
+                    return;
                 }
+
                 Form1.config.write("usecustomnode", true);
                 Form1.config.write("customnode", $"{input2.Text}FO");
             }
             else if (dropdown1.Text == "永久")
             {
-                AntdUI.Message.error(Program.MainForm, "提示码过段,需要至少8位", autoClose: 5, font: Program.AlertFont);
+                AntdUI.Message.error(Program.MainForm, "提示码过短,需要至少8位", autoClose: 5, font: Program.AlertFont);
                 Form1.config.write("usecustomnode", false);
             }
             else

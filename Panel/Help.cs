@@ -92,7 +92,7 @@ namespace MinecraftConnectTool
         {
             //测试下新UI元素 加入日期 2025 07 10 FF版本
             var customModal = new InteractiveModal();
-            string backInfo = customModal.ShowModal(Program.MainForm, "请输入柠檬寂寞大核弹");
+            string backInfo = customModal.ShowModal(Program.MainForm, "何意味？");
             MessageBox.Show("返回的输入内容为：" + backInfo); // 显示返回的输入内容
         }
         static void ApplyColor(string key, Action<Color> setColor)

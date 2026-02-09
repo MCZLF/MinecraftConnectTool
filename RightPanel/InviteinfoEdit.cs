@@ -44,6 +44,14 @@ namespace MinecraftConnectTool
                 badge1.State = TState.Success;
                 codeshow_Forever();
             }
+            bool usecustomport = Form1.config.read<bool>("usecustomport", false);
+            if (usecustomport)
+            {
+                string customport = Form1.config.read<string>("customport", "不存在");
+                switch1.Checked = true;
+                input1.Text = customport;
+                input1.Visible = true;
+            }
         }
         private void InitializeDropdown()
         {

@@ -513,11 +513,6 @@ namespace MinecraftConnectTool
             }
         }
 
-        private void input_search_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
 
         private async void button_mclogs_Click(object sender, EventArgs e)
         {

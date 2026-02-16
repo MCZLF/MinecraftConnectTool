@@ -77,12 +77,12 @@
             this.materialLabel2.Depth = 0;
             this.materialLabel2.Font = new System.Drawing.Font("Roboto", 11F);
             this.materialLabel2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.materialLabel2.Location = new System.Drawing.Point(3, 251);
+            this.materialLabel2.Location = new System.Drawing.Point(3, 268);
             this.materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialLabel2.Name = "materialLabel2";
-            this.materialLabel2.Size = new System.Drawing.Size(178, 19);
+            this.materialLabel2.Size = new System.Drawing.Size(217, 19);
             this.materialLabel2.TabIndex = 4;
-            this.materialLabel2.Text = "Candy Advanced Settings";
+            this.materialLabel2.Text = "MCILM-Link Advanced Settings";
             // 
             // materialRadioButton1
             // 

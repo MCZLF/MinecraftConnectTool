@@ -33,15 +33,12 @@ namespace MinecraftConnectTool
                 string fail = null;
                 try
                 {
-                    // 1. 拼协议
                     string body =
 $@"====ProbeContext====
 Version = {Version}
 Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
 ";
                     byte[] data = Encoding.UTF8.GetBytes(body);
-
-                    // 2. TCP
                     using (TcpClient c = new TcpClient())
                     {
                         var t = c.ConnectAsync(HOST, PORT);
@@ -53,8 +50,6 @@ Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
                         s.ReadTimeout = TIMEOUT;
 
                         await s.WriteAsync(data, 0, data.Length);
-
-                        // 3. 回包
                         byte[] buf = new byte[256];
                         int n = await s.ReadAsync(buf, 0, buf.Length);
                         string r = Encoding.UTF8.GetString(buf, 0, n).Trim();

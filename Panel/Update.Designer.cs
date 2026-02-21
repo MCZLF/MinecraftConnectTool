@@ -47,6 +47,7 @@
             // 
             this.button2.BackHover = System.Drawing.Color.FromArgb(((int)(((byte)(174)))), ((int)(((byte)(213)))), ((int)(((byte)(229)))));
             this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button2.Enabled = false;
             this.button2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button2.IconSvg = "BlockOutlined";
             this.button2.Location = new System.Drawing.Point(510, 395);

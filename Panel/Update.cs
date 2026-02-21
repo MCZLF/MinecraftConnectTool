@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-//RE代办 UpdaterV4存在下载后无法删除旧版本文件问题
 namespace MinecraftConnectTool
 {
     public partial class Update : UserControl

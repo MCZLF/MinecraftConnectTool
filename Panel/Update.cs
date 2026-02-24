@@ -50,7 +50,9 @@ namespace MinecraftConnectTool
                         label4.PrefixSvg = "ClockCircleOutlined";
                         url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/version006Pre";
                         urlupdatelog = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/PreUpdatelog006";
-                        urldownload = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/PreLatest.exe";
+                        string urldownload = Environment.Is64BitOperatingSystem
+                            ? "https://api.mct.mczlf.loft.games/Win_X64/version/Latest.exe"
+                            : "https://api.mct.mczlf.loft.games/Win_X86/Latest.exe";
                     }
                 }
                 catch (Exception ex)

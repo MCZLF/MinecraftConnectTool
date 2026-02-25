@@ -51,8 +51,8 @@ namespace MinecraftConnectTool
                         url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/version006Pre";
                         urlupdatelog = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/PreUpdatelog006";
                         urldownload = Environment.Is64BitOperatingSystem
-                            ? "https://gitee.com/linfon18/007api/raw/master/Win_X64/Latest.exe"
-                            : "https://gitee.com/linfon18/007api/raw/master/Win_X86/Latest.exe";
+                            ? "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X64/Latest.exe"
+                            : "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X86/Latest.exe";
                     }
                 }
                 catch (Exception ex)

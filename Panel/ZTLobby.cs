@@ -211,7 +211,7 @@ namespace MinecraftConnectTool
                 progress1.Value = 0;
                 // 下载
                 log("Downloader启动");
-                string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe";
+                string url = "https://g_itee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe";
                 using (var unityClient = new HttpClient())
                 using (var response = await unityClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
@@ -365,7 +365,7 @@ namespace MinecraftConnectTool
                 progress1.Value = 0;
                 // 下载
                 log("Downloader启动");
-                string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe";
+                string url = "https://g_itee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe";
                 using (var unityClient = new HttpClient())
                 using (var response = await unityClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
@@ -499,7 +499,7 @@ namespace MinecraftConnectTool
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Process.Start("https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe");
+            Process.Start("https://g_itee.com/linfon18/minecraft-connect-tool-api/raw/master/CandyCore.exe");
             Program.alertwarn("由于 Gitee 反爬虫策略，该文件无法自动下载。\n请手动下载后，【右键→以管理员模式运行】CandyCore.exe。");
         }
 

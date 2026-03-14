@@ -40,16 +40,16 @@ namespace MinecraftConnectTool
                     {
                         label4.Text = "当前更新通道：内测";
                         label4.PrefixSvg = "ExperimentOutlined";
-                        url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/Version006N";
-                        urlupdatelog = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/updatelog6N";
-                        urldownload = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/NPreLaest.exe";
+                        url = "https://api.mct.mczlf.loft.games/006/Preview/Version006N";
+                        urlupdatelog = "https://api.mct.mczlf.loft.games/006/Preview/updatelog6N";
+                        urldownload = "https://api.mct.mczlf.loft.games/006/Preview/NPreLaest.exe";
                     }}
                     else
                     {
                         label4.Text = "当前更新通道：测试";
                         label4.PrefixSvg = "ClockCircleOutlined";
-                        url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/version006Pre";
-                        urlupdatelog = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/PreUpdatelog006";
+                        url = "https://api.mct.mczlf.loft.games/006/Preview/version006Pre";
+                        urlupdatelog = "https://api.mct.mczlf.loft.games/006/Preview/PreUpdatelog006";
                         urldownload = Environment.Is64BitOperatingSystem
                             ? "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X64/Latest.exe"
                             : "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X86/Latest.exe";
@@ -62,9 +62,9 @@ namespace MinecraftConnectTool
             }
             else
             {
-                url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/version006.txt";
-                urlupdatelog = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/updatelog6";
-                urldownload = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Latest.exe";
+                url = "https://api.mct.mczlf.loft.games/006/version006";
+                urlupdatelog = "https://api.mct.mczlf.loft.games/006/updatelog6";
+                urldownload = "https://api.mct.mczlf.loft.games/006/Latest.exe";
             }
         }
         private string version;
@@ -386,7 +386,7 @@ namespace MinecraftConnectTool
         //内测名单获取方式
         private bool CheckName()
         {
-            string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/List";
+            string url = "https://api.mct.mczlf.loft.games/006/Preview/List";
             string name = Environment.MachineName;
 
             try

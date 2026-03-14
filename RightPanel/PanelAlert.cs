@@ -37,7 +37,7 @@ namespace MinecraftConnectTool
                 using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
                 {
                     var json = await client.GetStringAsync(
-                        "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/PanelAlert"
+                        "https://api.mct.mczlf.loft.games/PanelAlert"
                     );
 
                     var config = JObject.Parse(json);

@@ -26,7 +26,7 @@ namespace MinecraftConnectTool
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
         }
-        public static readonly string version = "0.0.6.110";
+        public static readonly string version = "0.0.6.120";
         public static readonly string designation = "赠予雪中的你_摘自 鸣潮3.1_PV";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变
@@ -450,7 +450,7 @@ namespace MinecraftConnectTool
         }
         private bool CheckName()
         {
-            string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/Preview/List";
+            string url = "https://api.mct.mczlf.loft.games/Preview/List";
             string name = Environment.MachineName;
 
             try
@@ -648,7 +648,7 @@ SysVersion:{SystemEvVersion}
             ApplyColor("LeftMenuHover", c => menu1.BackHover = c);
             }
         }
-        private const string CloudConfigUrl = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/PanelAlert";
+        private const string CloudConfigUrl = "https://api.mct.mczlf.loft.games/PanelAlert";
         private static readonly HttpClient httpClient = new HttpClient();
         public async Task CheckAndShowAnnouncementAsync()
         {
@@ -719,7 +719,7 @@ SysVersion:{SystemEvVersion}
             {
                 using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
                 {
-                    var result = await client.GetStringAsync("https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/006/IsThirdPartyEnable");
+                    var result = await client.GetStringAsync("https://api.mct.mczlf.loft.games/006/IsThirdEnable");
                     if (result.Trim().Equals("True", StringComparison.OrdinalIgnoreCase))
                     {
                         this.menu1.Items[1].Enabled = true;

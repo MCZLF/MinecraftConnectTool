@@ -198,7 +198,7 @@ namespace MinecraftConnectTool
         private async void button1_Click(object sender, EventArgs e)
         {
             button1.Loading = true;
-            string url = "https://gitee.com/linfon18/SunLogin2/raw/master/360DNS.exe";
+            string url = "https://api.mct.mczlf.loft.games/360DNS.exe";
             string tempDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "MCZLFAPP", "Temp");
             string destinationPath = Path.Combine(tempDir, "360DNS.exe");
             string expectedMd5 = "a0c67c45b118e9706cadb771b3014528";
@@ -811,13 +811,13 @@ namespace MinecraftConnectTool
 
             if (Environment.Is64BitOperatingSystem)
             {
-                url = "https://gitee.com/linfon18/SunLogin2/releases/download/64/SunLogin64.exe";
+                url = "https://api.mct.mczlf.loft.games/Sunlogin/SC64.exe";
                 expectedMd5 = "e31cb2f51ebbcc98ca9f51645727eb00";
                 destinationPath = Path.Combine(tempDir, "SunLogin64.exe");
             }
             else
             {
-                url = "https://gitee.com/linfon18/SunLogin2/releases/download/3264/SunLogin32.exe";
+                url = "https://api.mct.mczlf.loft.games/SC32.exe";
                 expectedMd5 = "55726ad06d8ad4484210345b195d285a";
                 destinationPath = Path.Combine(tempDir, "SunLogin32.exe");
             }

@@ -149,12 +149,12 @@ namespace MinecraftConnectTool
                 if (Environment.Is64BitOperatingSystem)
                 {
                     if (admin)
-                    { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/main32413.exe"; }
-                    else { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew.exe"; }//new  
+                    { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                    else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
                 }
                 else
                 {
-                    url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew32.exe";
+                    url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
                 }
                 string fileName = Path.Combine(customDirectory, "main.exe");
                 string fileMd5;
@@ -416,12 +416,12 @@ namespace MinecraftConnectTool
             if (Environment.Is64BitOperatingSystem)
             {
                 if (admin)
-                { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/main32413.exe"; }
-                else { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew.exe"; }//new  
+                { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
             }
             else
             {
-                url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew32.exe";
+                url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
             }
             string fileName = Path.Combine(customDirectory, "main.exe");
             string fileMd5;
@@ -1035,7 +1035,7 @@ namespace MinecraftConnectTool
 
         private async Task CloudAlert()
         {
-            string url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/cloudalert";
+            string url = "https://api.mct.mczlf.loft.games/cloudalert";
             Directory.CreateDirectory(Path.GetDirectoryName(CacheFileName));
             #region newfetch
             try
@@ -1241,12 +1241,12 @@ namespace MinecraftConnectTool
             if (Environment.Is64BitOperatingSystem)
             {
                 if (admin)
-                { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/main32413.exe"; }
-                else { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew.exe"; }//new  
+                { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
             }
             else
             {
-                url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew32.exe";
+                url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
             }
             string fileName = Path.Combine(customDirectory, "main.exe");
             string fileMd5;
@@ -1530,12 +1530,12 @@ namespace MinecraftConnectTool
             if (Environment.Is64BitOperatingSystem)
             {
                 if (admin)
-                { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/main32413.exe"; }
-                else { url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew.exe"; }//new  
+                { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
             }
             else
             {
-                url = "https://gitee.com/linfon18/minecraft-connect-tool-api/raw/master/mainnew32.exe";
+                url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
             }
             string fileName = Path.Combine(customDirectory, "main.exe");
             string fileMd5;

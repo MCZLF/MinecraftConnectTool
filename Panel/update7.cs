@@ -350,11 +350,18 @@ namespace MinecraftConnectTool
 
         private void ExtractAndLaunch()
         {
+            // 获取当前程序路径和目录
+            string currentFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string currentDirectory = Path.GetDirectoryName(currentFilePath);
+            
+            // 创建临时解压目录
             tempExtractPath = Path.Combine(Path.GetTempPath(), "MCT_Update_" + Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempExtractPath);
 
+            // 解压下载的zip文件
             ZipFile.ExtractToDirectory(tempZipPath, tempExtractPath);
 
+            // 找到解压后的Latest.exe
             string exePath = Path.Combine(tempExtractPath, "Latest.exe");
             if (!File.Exists(exePath))
             {
@@ -365,13 +372,41 @@ namespace MinecraftConnectTool
                     throw new FileNotFoundException("在下载的包中找不到 Latest.exe");
             }
 
+            // 新版本文件路径（放在同目录下）
+            string newFileName = "MinecraftConnectTool_0.0.7.exe";
+            string newFilePath = Path.Combine(currentDirectory, newFileName);
+            
+            // 复制新版本到当前目录
+            File.Copy(exePath, newFilePath, true);
+
+            // 生成随机数重命名旧版本
+            Random random = new Random();
+            int randomNum = random.Next(10000, 100000);
+            string oldFileName = "OldFile" + randomNum + ".exe";
+            string oldFilePath = Path.Combine(currentDirectory, oldFileName);
+            
+            // 重命名当前运行的旧版本
+            File.Move(currentFilePath, oldFilePath);
+
+            // 启动新版本
             Process.Start(new ProcessStartInfo
             {
-                FileName = exePath,
-                WorkingDirectory = Path.GetDirectoryName(exePath),
+                FileName = newFilePath,
+                WorkingDirectory = currentDirectory,
                 UseShellExecute = true
             });
 
+            // 创建bat脚本删除旧文件和临时文件
+            string deleteScriptPath = Path.Combine(currentDirectory, "delete_self_007.bat");
+            File.WriteAllText(deleteScriptPath, "@echo off\ncd /d %~dp0\ntimeout /t 2 /nobreak >nul\ndel /q \"" + oldFileName + "\"\ndel /q \"" + Path.GetFileName(tempZipPath) + "\"\nrmdir /s /q \"" + tempExtractPath + "\"\ndel /q delete_self_007.bat");
+            
+            Process.Start(new ProcessStartInfo(deleteScriptPath)
+            {
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            });
+
+            // 清理临时zip文件
             Task.Run(() =>
             {
                 try

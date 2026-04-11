@@ -48,11 +48,9 @@ namespace MinecraftConnectTool
                     {
                         label4.Text = "当前更新通道：测试";
                         label4.PrefixSvg = "ClockCircleOutlined";
-                        url = "https://api.mct.mczlf.loft.games/006/Preview/version006Pre";
-                        urlupdatelog = "https://api.mct.mczlf.loft.games/006/Preview/PreUpdatelog006";
-                        urldownload = Environment.Is64BitOperatingSystem
-                            ? "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X64/Latest.exe"
-                            : "https://cdn.gh-proxy.org/https://github.com/linfon18/MCTAPI/raw/master/Win_X86/Latest.exe";
+                        url = "https://api.mct.mczlf.loft.games/006/version006";
+                        urlupdatelog = "https://api.mct.mczlf.loft.games/006/updatelog6";
+                        urldownload = "https://api.mct.mczlf.loft.games/006/Latest.exe";
                     }
                 }
                 catch (Exception ex)

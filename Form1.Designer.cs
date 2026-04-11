@@ -36,6 +36,7 @@
             AntdUI.MenuItem menuItem6 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem7 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem8 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem9 = new AntdUI.MenuItem();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menu1 = new AntdUI.Menu();
             this.panel = new AntdUI.Panel();
@@ -89,11 +90,15 @@
             menuItem8.IconSvg = "SettingFilled";
             menuItem8.Tag = "Settings";
             menuItem8.Text = "设置";
+            menuItem9.IconSvg = "BulbFilled";
+            menuItem9.Text = "升级到0.0.7";
+            menuItem9.Tag = "Update7";
             this.menu1.Items.Add(menuItem1);
             this.menu1.Items.Add(menuItem5);
             this.menu1.Items.Add(menuItem6);
             this.menu1.Items.Add(menuItem7);
             this.menu1.Items.Add(menuItem8);
+            this.menu1.Items.Add(menuItem9);
             this.menu1.Location = new System.Drawing.Point(0, 40);
             this.menu1.Name = "menu1";
             this.menu1.Size = new System.Drawing.Size(140, 504);

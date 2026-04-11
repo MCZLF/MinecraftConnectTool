@@ -26,8 +26,8 @@ namespace MinecraftConnectTool
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
         }
-        public static readonly string version = "0.0.6.120";
-        public static readonly string designation = "赠予雪中的你_摘自 鸣潮3.1_PV";
+        public static readonly string version = "0.0.6.130";
+        public static readonly string designation = "我们终将重逢 _摘自«有兽焉»第一千话";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变
         public static readonly bool dark = false; //临时开关
@@ -159,6 +159,9 @@ namespace MinecraftConnectTool
                 case "P2PQA":
                     LoadPanel(panel, typeof(P2PQNA));
                     break;
+                case "Update7":
+                    LoadPanel(panel, typeof(update7));
+                    break;
                 default:
                     //MessageBox.Show("点击了其他菜单项", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     break;
@@ -197,6 +200,12 @@ namespace MinecraftConnectTool
             if (Program.admin == 2)
             { Console.WriteLine("非管理员启动"); }
             else { Console.WriteLine("管理员模式"); }
+
+            // Windows 7 系统隐藏 0.0.7 升级入口
+            if (IsWindows7OrLower())
+            {
+                HideUpdate7MenuItem();
+            }
             ;
             bool goupd = config.read<bool>("goupdatewhenstart");
             int bar = config.read<int>("Bar", 1);
@@ -320,6 +329,25 @@ namespace MinecraftConnectTool
         {
 
         }
+
+        private bool IsWindows7OrLower()
+        {
+            Version osVersion = Environment.OSVersion.Version;
+            return osVersion.Major < 6 || (osVersion.Major == 6 && osVersion.Minor <= 1);
+        }
+
+        private void HideUpdate7MenuItem()
+        {
+            foreach (var item in menu1.Items)
+            {
+                if (item.Tag != null && item.Tag.ToString() == "Update7")
+                {
+                    item.Visible = false;
+                    break;
+                }
+            }
+        }
+
         private string GetGreetingMessage(string userName)
         {
             int hour = DateTime.Now.Hour;

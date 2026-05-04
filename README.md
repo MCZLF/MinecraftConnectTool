@@ -340,11 +340,11 @@ MinecraftConnectTool/
 
 <div align="center">
 
-## 📚 MCT 官方知识库
+## 📚 相关链接
 
-**遇到问题？查看详细文档：**
-
-🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games)
+| MCT 官方知识库 | MCT API 文档 |
+|:---:|:---:|
+| 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) |
 
 </div>
 

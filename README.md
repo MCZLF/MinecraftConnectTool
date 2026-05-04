@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://free.picui.cn/free/2026/05/04/69f829881dbab.ico" width="128" alt="MCT Icon" style="border-radius: 20%; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_Ico.ico" width="128" alt="MCT Icon" style="border-radius: 20%; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 
 # 🎮 Minecraft Connect Tool
 
@@ -17,10 +17,7 @@
     <img src="https://img.shields.io/badge/Avalonia-UI-8B00FF?style=for-the-badge&logo=windows-terminal&logoColor=white" alt="Avalonia">
   </a>
   <a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-22c55e?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License">
-  </a>
-</p>
-
+    <img src="https://img.shields.io/badge/license-MIT-22c55e?style=fohttps://mct.mczlf.loft.games/quick-start/gethelp
 <p>
   <a href="https://mct.mczlf.loft.games/function/download">
     <img src="https://img.shields.io/badge/⬇️_立即下载-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows">
@@ -62,7 +59,7 @@ Frp/P2P 混合联机方案
 <td align="center" width="20%">
 
 🚀 **轻量便携**
-单文件 < 5MB，无需安装
+单文件 ~35MB，无需安装
 
 </td>
 </tr>
@@ -79,13 +76,13 @@ Frp/P2P 混合联机方案
 <td width="50%" align="center">
 
 ### 🏠 主界面
-<img src="https://free.picui.cn/free/2026/05/04/69f8288d99cdd.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="主界面">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_(1).png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="主界面">
 
 </td>
 <td width="50%" align="center">
 
 ### 🔗 P2P 联机界面
-<img src="https://free.picui.cn/free/2026/05/04/69f8289d6068e.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="P2P界面">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_(2).png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="P2P界面">
 
 </td>
 </tr>
@@ -93,13 +90,13 @@ Frp/P2P 混合联机方案
 <td width="50%" align="center">
 
 ### 🏢 Link & 房间管理
-<img src="https://free.picui.cn/free/2026/05/04/69f82882d2085.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Link&房间管理">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_(3).png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Link&房间管理">
 
 </td>
 <td width="50%" align="center">
 
 ### ⚙️ 设置
-<img src="https://free.picui.cn/free/2026/05/04/69f8289cd7103.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="设置">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_(4).png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="设置">
 
 </td>
 </tr>
@@ -107,7 +104,7 @@ Frp/P2P 混合联机方案
 <td colspan="2" align="center">
 
 ### 🚀 网络优化
-<img src="https://free.picui.cn/free/2026/05/04/69f828a55e5a3.png" width="80%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="网络优化">
+<img src="https://eo.mczlf.loft.games/otherthings/Github_MCT_Pic_(5).png" width="80%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="网络优化">
 
 </td>
 </tr>
@@ -122,9 +119,9 @@ Frp/P2P 混合联机方案
 ### 💬 官方交流群
 
 <p>
-  <a href="#"><img src="https://img.shields.io/badge/QQ_一群-690625244-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群1"></a>
-  <a href="#"><img src="https://img.shields.io/badge/QQ_二群-940606962-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群2"></a>
-  <a href="#"><img src="https://img.shields.io/badge/QQ_三群-475264978-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群3"></a>
+  <a href="https://mct.mczlf.loft.games/quick-start/gethelp"><img src="https://img.shields.io/badge/QQ_一群-690625244-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群1"></a>
+  <a href="https://mct.mczlf.loft.games/quick-start/gethelp"><img src="https://img.shields.io/badge/QQ_二群-940606962-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群2"></a>
+  <a href="https://mct.mczlf.loft.games/quick-start/gethelp"><img src="https://img.shields.io/badge/QQ_三群-475264978-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群3"></a>
 </p>
 
 **验证答案：联机**
@@ -145,7 +142,7 @@ Frp/P2P 混合联机方案
 
 ## 🚀 下载 & 运行
 
-1. 访问 [`https://github.com/MCZLF/MinecraftConnectTool/releases`](https://github.com/MCZLF/MinecraftConnectTool/releases) 页面下载唯一文件 `MCT.exe`（单文件，< 5 MB）。
+1. 访问 [`https://github.com/MCZLF/MinecraftConnectTool/releases`](https://github.com/MCZLF/MinecraftConnectTool/releases) 页面下载唯一文件 `MCT.exe`（单文件，~35 MB）。
 2. 双击启动：
    - 若系统缺少 .NET 4.7.2，会自动跳转微软官方安装页，装完重启工具即可。
    - 首次启动会弹出 **WDF（Windows Defender 防火墙）授权** 提示，**建议把"专用 / 公用"两个框都勾上**，否则可能打洞失败。

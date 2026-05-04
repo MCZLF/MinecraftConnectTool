@@ -1,49 +1,137 @@
 <div align="center">
 
-<img src="https://free.picui.cn/free/2026/05/04/69f829881dbab.ico" width="120" alt="MCT Icon">
+<img src="https://free.picui.cn/free/2026/05/04/69f829881dbab.ico" width="128" alt="MCT Icon" style="border-radius: 20%; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 
 # 🎮 Minecraft Connect Tool
 
 **基于 OpenP2P，轻量便携简单易用的高速不限速联机工具**
 
-[![Version](https://img.shields.io/badge/version-0.0.7-blue?style=flat-square)](https://github.com/MCZLF/MinecraftConnectTool)
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
-[![Avalonia](https://img.shields.io/badge/Avalonia-UI-8B00FF?style=flat-square)](https://avaloniaui.net/)
-[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+<p>
+  <a href="https://github.com/MCZLF/MinecraftConnectTool">
+    <img src="https://img.shields.io/badge/version-0.0.7-3b82f6?style=for-the-badge&logo=github&logoColor=white" alt="Version">
+  </a>
+  <a href="https://dotnet.microsoft.com/">
+    <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET">
+  </a>
+  <a href="https://avaloniaui.net/">
+    <img src="https://img.shields.io/badge/Avalonia-UI-8B00FF?style=for-the-badge&logo=windows-terminal&logoColor=white" alt="Avalonia">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-22c55e?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License">
+  </a>
+</p>
+
+<p>
+  <a href="https://mct.mczlf.loft.games/function/download">
+    <img src="https://img.shields.io/badge/⬇️_立即下载-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows">
+  </a>
+</p>
 
 </div>
 
 ---
 
-## 🖼️ 界面展示
+## ✨ 功能亮点
+
+<table align="center">
+<tr>
+<td align="center" width="20%">
+
+🏠 **房间管理**
+一键创建/加入联机房间
+
+</td>
+<td align="center" width="20%">
+
+� **P2P 联机**
+基于 OpenP2P 的高速直连
+
+</td>
+<td align="center" width="20%">
+
+🌐 **Link 模式**
+Frp/P2P 混合联机方案
+
+</td>
+<td align="center" width="20%">
+
+⚙️ **智能设置**
+个性化配置与网络优化
+
+</td>
+<td align="center" width="20%">
+
+🚀 **轻量便携**
+单文件 < 5MB，无需安装
+
+</td>
+</tr>
+</table>
+
+---
+
+## �️ 界面展示
 
 <div align="center">
 
+<table>
+<tr>
+<td width="50%" align="center">
+
 ### 🏠 主界面
-<img src="https://free.picui.cn/free/2026/05/04/69f8288d99cdd.png" width="800" alt="主界面">
+<img src="https://free.picui.cn/free/2026/05/04/69f8288d99cdd.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="主界面">
+
+</td>
+<td width="50%" align="center">
 
 ### 🔗 P2P 联机界面
-<img src="https://free.picui.cn/free/2026/05/04/69f8289d6068e.png" width="800" alt="P2P界面">
+<img src="https://free.picui.cn/free/2026/05/04/69f8289d6068e.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="P2P界面">
+
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
 
 ### 🏢 Link & 房间管理
-<img src="https://free.picui.cn/free/2026/05/04/69f82882d2085.png" width="800" alt="Link&房间管理">
+<img src="https://free.picui.cn/free/2026/05/04/69f82882d2085.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Link&房间管理">
+
+</td>
+<td width="50%" align="center">
 
 ### ⚙️ 设置
-<img src="https://free.picui.cn/free/2026/05/04/69f8289cd7103.png" width="800" alt="设置">
+<img src="https://free.picui.cn/free/2026/05/04/69f8289cd7103.png" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="设置">
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
 
 ### 🚀 网络优化
-<img src="https://free.picui.cn/free/2026/05/04/69f828a55e5a3.png" width="800" alt="网络优化">
+<img src="https://free.picui.cn/free/2026/05/04/69f828a55e5a3.png" width="80%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="网络优化">
+
+</td>
+</tr>
+</table>
 
 </div>
 
 ---
 
-> [!TIP]
-> 加入 **MinecraftConnectTool** 官方交流群，获取联机教程、NAT 打洞技巧与即时帮助：
-> - 一群 **690625244**（答案：联机）
-> - 二群 **940606962**（答案：联机）
-> - 三群 **475264978**（答案：联机）
-> 任选一群加入，下载更新、插件配置、故障排查，一站搞定，欢迎来聊！
+<div align="center">
+
+### 💬 官方交流群
+
+<p>
+  <a href="#"><img src="https://img.shields.io/badge/QQ_一群-690625244-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群1"></a>
+  <a href="#"><img src="https://img.shields.io/badge/QQ_二群-940606962-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群2"></a>
+  <a href="#"><img src="https://img.shields.io/badge/QQ_三群-475264978-12b7f5?style=for-the-badge&logo=tencent-qq&logoColor=white" alt="QQ群3"></a>
+</p>
+
+**验证答案：联机**
+
+获取联机教程、NAT 打洞技巧与即时帮助，下载更新、插件配置、故障排查，一站搞定！
+
+</div>
 
 ---
 
@@ -69,19 +157,52 @@
 
 ---
 
-## 📖 使用流程（主机 & 加入方相同界面）
+## 📖 使用流程
 
-📺 视频教程：[`https://www.bilibili.com/video/BV1sBXyYgE1j`](https://www.bilibili.com/video/BV1sBXyYgE1j)
+<div align="center">
 
-🌐 官方网站：
-- [`http://mcjavao.tttttttttt.top`](http://mcjavao.tttttttttt.top)
-- [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games)
+📺 **视频教程**：[Bilibili 视频](https://www.bilibili.com/video/BV1sBXyYgE1j)
 
-| 主机（开房间） | 加入方（进房间） |
-|:---:|:---:|
-| ① 点「开启联机房间」→ 复制提示码 | ① 输入主机提示码与端口 |
-| ② 进存档 → ESC → 对局域网开放 → 记下端口 | ② 点「加入联机房间」→ 获得本地地址 `127.0.0.1:xxxxx` |
-| ③ 把「提示码:端口」发给好友 | ③ MC 多人游戏直连该地址，即可联机 |
+🌐 **官方网站**：[mcjavao.tttttttttt.top](http://mcjavao.tttttttttt.top) | [mct.mczlf.loft.games](https://mct.mczlf.loft.games)
+
+</div>
+
+<br>
+
+<table align="center">
+<tr>
+<th width="50%" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 8px 8px 0 0;">
+
+### 🏠 主机（开房间）
+
+</th>
+<th width="50%" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 12px; border-radius: 8px 8px 0 0;">
+
+### 👥 加入方（进房间）
+
+</th>
+</tr>
+<tr>
+<td align="center" style="padding: 16px;">
+
+**①** 点「开启联机房间」→ 复制提示码
+
+**②** 进存档 → ESC → 对局域网开放 → 记下端口
+
+**③** 把「提示码:端口」发给好友
+
+</td>
+<td align="center" style="padding: 16px;">
+
+**①** 输入主机提示码与端口
+
+**②** 点「加入联机房间」→ 获得本地地址 `127.0.0.1:xxxxx`
+
+**③** MC 多人游戏直连该地址，即可联机
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -107,6 +228,7 @@
 | ~~CandyCreateService~~ | ❌ 已停止 | Candy 联机模式已停止支持 |
 | ProbeServer | ✅ 运行中 | 用户统计探针 |
 | Frp (OnlyServerService) | ✅ 运行中 | Frp 中继服务 |
+| **MCTListServer** | 🆕 **新增** | **全新房间管理服务** |
 
 ---
 

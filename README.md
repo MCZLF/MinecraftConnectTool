@@ -342,9 +342,9 @@ MinecraftConnectTool/
 
 ## 📚 相关链接
 
-| MCT 官方知识库 | MCT API 文档 |
+| MCT 官方知识库 | 版本查询 API |
 |:---:|:---:|
-| 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) |
+| 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) <br> *MinecraftConnectTool 各平台最新版本公示* |
 
 <br>
 

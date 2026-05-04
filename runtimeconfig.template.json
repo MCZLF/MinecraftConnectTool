@@ -1,0 +1,11 @@
+{
+  "configProperties": {
+    "System.GC.Server": false,
+    "System.GC.Concurrent": false,
+    "System.GC.RetainVM": false,
+    "System.GC.HeapHardLimit": 67108864,
+    "System.GC.HeapHardLimitPercent": 10,
+    "System.GC.HighMemoryPercent": 40,
+    "System.GC.LatencyLevel": "Batch"
+  }
+}

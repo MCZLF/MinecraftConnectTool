@@ -1,0 +1,268 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.UpdatePage"
+             x:DataType="vm:UpdatePageViewModel">
+
+  <Design.DataContext>
+    <vm:UpdatePageViewModel />
+  </Design.DataContext>
+
+  <Grid Margin="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- 顶部进度条 -->
+    <ProgressBar Grid.Row="0"
+                 Value="{Binding ProgressValue}"
+                 Maximum="100"
+                 IsVisible="{Binding IsProgressVisible}"
+                 Height="4"
+                 Margin="0,0,0,16"/>
+
+    <!-- 标题区域 -->
+    <Grid Grid.Row="1" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0" Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <icons:MaterialIcon Kind="Update" 
+                              Width="32" 
+                              Height="32"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="检查更新"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+        <TextBlock Text="获取最新版本和功能改进"
+                   FontSize="14"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 调试按钮 -->
+      <Button Grid.Column="1"
+              Command="{Binding DebugActionCommand}"
+              Height="40"
+              VerticalAlignment="Top"
+              IsVisible="{Binding IsDebugVisible}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <icons:MaterialIcon Kind="BugReport" Width="18" Height="18"/>
+          <TextBlock Text="调试按钮" VerticalAlignment="Center"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- 主内容区域 -->
+    <Grid Grid.Row="2" Margin="0,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="320" MinWidth="280" MaxWidth="400"/>
+        <ColumnDefinition Width="*" MinWidth="300"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 左侧：版本信息面板 -->
+      <StackPanel Grid.Column="0" Spacing="16">
+        <!-- 当前版本 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="PackageVariant" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="当前版本"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="{Binding CurrentVersion}"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <!-- 云端版本 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="CloudTags" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+              <TextBlock Text="云端版本"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="{Binding CloudVersion}"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <!-- 更新通道 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="{Binding UpdateChannelIcon}" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="更新通道"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="{Binding UpdateChannel}"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <!-- 立即更新按钮 -->
+        <Button Command="{Binding UpdateNowCommand}"
+                IsEnabled="{Binding CanUpdate}"
+                Height="52"
+                HorizontalAlignment="Stretch"
+                CornerRadius="26">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <icons:MaterialIcon Kind="{Binding UpdateButtonIcon}" Width="24" Height="24"/>
+            <TextBlock Text="{Binding UpdateButtonText}" 
+                       FontSize="16" 
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+      <!-- 右侧：更新日志 -->
+      <Border Grid.Column="1" 
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="20"
+              Margin="16,0,0,0">
+        <Grid RowDefinitions="Auto,*">
+          <!-- 标题 -->
+          <StackPanel Grid.Row="0" 
+                      Orientation="Horizontal" 
+                      Spacing="8"
+                      Margin="0,0,0,16">
+            <icons:MaterialIcon Kind="TextBox" 
+                                Width="24" 
+                                Height="24"
+                                Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="更新日志"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <!-- 新消息标记 -->
+            <Border IsVisible="{Binding HasNewUpdate}"
+                    Background="{DynamicResource MaterialErrorBrush}"
+                    CornerRadius="10"
+                    Width="20"
+                    Height="20"
+                    VerticalAlignment="Center">
+              <TextBlock Text=" "
+                         FontSize="10"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnErrorBrush}"/>
+            </Border>
+          </StackPanel>
+
+          <!-- 日志内容 -->
+          <Border Grid.Row="1"
+                  Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                  CornerRadius="12"
+                  Padding="16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <TextBlock Text="{Binding UpdateLogContent}"
+                         FontSize="14"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                         LineHeight="24"/>
+            </ScrollViewer>
+          </Border>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- 底部区域 -->
+    <Grid Grid.Row="3" Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 测试通道提示 -->
+      <Border Grid.Column="0"
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="12"
+              Padding="16">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <icons:MaterialIcon Kind="Information" 
+                              Width="24" 
+                              Height="24"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <StackPanel>
+            <TextBlock Text="{Binding BetaTipTitle}"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="{Binding BetaTipContent}"
+                       FontSize="12"
+                       Opacity="0.8"
+                       Margin="0,4,0,0"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- 检查更新按钮 -->
+      <Button Grid.Column="1"
+              Command="{Binding CheckUpdateCommand}"
+              Height="52"
+              Padding="24,0"
+              Margin="16,0,0,0"
+              CornerRadius="26">
+        <Button.ContentTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="Refresh" Width="24" Height="24"/>
+              <TextBlock Text="检查更新" 
+                         FontSize="16" 
+                         FontWeight="Bold"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </DataTemplate>
+        </Button.ContentTemplate>
+      </Button>
+    </Grid>
+  </Grid>
+</UserControl>

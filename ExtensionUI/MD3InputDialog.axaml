@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.ExtensionUI.MD3InputDialog"
+             x:DataType="local:MD3InputDialog"
+             xmlns:local="using:MinecraftConnectTool.ExtensionUI"
+             MinWidth="300"
+             MinHeight="180">
+
+    <Border Background="{DynamicResource MaterialSurfaceBrush}"
+            CornerRadius="28"
+            BoxShadow="0 12 48 0 #60000000"
+            BorderThickness="0"
+            Width="300"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <!-- 标题栏：图标 + 标题 + 关闭按钮 -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,*,Auto"
+                  Margin="24,20,16,0">
+                <!-- 提示图标 -->
+                <icons:MaterialIcon Grid.Column="0"
+                                    Kind="{Binding IconKind}"
+                                    Width="24"
+                                    Height="24"
+                                    Foreground="{DynamicResource MaterialPrimaryBrush}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,12,0"/>
+
+                <!-- 标题 -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Title}"
+                           FontSize="20"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           VerticalAlignment="Center"/>
+
+                <!-- 右上角关闭按钮 -->
+                <Button Grid.Column="2"
+                        x:Name="CloseButton"
+                        Width="32"
+                        Height="32"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="4"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+                    <icons:MaterialIcon Kind="Close"
+                                        Width="20"
+                                        Height="20"
+                                        Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+                </Button>
+            </Grid>
+
+            <!-- 提示文本和输入框 -->
+            <StackPanel Grid.Row="1"
+                        Margin="24,16,24,0"
+                        Spacing="8">
+                <!-- 提示文本 -->
+                <TextBlock Text="{Binding PromptText}"
+                           FontSize="14"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           TextWrapping="Wrap"
+                           LineHeight="20"/>
+
+                <!-- 输入框 -->
+                <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                        CornerRadius="8"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource MaterialOutlineBrush}"
+                        Padding="12,0">
+                    <TextBox x:Name="InputTextBox"
+                             Watermark="{Binding PlaceholderText}"
+                             FontSize="14"
+                             Height="40"
+                             VerticalContentAlignment="Center"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </Border>
+            </StackPanel>
+
+            <!-- 底部按钮区域 -->
+            <Grid Grid.Row="2"
+                  Margin="24,24,24,24"
+                  HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <!-- 取消按钮 -->
+                    <Button x:Name="CancelButton"
+                            Content="取消"
+                            Classes="Outlined"
+                            Padding="20,10"
+                            FontSize="14"
+                            FontWeight="Medium"/>
+
+                    <!-- 确定按钮 -->
+                    <Button x:Name="ConfirmButton"
+                            Content="确定"
+                            Classes="Filled"
+                            Padding="20,10"
+                            FontSize="14"
+                            FontWeight="Medium"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

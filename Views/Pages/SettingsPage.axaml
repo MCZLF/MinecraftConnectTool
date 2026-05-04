@@ -1,0 +1,1078 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             xmlns:controls="using:MinecraftConnectTool.Controls"
+             xmlns:picker="using:Avalonia.Controls"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:services="using:MinecraftConnectTool.Services"
+             xmlns:localConverters="using:MinecraftConnectTool.Converters"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.SettingsPage"
+             x:DataType="vm:SettingsPageViewModel">
+
+  <Design.DataContext>
+    <vm:SettingsPageViewModel />
+  </Design.DataContext>
+
+  <UserControl.Resources>
+    <localConverters:AnimationSpeedToBackgroundConverter x:Key="AnimationSpeedToBackgroundConverter" />
+    <localConverters:AnimationSpeedToForegroundConverter x:Key="AnimationSpeedToForegroundConverter" />
+    <localConverters:RenderingModeToBackgroundConverter x:Key="RenderingModeToBackgroundConverter" />
+    <localConverters:RenderingModeToForegroundConverter x:Key="RenderingModeToForegroundConverter" />
+  </UserControl.Resources>
+
+  <Grid>
+    <ScrollViewer>
+      <StackPanel Margin="32" Spacing="24">
+      <!-- 标题区域 -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="设置"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        <TextBlock Text="自定义应用程序选项和偏好设置"
+                   FontSize="16"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 外观设置卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="20">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="Palette" Width="24" Height="24" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="外观"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- 深色模式 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="深色模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="切换应用程序的明暗主题"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding IsDarkMode, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 彩色主题 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="彩色主题"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用自定义主题色"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableColor, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 主题色选择器 -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsColorPickerVisible}">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="选择主题色"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="自定义应用程序的主色调"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <controls:ColorPickerButton Grid.Column="1"
+                          SelectedColor="{Binding AccentColor, Mode=TwoWay}"
+                          MixIntensity="{Binding MixIntensity, Mode=TwoWay}"
+                          Title="选择主题色"
+                          VerticalAlignment="Center"
+                          Width="40"
+                          Height="40"/>
+          </Grid>
+
+          <!-- Fluent Design 模拟 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="模拟 Fluent Design"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="将界面风格调整为 Win11 风格（色调、圆角、透明度）"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding SimulateFluentDesign, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 照片背景 -->
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="照片背景"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="使用自定义图片作为应用背景"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    Command="{Binding SelectPhotoBackgroundCommand}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,12,0"
+                    IsVisible="{Binding EnablePhotoBackground}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Image" Width="18" Height="18"/>
+                <TextBlock Text="选择图片"/>
+              </StackPanel>
+            </Button>
+            <ToggleSwitch Grid.Column="2"
+                          IsChecked="{Binding EnablePhotoBackground, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 照片背景控制区域 -->
+          <StackPanel Spacing="12" IsVisible="{Binding IsPhotoBackgroundControlsVisible}">
+            <Separator Background="{DynamicResource MaterialDividerBrush}"/>
+
+            <!-- 背景透明度调节 -->
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="背景透明度"
+                           FontSize="14"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <TextBlock Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
+                           FontSize="12"
+                           Opacity="0.7"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              <Slider Grid.Column="1"
+                      Width="150"
+                      Minimum="0.1"
+                      Maximum="0.9"
+                      Value="{Binding BackgroundOpacity, Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- 控件区域不透明度调节 -->
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="控件区域不透明度"
+                           FontSize="14"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <TextBlock Text="{Binding ControlOpacity, StringFormat='{}{0:P0}'}"
+                           FontSize="12"
+                           Opacity="0.7"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              <Slider Grid.Column="1"
+                      Width="150"
+                      Minimum="0"
+                      Maximum="0.8"
+                      Value="{Binding ControlOpacity, Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- 当前图片路径显示 -->
+            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding PhotoBackgroundPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+              <TextBlock Grid.Column="0"
+                         Text="{Binding PhotoBackgroundPath}"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextTrimming="CharacterEllipsis"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                         VerticalAlignment="Center"/>
+              <Button Grid.Column="1"
+                      Classes="outlined"
+                      Command="{Binding ClearPhotoBackgroundCommand}"
+                      VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="Close" Width="18" Height="18"/>
+                  <TextBlock Text="清除"/>
+                </StackPanel>
+              </Button>
+            </Grid>
+          </StackPanel>
+
+          <!-- 语言设置 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="语言"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding Language}"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Translate" Width="18" Height="18"/>
+                <TextBlock Text="更改"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 启动设置卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="20">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="RocketLaunch" Width="24" Height="24" Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+            <TextBlock Text="启动"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- 启动时不显示欢迎通知 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="静默启动"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启动时不显示欢迎通知"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding NoNotifyWhenStart, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 启动时检查更新 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="自动检查更新"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启动时自动检查新版本"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding GoUpdateWhenStart, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 启动时检查版本 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="版本验证"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启动时验证版本信息"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableVersionCheck, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 自动检查P2P IF开启状态 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="P2P状态监测"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="自动检查P2P接口开启状态"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding AutoCheckP2PIFOpen, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 动画速度设置 -->
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock Text="动画速度"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="调整界面动画过渡效果的快慢（默认值：适中）"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="自定义值支持 0 或 50-2000，0 关闭动画"
+                         FontSize="12"
+                         Opacity="0.5"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            
+            <!-- 速度选择按钮组 -->
+            <StackPanel Grid.Column="2" 
+                        Orientation="Horizontal" 
+                        Spacing="4"
+                        VerticalAlignment="Center">
+              <Button Classes="outlined"
+                      Command="{Binding SetAnimationSpeedCommand}"
+                      CommandParameter="{x:Static services:AnimationSpeed.Fast}"
+                      Background="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToBackgroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Fast}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="快速" 
+                             FontSize="12" 
+                             FontWeight="Medium"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Fast}}"/>
+                  <TextBlock Text="100ms" 
+                             FontSize="10" 
+                             Opacity="0.6"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Fast}}"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding SetAnimationSpeedCommand}"
+                      CommandParameter="{x:Static services:AnimationSpeed.Medium}"
+                      Background="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToBackgroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Medium}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="适中"
+                             FontSize="12"
+                             FontWeight="Medium"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Medium}}"/>
+                  <TextBlock Text="300ms"
+                             FontSize="10"
+                             Opacity="0.6"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Medium}}"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding SetAnimationSpeedCommand}"
+                      CommandParameter="{x:Static services:AnimationSpeed.Slow}"
+                      Background="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToBackgroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Slow}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="慢速" 
+                             FontSize="12" 
+                             FontWeight="Medium"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Slow}}"/>
+                  <TextBlock Text="500ms" 
+                             FontSize="10" 
+                             Opacity="0.6"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Slow}}"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding SetAnimationSpeedCommand}"
+                      CommandParameter="{x:Static services:AnimationSpeed.Custom}"
+                      Background="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToBackgroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Custom}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="自定义" 
+                             FontSize="12" 
+                             FontWeight="Medium"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Custom}}"/>
+                  <TextBlock Text="输入ms" 
+                             FontSize="10" 
+                             Opacity="0.6"
+                             Foreground="{Binding AnimationSpeed, Converter={StaticResource AnimationSpeedToForegroundConverter}, ConverterParameter={x:Static services:AnimationSpeed.Custom}}"/>
+                </StackPanel>
+              </Button>
+              <!-- 自定义输入框和确认按钮 -->
+              <StackPanel Orientation="Horizontal" 
+                          Spacing="4"
+                          IsVisible="{Binding IsCustomAnimationDurationVisible}"
+                          VerticalAlignment="Center">
+                <TextBox Text="{Binding CustomAnimationDurationText, Mode=TwoWay}"
+                         Watermark="ms"
+                         Width="70"
+                         Height="46"
+                         VerticalAlignment="Center"
+                         VerticalContentAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}">
+                  <TextBox.InnerRightContent>
+                    <TextBlock Text="ms"
+                               Opacity="0.6"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </TextBox.InnerRightContent>
+                </TextBox>
+                <!-- 确认按钮 - 仅当值修改时显示 -->
+                <Button Classes="outlined"
+                        Command="{Binding ConfirmCustomAnimationDurationCommand}"
+                        IsVisible="{Binding IsCustomDurationConfirmVisible}"
+                        Width="46"
+                        Height="46"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource MaterialPrimaryBrush}">
+                  <icons:MaterialIcon Kind="Check" 
+                                      Width="20" 
+                                      Height="20"
+                                      Foreground="{DynamicResource MaterialOnPrimaryBrush}"/>
+                </Button>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+
+          <!-- 渲染方式设置 -->
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock Text="渲染方式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="选择图形渲染模式（重启后生效）"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <!-- 渲染方式选择按钮组 -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center">
+              <Button Classes="outlined"
+                      Command="{Binding SetRenderingModeCommand}"
+                      CommandParameter="{x:Static services:RenderingMode.SystemDefault}"
+                      Background="{Binding RenderingMode, Converter={StaticResource RenderingModeToBackgroundConverter}, ConverterParameter={x:Static services:RenderingMode.SystemDefault}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="系统默认"
+                             FontSize="12"
+                             FontWeight="Medium"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.SystemDefault}}"/>
+                  <TextBlock Text="自动选择"
+                             FontSize="10"
+                             Opacity="0.6"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.SystemDefault}}"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding SetRenderingModeCommand}"
+                      CommandParameter="{x:Static services:RenderingMode.Gpu}"
+                      Background="{Binding RenderingMode, Converter={StaticResource RenderingModeToBackgroundConverter}, ConverterParameter={x:Static services:RenderingMode.Gpu}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="GPU"
+                             FontSize="12"
+                             FontWeight="Medium"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.Gpu}}"/>
+                  <TextBlock Text="硬件加速"
+                             FontSize="10"
+                             Opacity="0.6"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.Gpu}}"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding SetRenderingModeCommand}"
+                      CommandParameter="{x:Static services:RenderingMode.Cpu}"
+                      Background="{Binding RenderingMode, Converter={StaticResource RenderingModeToBackgroundConverter}, ConverterParameter={x:Static services:RenderingMode.Cpu}}">
+                <StackPanel Spacing="1" HorizontalAlignment="Center">
+                  <TextBlock Text="CPU"
+                             FontSize="12"
+                             FontWeight="Medium"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.Cpu}}"/>
+                  <TextBlock Text="软件渲染"
+                             FontSize="10"
+                             Opacity="0.6"
+                             Foreground="{Binding RenderingMode, Converter={StaticResource RenderingModeToForegroundConverter}, ConverterParameter={x:Static services:RenderingMode.Cpu}}"/>
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 功能设置卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="20">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="Tune" Width="24" Height="24" Foreground="{DynamicResource MaterialTertiaryBrush}"/>
+            <TextBlock Text="功能"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- 启用Relay中转 (禁用) -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="Relay中转"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Opacity="0.5"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用Relay服务器中转功能 (当前不可用)"
+                         FontSize="14"
+                         Opacity="0.5"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableRelay, Mode=TwoWay}"
+                          IsEnabled="False"
+                          Opacity="0.5"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 启用服务器Post -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="服务器Post"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用服务器Post功能"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding ServerPostEnable, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- P2P高级设置卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="20">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="LanConnect" Width="24" Height="24" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="P2P高级设置"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- TCP模式 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="TCP模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="使用TCP协议进行连接"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableTCP, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 数据节省模式 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="数据节省模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="减少数据传输量"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding DataSaving, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- OLAN兼容模式 (隐藏但保留) -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="False">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="OLAN兼容模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用OLAN兼容模式"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableOLAN, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- TL模式 (隐藏但保留) -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="False">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="TL模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用TL传输模式"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableTL, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- DST模式 (隐藏但保留) -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="False">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="DST模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用DST模式（饥荒联机版专用）"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableDST, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- P2P调试信息 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="P2P调试信息"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="显示详细的P2P调试日志"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding ShowP2PBug, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- 房间管理_用户昵称 -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsUserSettingsVisible}">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="房间管理_用户昵称"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding Username}"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    Command="{Binding ChangeUsernameCommand}"
+                    VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Pencil" Width="18" Height="18"/>
+                <TextBlock Text="修改"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- 自定义邀请信息 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="自定义邀请信息"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="设置自定义P2P提示码和端口"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center"
+                    Command="{Binding OpenInviteEditDrawerCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="ArrowRight" Width="18" Height="18"/>
+                <TextBlock Text="打开"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 高级设置卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="20">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="Tools" Width="24" Height="24" Foreground="{DynamicResource MaterialErrorBrush}"/>
+            <TextBlock Text="高级"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <!-- 性能模式 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="性能模式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启用内存优化，降低内存占用（需重启应用）"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnablePerformanceMode, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 使用GitHub镜像源 (已禁用 - 国内加速不再需要GitHub镜像) -->
+          <Grid ColumnDefinitions="*,Auto" Opacity="0.5">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="使用GitHub镜像源"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="自动使用镜像源加速GitHub资源下载 (当前不可用)"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding UseGitHubMirror, Mode=TwoWay}"
+                          IsEnabled="False"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 镜像源类型选择 (已禁用 - 国内加速不再需要GitHub镜像) -->
+          <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsMirrorTypeSelectorVisible}" Opacity="0.5">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="镜像源类型"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="选择GitHub镜像加速节点 (当前不可用)"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding GitHubMirrorTypes}"
+                      SelectedItem="{Binding GitHubMirrorType, Mode=TwoWay}"
+                      IsEnabled="False"
+                      VerticalAlignment="Center"
+                      Width="160"
+                      Height="40"
+                      Padding="12,8"
+                      Background="Transparent"
+                      BorderThickness="0,0,0,1"
+                      BorderBrush="{DynamicResource MaterialOutlineBrush}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Width="120"
+                             Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
+          <!-- 允许Probe探针 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="允许Probe探针"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="允许上报版本号等基础统计信息，帮助我们改进产品"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding AllowProbe, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 接收测试更新 (已禁用 - 暂不可用) -->
+          <Grid ColumnDefinitions="*,Auto" Opacity="0.5">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="接收测试更新"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="接收最新的构建版本更新，可能存在未修复的问题 (暂不可用)"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="False"
+                          IsEnabled="False"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- 清除缓存 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="清除缓存"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="清理临时文件和下载的核心"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center"
+                    Command="{Binding ClearCacheCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="DeleteSweep" Width="18" Height="18"/>
+                <TextBlock Text="清除"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- 重置配置文件 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="重置配置文件"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="恢复默认设置，不影响已下载的核心"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center"
+                    Command="{Binding ResetConfigCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Restore" Width="18" Height="18"/>
+                <TextBlock Text="重置"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- 添加到Defender排除列表 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="添加到Windows Defender排除列表"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="防止Windows Defender误删核心文件"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center"
+                    Command="{Binding AddToDefenderExclusionCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="ShieldCheck" Width="18" Height="18"/>
+                <TextBlock Text="添加"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- 网络优化 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="网络优化"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="下载并运行360DNS优化工具"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <!-- 下载进度条 -->
+              <ProgressBar IsVisible="{Binding IsNetworkOptimizing}"
+                           Value="{Binding NetworkOptimizationProgress}"
+                           Maximum="100"
+                           Margin="0,8,0,0"
+                           Height="4"
+                           Foreground="{DynamicResource MaterialPrimaryBrush}"
+                           Background="{DynamicResource MaterialSurfaceVariantBrush}"/>
+              <TextBlock IsVisible="{Binding IsNetworkOptimizing}"
+                         Text="{Binding NetworkOptimizationProgress, StringFormat='{}{0}%'}}"
+                         FontSize="12"
+                         Opacity="0.7"
+                         Margin="0,4,0,0"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Classes="outlined"
+                    VerticalAlignment="Center"
+                    Command="{Binding NetworkOptimizationCommand}"
+                    IsEnabled="{Binding !IsNetworkOptimizing}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Network" Width="18" Height="18"/>
+                <TextBlock Text="{Binding IsNetworkOptimizing, Converter={StaticResource BoolToStringConverter}, ConverterParameter='下载中,优化'}"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 关于卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="24">
+        <StackPanel Spacing="16">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="Information" Width="24" Height="24" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="关于"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
+
+          <StackPanel Spacing="8">
+            <TextBlock Text="Minecraft Connect Tool"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="{Binding VersionText}"
+                       FontSize="14"
+                       Opacity="0.7"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="{Binding Designation}"
+                       FontSize="12"
+                       Opacity="0.5"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+            <Button Classes="outlined"
+                    Command="{Binding OpenGitHubCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Github" Width="18" Height="18"/>
+                <TextBlock Text="GitHub"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="outlined"
+                    Command="{Binding OpenEmailCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Email" Width="18" Height="18"/>
+                <TextBlock Text="联系我们"/>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+
+          <!-- Restart按钮 -->
+          <Button Classes="filled"
+                  HorizontalAlignment="Right"
+                  Margin="0,16,0,0"
+                  Command="{Binding RestartApplicationCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="Restart" Width="18" Height="18"/>
+              <TextBlock Text="Restart"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+
+        <!-- 缓存提示 -->
+        <Border Background="{DynamicResource MaterialTertiaryContainerBrush}"
+                CornerRadius="12"
+                Padding="16">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="InformationCircle" 
+                                Width="20" 
+                                Height="20"
+                                Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+            <TextBlock Text="设置会自动保存到配置文件"
+                       FontSize="14"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Toast 通知 - 中间下方位置，类似安卓Toast，带淡入淡出动画 -->
+    <Border x:Name="ToastBorder"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Margin="0,0,0,60"
+            Padding="20,12"
+            CornerRadius="28"
+            Background="{DynamicResource MaterialSurfaceVariantBrush}"
+            MaxWidth="360"
+            Opacity="{Binding ToastOpacity, FallbackValue=0}"
+            IsVisible="{Binding IsToastVisible, FallbackValue=False}"
+            BoxShadow="0 6 16 0 #60000000"
+            ZIndex="100">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <icons:MaterialIcon x:Name="ToastIcon"
+                            Kind="{Binding ToastIconKind, FallbackValue=AlertCircle}"
+                            Width="24"
+                            Height="24"
+                            Foreground="{Binding ToastIconColor, FallbackValue=#F44336}"/>
+        <TextBlock x:Name="ToastText"
+                   Text="{Binding ToastMessage, FallbackValue=操作成功}"
+                   FontSize="14"
+                   FontWeight="Medium"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

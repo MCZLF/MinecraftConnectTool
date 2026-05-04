@@ -1,0 +1,82 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:MinecraftConnectTool"
+             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:converters="using:MinecraftConnectTool.Converters"
+             x:Class="MinecraftConnectTool.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <FluentTheme />
+    <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Teal" />
+    <icons:MaterialIconStyles />
+  </Application.Styles>
+
+  <Application.Resources>
+    <!-- Material Design 3 颜色资源 -->
+    <SolidColorBrush x:Key="MaterialPrimaryBrush" Color="#D0BCFF"/>
+    <SolidColorBrush x:Key="MaterialOnPrimaryBrush" Color="#381E72"/>
+    <SolidColorBrush x:Key="MaterialPrimaryContainerBrush" Color="#4F378B"/>
+    <SolidColorBrush x:Key="MaterialOnPrimaryContainerBrush" Color="#EADDFF"/>
+
+    <SolidColorBrush x:Key="MaterialSecondaryBrush" Color="#CCC2DC"/>
+    <SolidColorBrush x:Key="MaterialOnSecondaryBrush" Color="#332D41"/>
+    <SolidColorBrush x:Key="MaterialSecondaryContainerBrush" Color="#4A4458"/>
+    <SolidColorBrush x:Key="MaterialOnSecondaryContainerBrush" Color="#E8DEF8"/>
+
+    <SolidColorBrush x:Key="MaterialTertiaryBrush" Color="#EFB8C8"/>
+    <SolidColorBrush x:Key="MaterialOnTertiaryBrush" Color="#492532"/>
+    <SolidColorBrush x:Key="MaterialTertiaryContainerBrush" Color="#633B48"/>
+    <SolidColorBrush x:Key="MaterialOnTertiaryContainerBrush" Color="#FFD8E4"/>
+
+    <SolidColorBrush x:Key="MaterialSurfaceBrush" Color="#1C1B1F"/>
+    <SolidColorBrush x:Key="MaterialOnSurfaceBrush" Color="#E6E1E5"/>
+    <SolidColorBrush x:Key="MaterialOnSurfaceVariantBrush" Color="#49454F"/>
+    <SolidColorBrush x:Key="MaterialSurfaceVariantBrush" Color="#49454F"/>
+
+    <SolidColorBrush x:Key="MaterialBackgroundBrush" Color="#1C1B1F"/>
+    <SolidColorBrush x:Key="MaterialOnBackgroundBrush" Color="#E6E1E5"/>
+
+    <SolidColorBrush x:Key="MaterialErrorBrush" Color="#F2B8B5"/>
+    <SolidColorBrush x:Key="MaterialOnErrorBrush" Color="#601410"/>
+    <SolidColorBrush x:Key="MaterialErrorContainerBrush" Color="#8C1D18"/>
+    <SolidColorBrush x:Key="MaterialOnErrorContainerBrush" Color="#F9DEDC"/>
+
+    <SolidColorBrush x:Key="MaterialOutlineBrush" Color="#938F99"/>
+    <SolidColorBrush x:Key="MaterialOutlineVariantBrush" Color="#49454F"/>
+    <SolidColorBrush x:Key="MaterialDividerBrush" Color="#49454F"/>
+
+    <SolidColorBrush x:Key="MaterialPaperBrush" Color="#141218"/>
+
+    <!-- Inverse colors for ToolTips and overlays -->
+    <SolidColorBrush x:Key="MaterialInverseSurfaceBrush" Color="#E6E1E5"/>
+    <SolidColorBrush x:Key="MaterialInverseOnSurfaceBrush" Color="#1C1B1F"/>
+
+    <!-- 指示灯状态转换器 -->
+    <converters:BadgeStateToBrushConverter x:Key="BadgeStateToBrushConverter"/>
+    <converters:BadgeStateToIconConverter x:Key="BadgeStateToIconConverter"/>
+
+    <!-- 整数到布尔值转换器 -->
+    <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
+
+    <!-- 布尔值到字符串转换器 -->
+    <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+    
+    <!-- 布尔值到透明度转换器 -->
+    <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+    
+    <!-- 颜色到画刷转换器 -->
+    <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+
+    <!-- 初次启动向导转换器 -->
+    <converters:BoolToPresetBackgroundConverter x:Key="BoolToPresetBackgroundConverter"/>
+    <converters:BoolToPresetBorderConverter x:Key="BoolToPresetBorderConverter"/>
+    <converters:BoolToDarkModeTextConverter x:Key="BoolToDarkModeTextConverter"/>
+    <converters:IntGreaterThanOneConverter x:Key="IntGreaterThanOneConverter"/>
+  </Application.Resources>
+</Application>

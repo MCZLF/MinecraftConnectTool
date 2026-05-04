@@ -1,0 +1,272 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.OptimizePage"
+             x:DataType="vm:OptimizePageViewModel">
+
+  <Design.DataContext>
+    <vm:OptimizePageViewModel />
+  </Design.DataContext>
+
+  <ScrollViewer>
+    <StackPanel Margin="32" Spacing="24">
+      <!-- 标题区域 -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="8">
+          <TextBlock Text="网络优化"
+                     FontSize="32"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="检测并优化您的网络环境，提高P2P连接成功率"
+                     FontSize="16"
+                     Opacity="0.7"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+        <!-- 右上角测试Label -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                CornerRadius="8"
+                Padding="12,6"
+                VerticalAlignment="Top">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <icons:MaterialIcon Kind="Flask"
+                               Width="16"
+                               Height="16"
+                               Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+            <TextBlock Text="测试功能"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- NAT类型检测卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              BoxShadow="0 2 8 0 #1A000000"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource MaterialDividerBrush}"
+              Padding="24">
+        <StackPanel Spacing="16">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="RouterNetwork" Width="28" Height="28"
+                               Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="NAT类型检测"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <TextBlock Text="STUN服务器: stun.cloudflare.com + 随机10个备用服务器"
+                     FontSize="14"
+                     Opacity="0.6"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+
+          <!-- 检测结果 -->
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,8">
+            <!-- NAT类型 -->
+            <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4" Margin="0,0,8,16">
+              <TextBlock Text="NAT类型"
+                         FontSize="14"
+                         Opacity="0.6"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding NatTypeText}"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            </StackPanel>
+
+            <!-- 公网IP -->
+            <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4" Margin="8,0,0,16">
+              <TextBlock Text="公网IP"
+                         FontSize="14"
+                         Opacity="0.6"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding PublicIp}"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <!-- 公网端口 -->
+            <StackPanel Grid.Column="0" Grid.Row="1" Spacing="4" Margin="0,0,8,0">
+              <TextBlock Text="公网端口 (可能会变化)"
+                         FontSize="14"
+                         Opacity="0.6"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding PublicPort}"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <!-- P2P联机建议 -->
+            <StackPanel Grid.Column="1" Grid.Row="1" Spacing="4" Margin="8,0,0,0">
+              <TextBlock Text="P2P联机建议 (仅供参考,请以实际为准)"
+                         FontSize="14"
+                         Opacity="0.6"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <!-- 成功状态 - 绿色 -->
+              <TextBlock Text="{Binding P2pSuggestion}"
+                         FontSize="14"
+                         FontWeight="SemiBold"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialPrimaryBrush}"
+                         IsVisible="{Binding P2pSuggestionSuccess}"/>
+              <!-- 警告状态 - 橙色 -->
+              <TextBlock Text="{Binding P2pSuggestion}"
+                         FontSize="14"
+                         FontWeight="SemiBold"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialTertiaryBrush}"
+                         IsVisible="{Binding P2pSuggestionWarning}"/>
+              <!-- 错误状态 - 红色 -->
+              <TextBlock Text="{Binding P2pSuggestion}"
+                         FontSize="14"
+                         FontWeight="SemiBold"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialErrorBrush}"
+                         IsVisible="{Binding P2pSuggestionError}"/>
+            </StackPanel>
+          </Grid>
+
+          <!-- 状态消息 -->
+          <TextBlock Text="{Binding StatusMessage}"
+                     FontSize="14"
+                     IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     Foreground="{DynamicResource MaterialErrorBrush}"/>
+
+          <!-- 检测按钮 -->
+          <Button Command="{Binding DetectNatTypeCommand}"
+                  IsEnabled="{Binding !IsDetecting}"
+                  HorizontalAlignment="Left"
+                  Theme="{StaticResource MaterialOutlineButtonTheme}"
+                  Classes="large">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="{Binding DetectButtonIcon}"
+                                 Width="20"
+                                 Height="20"/>
+              <TextBlock Text="{Binding DetectButtonText}"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <!-- 详细日志卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              BoxShadow="0 2 8 0 #1A000000"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource MaterialDividerBrush}"
+              Padding="24"
+              IsVisible="{Binding DetailedLog, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <StackPanel Spacing="16">
+          <!-- 卡片标题和复制按钮 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+              <icons:MaterialIcon Kind="TextBox" Width="28" Height="28"
+                                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="检测日志"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Command="{Binding CopyLogCommand}"
+                    Theme="{StaticResource MaterialOutlineButtonTheme}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="ContentCopy" Width="16" Height="16"/>
+                <TextBlock Text="复制日志"/>
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- 日志内容 -->
+          <Border Background="{DynamicResource MaterialBackgroundBrush}"
+                  CornerRadius="8"
+                  Padding="16">
+            <ScrollViewer MaxHeight="300"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
+              <TextBlock Text="{Binding DetailedLog}"
+                         FontSize="12"
+                         FontFamily="Consolas,Monospace"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+            </ScrollViewer>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- 优化建议卡片 -->
+      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              BoxShadow="0 2 8 0 #1A000000"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource MaterialDividerBrush}"
+              Padding="24">
+        <StackPanel Spacing="16">
+          <!-- 卡片标题 -->
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <icons:MaterialIcon Kind="LightbulbOutline" Width="28" Height="28"
+                               Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+            <TextBlock Text="优化建议"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+
+          <!-- 建议列表 -->
+          <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <icons:MaterialIcon Kind="CheckCircleOutline" Width="20" Height="20"
+                                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="开启路由器的UPnP功能，自动配置端口映射"
+                         FontSize="14"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <icons:MaterialIcon Kind="CheckCircleOutline" Width="20" Height="20"
+                                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="如果UPnP不可用，尝试手动配置端口转发"
+                         FontSize="14"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <icons:MaterialIcon Kind="CheckCircleOutline" Width="20" Height="20"
+                                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="确保防火墙允许应用程序通过UDP/TCP通信"
+                         FontSize="14"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <icons:MaterialIcon Kind="CheckCircleOutline" Width="20" Height="20"
+                                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="完全连不上/校园网 建议使用Link模式"
+                         FontSize="14"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

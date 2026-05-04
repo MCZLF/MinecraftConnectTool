@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.Controls.FloatingStopButton"
+             IsVisible="False"
+             Width="56"
+             Height="56">
+
+  <UserControl.Styles>
+    <Style Selector="ToolTip">
+      <Setter Property="Background" Value="{DynamicResource MaterialInverseSurfaceBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialInverseOnSurfaceBrush}"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Button x:Name="StopButton"
+          Width="56"
+          Height="56"
+          CornerRadius="28"
+          Background="{DynamicResource MaterialErrorBrush}"
+          Foreground="White"
+          BorderThickness="0"
+          ClipToBounds="True"
+          ToolTip.Placement="Top">
+    <Button.Styles>
+      <!-- 覆盖 Material 主题，强制圆形 -->
+      <Style Selector="Button">
+        <Setter Property="CornerRadius" Value="28"/>
+        <Setter Property="Background" Value="{DynamicResource MaterialErrorBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+      </Style>
+      <!-- 悬停效果 -->
+      <Style Selector="Button:pointerover">
+        <Setter Property="Background" Value="#FF5C5C"/>
+        <Setter Property="CornerRadius" Value="28"/>
+      </Style>
+      <!-- 按下效果 -->
+      <Style Selector="Button:pressed">
+        <Setter Property="Background" Value="#CC3333"/>
+        <Setter Property="CornerRadius" Value="28"/>
+      </Style>
+    </Button.Styles>
+    <icons:MaterialIcon Kind="Power" Width="24" Height="24" Foreground="White"/>
+  </Button>
+</UserControl>

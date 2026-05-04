@@ -1,0 +1,4 @@
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Release\net8.0\win-x64\publish\av_libglesv2.dll
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Release\net8.0\win-x64\publish\libHarfBuzzSharp.dll
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Release\net8.0\win-x64\publish\libSkiaSharp.dll
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Release\net8.0\win-x64\publish\MinecraftConnectTool.exe

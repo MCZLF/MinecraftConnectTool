@@ -1,0 +1,26 @@
+{
+  "runtimeOptions": {
+    "tfm": "net8.0",
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "8.0.0"
+    },
+    "configProperties": {
+      "System.GC.Server": false,
+      "System.GC.Concurrent": false,
+      "System.GC.RetainVM": false,
+      "System.GC.HeapHardLimit": 67108864,
+      "System.GC.HeapHardLimitPercent": 10,
+      "System.GC.HighMemoryPercent": 40,
+      "System.GC.LatencyLevel": "Batch",
+      "MaterialThemeIncludeDataGrid": true,
+      "System.Diagnostics.Metrics.Meter.IsSupported": false,
+      "System.Diagnostics.StackTrace.IsSupported": false,
+      "System.Globalization.Invariant": true,
+      "System.Globalization.PredefinedCulturesOnly": true,
+      "System.Reflection.Metadata.MetadataUpdater.IsSupported": false,
+      "System.Runtime.InteropServices.BuiltInComInterop.IsSupported": true,
+      "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
+    }
+  }
+}

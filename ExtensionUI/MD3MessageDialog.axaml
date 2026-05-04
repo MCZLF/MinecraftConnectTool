@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.ExtensionUI.MD3MessageDialog"
+             x:DataType="local:MD3MessageDialog"
+             xmlns:local="using:MinecraftConnectTool.ExtensionUI"
+             MinWidth="302"
+             MinHeight="126">
+    
+    <Border Background="{DynamicResource MaterialSecondaryContainerBrush}"
+            CornerRadius="28"
+            BoxShadow="0 12 48 0 #60000000"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource MaterialOutlineVariantBrush}">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <!-- 标题栏：图标 + 标题 + 关闭按钮 -->
+            <Grid Grid.Row="0" 
+                  ColumnDefinitions="Auto,*,Auto"
+                  Margin="24,20,16,0">
+                <!-- 提示图标 -->
+                <icons:MaterialIcon Grid.Column="0"
+                                    Kind="{Binding IconKind}"
+                                    Width="28"
+                                    Height="28"
+                                    Foreground="{DynamicResource MaterialPrimaryBrush}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,12,0"/>
+                
+                <!-- 标题 -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Title}"
+                           FontSize="20"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                           VerticalAlignment="Center"/>
+                
+                <!-- 右上角关闭按钮 -->
+                <Button Grid.Column="2"
+                        x:Name="CloseButton"
+                        Width="32"
+                        Height="32"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="4"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+                    <icons:MaterialIcon Kind="Close"
+                                        Width="20"
+                                        Height="20"
+                                        Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+                </Button>
+            </Grid>
+            
+            <!-- 消息内容 -->
+            <ScrollViewer Grid.Row="1"
+                          Margin="24,16,24,0"
+                          VerticalScrollBarVisibility="Auto"
+                          MaxHeight="200">
+                <TextBlock Text="{Binding Message}"
+                           FontSize="14"
+                           Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                           TextWrapping="Wrap"
+                           LineHeight="20"/>
+            </ScrollViewer>
+            
+            <!-- 底部按钮区域 -->
+            <Grid Grid.Row="2" 
+                  Margin="24,24,24,24"
+                  HorizontalAlignment="Right">
+                <Button x:Name="ConfirmButton"
+                        Content="确定"
+                        Classes="Filled"
+                        Padding="24,10"
+                        FontSize="14"
+                        FontWeight="Medium"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

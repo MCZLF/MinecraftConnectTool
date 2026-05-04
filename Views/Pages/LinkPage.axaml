@@ -1,0 +1,465 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             xmlns:controls="using:MinecraftConnectTool.Controls"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.LinkPage"
+             x:DataType="vm:LinkPageViewModel">
+
+  <Design.DataContext>
+    <vm:LinkPageViewModel />
+  </Design.DataContext>
+
+  <UserControl.Styles>
+    <!-- 完全椭圆按钮样式 -->
+    <Style Selector="Button.pill">
+      <Setter Property="CornerRadius" Value="24"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid Margin="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- 顶部区域：标题 -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 标题区域 -->
+      <StackPanel Grid.Column="0" Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <icons:MaterialIcon Kind="LinkVariant" 
+                              Width="32" 
+                              Height="32"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="Link模式"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <!-- 状态指示区域 - 上下两个badge -->
+          <StackPanel Orientation="Vertical" Spacing="4" Margin="12,0,0,0" VerticalAlignment="Center">
+            <!-- 连接状态 badge3 -->
+            <Border IsVisible="{Binding IsStatusBadgeVisible}"
+                    Background="{Binding StatusBadgeState, Converter={StaticResource BadgeStateToBrushConverter}}"
+                    CornerRadius="4"
+                    Padding="6,2"
+                    HorizontalAlignment="Left"
+                    MaxWidth="300">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <icons:MaterialIcon Kind="{Binding StatusBadgeState, Converter={StaticResource BadgeStateToIconConverter}}"
+                                    Width="14"
+                                    Height="14"
+                                    Foreground="{DynamicResource MaterialOnPrimaryBrush}"
+                                    VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatusBadgeText}"
+                           FontSize="11"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding StatusBadgeText}"/>
+              </StackPanel>
+            </Border>
+            <!-- 工作模式 badge1 - 只在加入方显示 -->
+            <Border IsVisible="{Binding IsWorkModeBadgeVisible}"
+                    Background="{DynamicResource MaterialSecondaryContainerBrush}"
+                    CornerRadius="4"
+                    Padding="6,2"
+                    HorizontalAlignment="Left">
+              <TextBlock Text="{Binding WorkModeBadgeText}"
+                         FontSize="11"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                         VerticalAlignment="Center"
+                         TextTrimming="CharacterEllipsis"/>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+        <TextBlock Text="通过服务器中转连接，突破网络限制"
+                   FontSize="14"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 平台支持标签 + 调试选项按钮 - 右上角 -->
+      <StackPanel Grid.Column="1" 
+                  Orientation="Horizontal" 
+                  Spacing="12"
+                  VerticalAlignment="Top">
+        <!-- 平台支持标签 -->
+        <Border Background="{DynamicResource MaterialTertiaryContainerBrush}"
+                CornerRadius="8"
+                Padding="10,6"
+                VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <icons:MaterialIcon Kind="DesktopTower"
+                               Width="16"
+                               Height="16"
+                               Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+            <TextBlock Text="Win / Linux / Mac"
+                       FontSize="12"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+        </Border>
+        
+        <Button Content="调试选项"
+                Height="40"
+                VerticalAlignment="Center"
+                Click="DebugButton_Click">
+          <Button.ContentTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="BlockHelper" Width="18" Height="18"/>
+                <TextBlock Text="调试选项" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </Button.ContentTemplate>
+        </Button>
+
+        <!-- 房间管理按钮 -->
+        <Button Content="房间管理"
+                Height="40"
+                VerticalAlignment="Center"
+                Command="{Binding OpenPlayerManagerCommand}"
+                IsVisible="{Binding IsPlayerListConnected}">
+          <Button.ContentTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="AccountGroup" Width="18" Height="18"/>
+                <TextBlock Text="房间管理" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </Button.ContentTemplate>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- 信息栏/副标题 重叠区域 -->
+    <Grid Grid.Row="1" Margin="0,0,0,16">
+      <!-- 副标题 - 底层 -->
+      <TextBlock Text="您正在使用Link模式进行联机ヾ(≧▽≦*)o"
+                 FontSize="16"
+                 FontWeight="Medium"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+      
+      <!-- 进度条 -->
+      <ProgressBar Value="{Binding ProgressValue}"
+                   Maximum="100"
+                   IsVisible="{Binding IsProgressVisible}"
+                   Height="4"
+                   Margin="0,24,0,0"
+                   VerticalAlignment="Top"/>
+      
+      <!-- 常驻信息栏 - 显示提示码 - 顶层 -->
+      <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="12"
+              Padding="16"
+              IsVisible="{Binding IsAlertVisible}"
+              ZIndex="1">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <icons:MaterialIcon Grid.Column="0"
+                              Kind="Information"
+                              Width="24"
+                              Height="24"
+                              Margin="0,0,12,0"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Grid.Column="1"
+                     Text="{Binding AlertText}"
+                     VerticalAlignment="Center"
+                     FontSize="16"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <Button Grid.Column="2"
+                  x:Name="CopyButton"
+                  IsVisible="{Binding IsInfoButtonVisible}"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  Padding="8,4">
+            <TextBlock Text="复制"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </Button>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- 主内容区域 - 响应式布局 -->
+    <Grid Grid.Row="2" Margin="0,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="320" MinWidth="280" MaxWidth="400"/>
+        <ColumnDefinition Width="*" MinWidth="300"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 左侧操作面板 -->
+      <StackPanel Grid.Column="0" Spacing="16">
+        <!-- 开启联机房间区域 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="LanConnect" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="开启联机房间"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <!-- 状态徽章 -->
+            <WrapPanel>
+              <Border Background="{DynamicResource MaterialSuccessContainerBrush}"
+                      CornerRadius="12"
+                      Padding="8,4"
+                      Margin="0,0,8,8"
+                      IsVisible="{Binding IsCustomPortEnabled}">
+                <TextBlock Text="已启用自定义端口"
+                           FontSize="11"
+                           Foreground="{DynamicResource MaterialOnSuccessContainerBrush}"/>
+              </Border>
+              <Border Background="{DynamicResource MaterialSecondaryContainerBrush}"
+                      CornerRadius="12"
+                      Padding="8,4"
+                      Margin="0,0,8,8"
+                      IsVisible="{Binding IsMulticastEnabled}">
+                <TextBlock Text="已启用房间多播"
+                           FontSize="11"
+                           Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+              </Border>
+            </WrapPanel>
+
+            <!-- 完全椭圆按钮 -->
+            <Button Content="开启联机房间"
+                    Height="48"
+                    Classes="pill"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding StartRoomCommand}">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <icons:MaterialIcon Kind="Play" Width="20" Height="20"/>
+                    <TextBlock Text="开启联机房间" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
+          </StackPanel>
+        </Border>
+
+        <!-- 加入联机房间区域 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="LanConnect" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+              <TextBlock Text="加入联机房间"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <icons:MaterialIcon Grid.Column="0" Kind="Key" Width="20" Height="20" Margin="12,0,8,0" Foreground="{DynamicResource MaterialOnSurfaceBrush}" VerticalAlignment="Center"/>
+              <TextBox Grid.Column="1"
+                       Watermark="输入提示码"
+                       Text="{Binding JoinCode}"
+                       Height="44"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                       BorderBrush="{DynamicResource MaterialOutlineBrush}"
+                       BorderThickness="0,0,0,1"
+                       Background="Transparent"/>
+            </Grid>
+
+            <!-- 完全椭圆按钮 -->
+            <Button Content="加入联机房间"
+                    Height="48"
+                    Classes="pill"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding JoinRoomCommand}">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <icons:MaterialIcon Kind="Login" Width="20" Height="20"/>
+                    <TextBlock Text="加入联机房间" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- 右侧日志区域 -->
+      <Border Grid.Column="1"
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="20"
+              Margin="20,0,0,5">
+        <Grid RowDefinitions="Auto,*">
+          <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" 
+                        Orientation="Horizontal" 
+                        Spacing="8">
+              <icons:MaterialIcon Kind="TextBox" 
+                                  Width="24" 
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="运行日志"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="复制日志"
+                    Command="{Binding CopyLogCommand}"
+                    Theme="{DynamicResource MaterialFlatButtonTheme}"
+                    Foreground="{DynamicResource MaterialOnSurfaceBrush}">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <icons:MaterialIcon Kind="ContentCopy" Width="16" Height="16"/>
+                    <TextBlock Text="复制日志" VerticalAlignment="Center" FontSize="13"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
+          </Grid>
+
+          <Border Grid.Row="1"
+                  Background="{DynamicResource MaterialBackgroundBrush}"
+                  CornerRadius="12"
+                  Padding="16">
+            <ScrollViewer x:Name="LogScrollViewer"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+              <TextBlock x:Name="LogTextBlock"
+                         Text="{Binding LogText}"
+                         FontFamily="Consolas, monospace"
+                         FontSize="13"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+            </ScrollViewer>
+          </Border>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- 底部区域 -->
+    <Grid Grid.Row="3" Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 底部提示 -->
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+        <icons:MaterialIcon Kind="Alert" 
+                            Width="18" 
+                            Height="18"
+                            Opacity="0.7"
+                            Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+        <TextBlock Text="请勿多开核心,避免出现意料之外的错误！启动后点击上方提示按钮,即可复制相关信息"
+                   FontSize="13"
+                   Opacity="0.7"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+      </StackPanel>
+
+      <!-- 工作模式标签 -->
+      <StackPanel Grid.Column="1" 
+                  Orientation="Horizontal" 
+                  Spacing="8"
+                  IsVisible="False">
+        <icons:MaterialIcon Kind="Earth" 
+                            Width="18" 
+                            Height="18"
+                            Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        <TextBlock Text="工作模式"
+                   FontSize="13"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </StackPanel>
+      
+      <!-- 发送命令区域 - 参考LinkMode的materialSingleLineTextField1和button2 -->
+      <StackPanel Grid.Column="1" 
+                  Orientation="Horizontal" 
+                  Spacing="8"
+                  IsVisible="{Binding IsCommandInputVisible}">
+        <TextBox Text="{Binding CommandText}"
+                 Width="140"
+                 Height="40"
+                 VerticalAlignment="Center"
+                 Background="Transparent"
+                 Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                 BorderBrush="{DynamicResource MaterialOutlineBrush}"
+                 BorderThickness="0,0,0,1"/>
+        <Button Content="发送"
+                Width="60"
+                Height="40"
+                VerticalAlignment="Center"
+                Command="{Binding SendCommandCommand}"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- 错误提示窗 - 类似安卓Toast，中间下方位置，带淡入淡出动画 -->
+    <Border Grid.Row="0" Grid.RowSpan="4"
+            IsVisible="{Binding IsErrorToastVisible}"
+            Background="{DynamicResource MaterialErrorContainerBrush}"
+            CornerRadius="28"
+            Padding="20,12"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Margin="0,0,0,60"
+            MaxWidth="360"
+            Opacity="{Binding ErrorToastOpacity}"
+            BoxShadow="0 4 8 0 #40000000">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <icons:MaterialIcon Kind="AlertCircle"
+                            Width="24"
+                            Height="24"
+                            Foreground="{DynamicResource MaterialOnErrorContainerBrush}"/>
+        <TextBlock Text="{Binding ErrorToastText}"
+                   FontSize="14"
+                   FontWeight="Medium"
+                   Foreground="{DynamicResource MaterialOnErrorContainerBrush}"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

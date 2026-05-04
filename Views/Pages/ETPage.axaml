@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.ETPage"
+             x:DataType="vm:ETPageViewModel">
+
+  <Design.DataContext>
+    <vm:ETPageViewModel />
+  </Design.DataContext>
+
+  <Grid>
+    <ScrollViewer>
+      <StackPanel Margin="32" Spacing="24">
+        <!-- 标题区域 -->
+        <StackPanel Spacing="8">
+          <TextBlock Text="ET"
+                     FontSize="32"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="基于EasyTier的联机模式，目前正在开发"
+                     FontSize="16"
+                     Opacity="0.7"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+
+        <!-- 状态卡片 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="24">
+          <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                    CornerRadius="12"
+                    Width="56"
+                    Height="56"
+                    Margin="0,0,16,0">
+              <icons:MaterialIcon Kind="CodeBraces"
+                                  Width="28"
+                                  Height="28"
+                                  Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+              <TextBlock Text="{Binding PageText}"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding StatusText}"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Margin="0,4,0,0"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- 占位内容 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="32"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+          <StackPanel Spacing="16" HorizontalAlignment="Center">
+            <icons:MaterialIcon Kind="CodeBraces"
+                                Width="64"
+                                Height="64"
+                                Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"
+                                Opacity="0.5"/>
+            <TextBlock Text="ET 功能开发中..."
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="基于EasyTier的联机模式"
+                       FontSize="14"
+                       Opacity="0.6"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- 左下角提示 -->
+    <TextBlock Text="EasyTier有点麻烦,估计没那么快上"
+               FontSize="12"
+               Opacity="0.5"
+               Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Bottom"
+               Margin="32,0,0,16"/>
+  </Grid>
+</UserControl>

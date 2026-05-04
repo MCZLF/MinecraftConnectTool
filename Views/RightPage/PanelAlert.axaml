@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.RightPage"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.Views.RightPage.PanelAlert"
+             x:DataType="vm:PanelAlertViewModel"
+             Width="350">
+  <UserControl.Styles>
+    <!-- Back按钮样式 - 类似MaterialFlatButton -->
+    <Style Selector="Button.back-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.back-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <!-- 刷新按钮样式 -->
+    <Style Selector="Button.refresh-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8"/>
+      <Setter Property="Width" Value="36"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.refresh-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 顶部标题栏 - 固定高度 -->
+    <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,*,Auto" Margin="0">
+      <!-- Back按钮 -->
+      <Button Grid.Column="0"
+              x:Name="BackButton"
+              Classes="back-button"
+              VerticalAlignment="Center"
+              Margin="8,0,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <icons:MaterialIcon Kind="ArrowLeft" Width="16" Height="16" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="Back" FontSize="14" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+      </Button>
+
+      <!-- 标题 - 带图标 -->
+      <StackPanel Grid.Column="1" 
+                  Orientation="Horizontal" 
+                  Spacing="8"
+                  VerticalAlignment="Center"
+                  Margin="12,0,0,0">
+        <icons:MaterialIcon Kind="NotificationsActive" 
+                            Width="18" 
+                            Height="18"
+                            Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        <TextBlock x:Name="TitleText"
+                   Text="重要云公告|TagID:"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   FontWeight="Medium"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </StackPanel>
+
+      <!-- 刷新按钮 - 右上角 -->
+      <Button Grid.Column="2"
+              x:Name="RefreshButton"
+              Classes="refresh-button"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Right"
+              Margin="0,0,8,0">
+        <icons:MaterialIcon Kind="Refresh" 
+                            Width="20" 
+                            Height="20"
+                            Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+      </Button>
+    </Grid>
+
+    <!-- 公告内容区域 -->
+    <Border Grid.Row="1" 
+            Background="{DynamicResource MaterialSurfaceVariantBrush}"
+            Margin="12,0,12,12"
+            CornerRadius="8"
+            Padding="16">
+      <ScrollViewer>
+        <TextBlock x:Name="AlertContent"
+                   Text="正在加载公告..."
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   LineHeight="24"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,213 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.RightPage"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.Views.RightPage.PanelPlayerManager"
+             x:DataType="vm:PanelPlayerManagerViewModel"
+             Width="380">
+  <UserControl.Styles>
+    <!-- Back按钮样式 -->
+    <Style Selector="Button.back-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.back-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <!-- 踢出按钮样式 -->
+    <Style Selector="Button.kick-button">
+      <Setter Property="Background" Value="{DynamicResource MaterialErrorContainerBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnErrorContainerBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="Button.kick-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialErrorBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnErrorBrush}"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 顶部标题栏 -->
+    <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,*,Auto" Margin="0">
+      <!-- Back按钮 -->
+      <Button Grid.Column="0"
+              x:Name="BackButton"
+              Classes="back-button"
+              VerticalAlignment="Center"
+              Margin="8,0,0,0"
+              Command="{Binding CloseCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <icons:MaterialIcon Kind="ArrowLeft" Width="16" Height="16" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="Back" FontSize="14" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+      </Button>
+
+      <!-- 标题 -->
+      <StackPanel Grid.Column="1" 
+                  Orientation="Horizontal" 
+                  Spacing="8"
+                  VerticalAlignment="Center"
+                  Margin="12,0,0,0">
+        <icons:MaterialIcon Kind="AccountGroup" 
+                            Width="18" 
+                            Height="18"
+                            Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        <TextBlock Text="{Binding PanelTitle}"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   FontWeight="Medium"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                CornerRadius="10"
+                Padding="6,2"
+                VerticalAlignment="Center">
+          <TextBlock Text="{Binding PlayerCountText}"
+                     FontSize="11"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+        </Border>
+      </StackPanel>
+
+      <!-- 刷新按钮 -->
+      <Button Grid.Column="2"
+              x:Name="RefreshButton"
+              Classes="back-button"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Right"
+              Margin="0,0,8,0"
+              Command="{Binding RefreshCommand}">
+        <icons:MaterialIcon Kind="Refresh" 
+                            Width="20" 
+                            Height="20"
+                            Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+      </Button>
+    </Grid>
+
+    <!-- 内容区域 -->
+    <Grid Grid.Row="1" Margin="12,0,12,12">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+
+      <!-- 房间信息 -->
+      <Border Grid.Row="0"
+              Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="8"
+              Padding="12"
+              Margin="0,0,0,12">
+        <StackPanel Spacing="4">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <icons:MaterialIcon Kind="LanConnect" 
+                                Width="16" 
+                                Height="16"
+                                Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+            <TextBlock Text="{Binding RoomCodeText}"
+                       FontSize="13"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+          </StackPanel>
+          <TextBlock Text="{Binding RoleText}"
+                     FontSize="12"
+                     Opacity="0.8"
+                     Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- 玩家列表 -->
+      <Border Grid.Row="1"
+              Background="{DynamicResource MaterialSurfaceVariantBrush}"
+              CornerRadius="8"
+              Padding="0">
+        <Grid>
+          <!-- 空状态 -->
+          <StackPanel HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="8"
+                      IsVisible="{Binding IsEmpty}">
+            <icons:MaterialIcon Kind="AccountOff" 
+                                Width="48" 
+                                Height="48"
+                                Opacity="0.5"
+                                Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+            <TextBlock Text="暂无其他玩家"
+                       FontSize="14"
+                       Opacity="0.7"
+                       Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+          </StackPanel>
+
+          <!-- 玩家列表 -->
+          <ScrollViewer IsVisible="{Binding !IsEmpty}"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Players}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                          CornerRadius="8"
+                          Padding="12"
+                          Margin="8,4,8,4">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <!-- 头像 -->
+                      <Border Grid.Column="0"
+                              Width="36"
+                              Height="36"
+                              CornerRadius="18"
+                              Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                              VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Initial}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+                      </Border>
+
+                      <!-- 信息 -->
+                      <StackPanel Grid.Column="1"
+                                  Margin="12,0,0,0"
+                                  VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Nickname}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                        <TextBlock Text="{Binding Version}"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+                      </StackPanel>
+
+                      <!-- 踢出按钮（仅房主显示，且不能踢出房主自己） -->
+                      <Button Grid.Column="2"
+                              Classes="kick-button"
+                              VerticalAlignment="Center"
+                              Command="{Binding $parent[ItemsControl].DataContext.KickPlayerCommand}"
+                              CommandParameter="{Binding Id}">
+                        <Button.IsVisible>
+                          <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="$parent[ItemsControl].DataContext.IsHost" />
+                            <Binding Path="!IsHostPlayer" />
+                          </MultiBinding>
+                        </Button.IsVisible>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                          <icons:MaterialIcon Kind="AccountRemove" Width="14" Height="14"/>
+                          <TextBlock Text="踢出" FontSize="11" VerticalAlignment="Center"/>
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

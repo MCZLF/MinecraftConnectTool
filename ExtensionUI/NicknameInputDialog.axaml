@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.ExtensionUI.NicknameInputDialog"
+             Width="400"
+             Height="220">
+  <UserControl.Styles>
+    <Style Selector="Button.pill">
+      <Setter Property="CornerRadius" Value="24"/>
+      <Setter Property="Height" Value="44"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Border Background="{DynamicResource MaterialSurfaceBrush}"
+          CornerRadius="16"
+          Padding="24"
+          BoxShadow="0 4 16 0 #40000000">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <!-- 标题 -->
+      <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <icons:MaterialIcon Kind="AccountEdit" 
+                              Width="28" 
+                              Height="28"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="输入昵称"
+                     FontSize="20"
+                     FontWeight="Bold"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+        <TextBlock Text="请输入您的游戏昵称，其他玩家将看到此名称"
+                   FontSize="13"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+      </StackPanel>
+
+      <!-- 输入框 -->
+      <Grid Grid.Row="1" Margin="0,8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <icons:MaterialIcon Grid.Column="0" 
+                            Kind="Account" 
+                            Width="24" 
+                            Height="24" 
+                            Margin="0,0,12,0"
+                            Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                            VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1"
+                 x:Name="NicknameTextBox"
+                 Watermark="请输入昵称（最多20个字符）"
+                 MaxLength="20"
+                 Height="48"
+                 FontSize="15"
+                 VerticalContentAlignment="Center"
+                 Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                 Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                 CornerRadius="8"
+                 Padding="12,0"/>
+      </Grid>
+
+      <!-- 按钮 -->
+      <StackPanel Grid.Row="2"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="12"
+                  Margin="0,16,0,0">
+        <Button x:Name="SkipButton"
+                Content="跳过"
+                Theme="{DynamicResource MaterialFlatButtonTheme}"
+                Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+        <Button x:Name="CancelButton"
+                Content="取消"
+                Theme="{DynamicResource MaterialFlatButtonTheme}"
+                Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        <Button x:Name="ConfirmButton"
+                Content="确认加入"
+                Classes="pill"
+                Width="120"
+                Background="{DynamicResource MaterialPrimaryBrush}"
+                Foreground="{DynamicResource MaterialOnPrimaryBrush}">
+          <Button.ContentTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                <icons:MaterialIcon Kind="Login" Width="18" Height="18"/>
+                <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </Button.ContentTemplate>
+        </Button>
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,83 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = true
+build_property.EnableTrimAnalyzer = 
+build_property.IncludeAllContentForSelfExtract = true
+build_property.AvaloniaNameGeneratorIsEnabled = true
+build_property.AvaloniaNameGeneratorBehavior = InitializeComponent
+build_property.AvaloniaNameGeneratorDefaultFieldModifier = internal
+build_property.AvaloniaNameGeneratorFilterByPath = *
+build_property.AvaloniaNameGeneratorFilterByNamespace = *
+build_property.AvaloniaNameGeneratorViewFileNamingStrategy = NamespaceAndClassName
+build_property.AvaloniaNameGeneratorAttachDevTools = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = true
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = MinecraftConnectTool
+build_property.ProjectDir = D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/App.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Controls/ColorPickerButton.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Controls/FloatingStopButton.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/ExtensionUI/MD3InputDialog.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/ExtensionUI/MD3MessageDialog.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/ExtensionUI/NicknameInputDialog.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/FirstLaunchWizardWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/MainWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/ETPage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/HelpPage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/HomePage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/LinkPage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/OptimizePage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/P2PPage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/SettingsPage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/UpdatePage.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelAlert.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelInviteEdit.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelPlayerManager.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             x:Class="MinecraftConnectTool.Views.Pages.HelpPage"
+             x:DataType="vm:HelpPageViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="16">
+      <!-- 标题 -->
+      <TextBlock Text="Hi,"
+                 FontSize="32"
+                 FontWeight="Light"
+                 Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+
+      <TextBlock Text="需要帮助吗,以下是一些教程,可以提前看看&#x0A;看完后可以点击左侧菜单,即可返回主界面~"
+                 FontSize="16"
+                 TextWrapping="Wrap"
+                 Opacity="0.8"
+                 Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+
+      <!-- 教程链接卡片 -->
+      <Grid ColumnDefinitions="*,*" Margin="0,16,0,0">
+        <!-- 图文教程 -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                CornerRadius="12"
+                Padding="16"
+                Margin="0,0,8,0"
+                PointerPressed="OnTutorialLinkClick">
+          <StackPanel Spacing="8">
+            <TextBlock Text="图文教程"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="http://mcjavao.tttttttttt.top/"
+                       FontSize="12"
+                       Opacity="0.7"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <!-- 视频教程 -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                CornerRadius="12"
+                Padding="16"
+                Margin="8,0,0,0"
+                PointerPressed="OnVideoLinkClick">
+          <StackPanel Spacing="8">
+            <TextBlock Text="视频教程"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="https://www.bilibili.com/video/BV1sBXyYgE1j/"
+                       FontSize="12"
+                       Opacity="0.7"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- 提示信息 -->
+      <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+              CornerRadius="8"
+              Padding="16">
+        <TextBlock Text="点击上方链接即可直接打开~                              欢迎加入QQ群一起讨论|690625244"
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </Border>
+
+      <!-- 功能按钮 -->
+      <Grid ColumnDefinitions="*,*,*,*" Margin="0,16,0,0">
+        <Button Grid.Column="0"
+                Content="一图解"
+                Margin="0,0,8,0"
+                HorizontalAlignment="Stretch"
+                Click="OnImageGuideClick"/>
+        <Button Grid.Column="1"
+                Content="BUG反馈"
+                Margin="4,0,4,0"
+                HorizontalAlignment="Stretch"
+                Click="OnBugReportClick"/>
+        <Button Grid.Column="2"
+                Content="查询渲染模式"
+                Margin="4,0,4,0"
+                HorizontalAlignment="Stretch"
+                Click="OnCheckRenderingModeClick"/>
+        <Button Grid.Column="3"
+                Content="我强迫症"
+                Margin="8,0,0,0"
+                HorizontalAlignment="Stretch"
+                Click="OnPlaceholder2Click"/>
+      </Grid>
+
+      <!-- 渲染模式显示区域 -->
+      <Border x:Name="RenderingModeBorder"
+              Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="12"
+              Padding="16"
+              IsVisible="False">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="RenderingModeText"
+                     FontSize="16"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock x:Name="RenderingModeDetail"
+                     FontSize="13"
+                     Opacity="0.8"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Restart 按钮 - 右下角 -->
+      <Button Content="Restart"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,32,0,0"
+              Click="OnRestartClick"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

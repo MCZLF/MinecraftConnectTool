@@ -1,0 +1,327 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\mainwindow.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\mainwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\services\\playerlistservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:services\\playerlistservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\pages\\p2ppage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\pages\\p2ppage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\firstlaunchwizardwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\firstlaunchwizardwindow.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\services\\themeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:services\\themeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\services\\versioncheckservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:services\\versioncheckservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\services\\p2pmodeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:services\\p2pmodeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\rightpage\\panelalert.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\rightpage\\panelalert.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\pages\\p2ppage.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\pages\\p2ppage.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\viewmodels\\pages\\p2ppageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:viewmodels\\pages\\p2ppageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\services\\p2pprocessservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:services\\p2pprocessservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\viewmodels\\pages\\updatepageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:viewmodels\\pages\\updatepageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\pages\\homepage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\pages\\homepage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\pages\\linkpage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\pages\\linkpage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\viewmodels\\pages\\linkpageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:viewmodels\\pages\\linkpageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|d:\\mczlfvisualstudio\\0.0.7\\minecraftconnecttool\\views\\pages\\etpage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{EAB8DE44-5110-D01E-3FDD-F4A8180AD276}|MinecraftConnectTool.csproj|solutionrelative:views\\pages\\etpage.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "VersionCheckService.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\VersionCheckService.cs",
+              "RelativeDocumentMoniker": "Services\\VersionCheckService.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\VersionCheckService.cs",
+              "RelativeToolTip": "Services\\VersionCheckService.cs",
+              "ViewState": "AgIAACIAAAAALDMzMzMDwDIAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-27T16:02:05.113Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "P2PModeService.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\P2PModeService.cs",
+              "RelativeDocumentMoniker": "Services\\P2PModeService.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\P2PModeService.cs",
+              "RelativeToolTip": "Services\\P2PModeService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKADAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T06:41:34.465Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "P2PPage.axaml.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\P2PPage.axaml.cs",
+              "RelativeDocumentMoniker": "Views\\Pages\\P2PPage.axaml.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\P2PPage.axaml.cs",
+              "RelativeToolTip": "Views\\Pages\\P2PPage.axaml.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T06:40:54.843Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "P2PPage.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\P2PPage.axaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\P2PPage.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\P2PPage.axaml",
+              "RelativeToolTip": "Views\\Pages\\P2PPage.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-13T06:40:51.811Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAFAAAAAAAAAAAAAQwFsAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-20T04:25:47.229Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\MainWindow.axaml",
+              "RelativeDocumentMoniker": "Views\\MainWindow.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\MainWindow.axaml",
+              "RelativeToolTip": "Views\\MainWindow.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-18T13:51:50.164Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.axaml.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\MainWindow.axaml.cs",
+              "RelativeDocumentMoniker": "Views\\MainWindow.axaml.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\MainWindow.axaml.cs",
+              "RelativeToolTip": "Views\\MainWindow.axaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T01:50:58.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ThemeService.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\ThemeService.cs",
+              "RelativeDocumentMoniker": "Services\\ThemeService.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\ThemeService.cs",
+              "RelativeToolTip": "Services\\ThemeService.cs",
+              "ViewState": "AgIAAEIBAADAAAAAAAAmwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-12T01:03:33.723Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PlayerListService.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\PlayerListService.cs",
+              "RelativeDocumentMoniker": "Services\\PlayerListService.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\PlayerListService.cs",
+              "RelativeToolTip": "Services\\PlayerListService.cs",
+              "ViewState": "AgIAADMBAAAAMDMzMzMgwMsAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-12T04:43:58.529Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FirstLaunchWizardWindow.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\FirstLaunchWizardWindow.axaml",
+              "RelativeDocumentMoniker": "Views\\FirstLaunchWizardWindow.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\FirstLaunchWizardWindow.axaml",
+              "RelativeToolTip": "Views\\FirstLaunchWizardWindow.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-18T12:10:58.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "PanelAlert.axaml.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\RightPage\\PanelAlert.axaml.cs",
+              "RelativeDocumentMoniker": "Views\\RightPage\\PanelAlert.axaml.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\RightPage\\PanelAlert.axaml.cs",
+              "RelativeToolTip": "Views\\RightPage\\PanelAlert.axaml.cs",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAAAEsAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-27T16:01:28.419Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "MainWindowViewModel.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\MainWindowViewModel.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeToolTip": "ViewModels\\MainWindowViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-25T06:49:53.999Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "P2PPageViewModel.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\P2PPageViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\Pages\\P2PPageViewModel.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\P2PPageViewModel.cs",
+              "RelativeToolTip": "ViewModels\\Pages\\P2PPageViewModel.cs",
+              "ViewState": "AgIAAPgAAAAAAAAAAAAuwHQBAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T02:29:40.258Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "P2PProcessService.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\P2PProcessService.cs",
+              "RelativeDocumentMoniker": "Services\\P2PProcessService.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Services\\P2PProcessService.cs",
+              "RelativeToolTip": "Services\\P2PProcessService.cs",
+              "ViewState": "AgIAANYAAAAAAAAAAAAswAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T06:41:26.93Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "UpdatePageViewModel.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\UpdatePageViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\Pages\\UpdatePageViewModel.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\UpdatePageViewModel.cs",
+              "RelativeToolTip": "ViewModels\\Pages\\UpdatePageViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T14:41:29.266Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "HomePage.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\HomePage.axaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\HomePage.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\HomePage.axaml",
+              "RelativeToolTip": "Views\\Pages\\HomePage.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-20T04:26:20.433Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "LinkPage.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\LinkPage.axaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\LinkPage.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\LinkPage.axaml",
+              "RelativeToolTip": "Views\\Pages\\LinkPage.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-27T04:05:30.899Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "LinkPageViewModel.cs",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\LinkPageViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\Pages\\LinkPageViewModel.cs",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\ViewModels\\Pages\\LinkPageViewModel.cs",
+              "RelativeToolTip": "ViewModels\\Pages\\LinkPageViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJwDAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-24T15:14:58.64Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "ETPage.axaml",
+              "DocumentMoniker": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\ETPage.axaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\ETPage.axaml",
+              "ToolTip": "D:\\MCZLFVisualStudio\\0.0.7\\MinecraftConnectTool\\Views\\Pages\\ETPage.axaml",
+              "RelativeToolTip": "Views\\Pages\\ETPage.axaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-20T04:26:14.623Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

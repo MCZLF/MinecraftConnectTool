@@ -1,0 +1,373 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.RightPage"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             x:Class="MinecraftConnectTool.Views.RightPage.PanelInviteEdit"
+             x:DataType="vm:PanelInviteEditViewModel"
+             Width="350">
+  <UserControl.Styles>
+    <!-- Back按钮样式 -->
+    <Style Selector="Button.back-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.back-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <!-- 帮助按钮样式 -->
+    <Style Selector="Button.help-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineBrush}"/>
+      <Setter Property="Padding" Value="4"/>
+      <Setter Property="Width" Value="24"/>
+      <Setter Property="Height" Value="24"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+    <Style Selector="Button.help-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <!-- 帮助按钮激活状态 -->
+    <Style Selector="Button.help-button.active">
+      <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+    </Style>
+    <!-- 保存按钮动效样式 -->
+    <Style Selector="Button.save-button">
+      <Setter Property="Background" Value="{DynamicResource MaterialPrimaryBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnPrimaryBrush}"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.2"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.save-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+      <Setter Property="RenderTransform" Value="scale(1.05)"/>
+    </Style>
+    <Style Selector="Button.save-button:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.95)"/>
+    </Style>
+    <!-- 输入框下划线样式 -->
+    <Style Selector="TextBox.underline-input">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0,0,0,2"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineBrush}"/>
+      <Setter Property="Padding" Value="0,8"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+      <Setter Property="CaretBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+    </Style>
+    <Style Selector="TextBox.underline-input:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+    </Style>
+    <Style Selector="TextBox.underline-input:focus /template/ Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 顶部标题栏 -->
+    <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,*" Margin="0">
+      <!-- Back按钮 -->
+      <Button Grid.Column="0"
+              x:Name="BackButton"
+              Classes="back-button"
+              VerticalAlignment="Center"
+              Margin="8,0,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <icons:MaterialIcon Kind="ArrowLeft" Width="16" Height="16" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="Back" FontSize="14" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+      </Button>
+
+      <!-- 标题 -->
+      <StackPanel Grid.Column="1"
+                  Orientation="Horizontal"
+                  Spacing="8"
+                  VerticalAlignment="Center"
+                  Margin="12,0,0,0">
+        <icons:MaterialIcon Kind="AccountEdit"
+                            Width="18"
+                            Height="18"
+                            Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        <TextBlock Text="自定义邀请信息"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   FontWeight="Medium"
+                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- 内容区域 -->
+    <ScrollViewer Grid.Row="1" Margin="12,0,12,12">
+      <StackPanel Spacing="16">
+
+        <!-- ========== 房主部分 ========== -->
+        <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                CornerRadius="12"
+                Padding="16">
+          <StackPanel Spacing="12">
+            <!-- 标题行 -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="AccountPlus"
+                                  Width="20"
+                                  Height="20"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="房主"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <!-- 状态指示 -->
+              <Border Background="{Binding HostBadgeColor}"
+                      CornerRadius="4"
+                      Padding="6,2"
+                      Margin="8,0,0,0"
+                      VerticalAlignment="Center">
+                <TextBlock Text="{Binding HostBadgeText}"
+                           FontSize="11"
+                           Foreground="White"/>
+              </Border>
+              <!-- 帮助按钮 -->
+              <Button Classes="help-button"
+                      Classes.active="{Binding IsHostHelpVisible}"
+                      VerticalAlignment="Center"
+                      Margin="4,0,0,0"
+                      Command="{Binding ToggleHostHelpCommand}">
+                <TextBlock Text="?" FontSize="12" HorizontalAlignment="Center"/>
+              </Button>
+            </StackPanel>
+
+            <Separator Background="{DynamicResource MaterialDividerBrush}"/>
+
+            <!-- 提示码更新频率 -->
+            <Grid ColumnDefinitions="Auto,*">
+              <StackPanel Grid.Column="0"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          VerticalAlignment="Center">
+                <icons:MaterialIcon Kind="ClockOutline"
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                <TextBlock Text="提示码更新频率"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              <ComboBox Grid.Column="1"
+                        ItemsSource="{Binding CodeUpdateOptions}"
+                        SelectedIndex="{Binding SelectedCodeUpdateIndex, Mode=TwoWay}"
+                        HorizontalAlignment="Right"
+                        Width="120"
+                        Height="36">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding}"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </Grid>
+
+            <!-- 房主帮助说明 (动态折叠) -->
+            <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                    CornerRadius="8"
+                    Padding="12"
+                    IsVisible="{Binding IsHostHelpVisible}">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="Information"
+                                      Width="16"
+                                      Height="16"
+                                      Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+                  <TextBlock Text="自定义提示码说明"
+                             FontSize="13"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+                </StackPanel>
+                <TextBlock Text="开启后可将提示码固定为[输入的文本FO]&#x0a;&#x0a;FO是选项[永久]的标记符，于0.0.6.103版本加入强制FO结尾&#x0a;可在编辑配置文件中手动去除FO，但对应的自动识别永久提示码功能也将失效"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           LineHeight="20"
+                           Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+              </StackPanel>
+            </Border>
+
+            <!-- 自定义提示码输入框 (仅永久模式显示) -->
+            <StackPanel IsVisible="{Binding IsCustomCodeInputVisible}"
+                        Spacing="8">
+              <TextBlock Text="自定义提示码 (至少8位)"
+                         FontSize="13"
+                         Opacity="0.8"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0"
+                         Classes="underline-input"
+                         Text="{Binding CustomNode, Mode=TwoWay}"
+                         Watermark="输入自定义提示码"
+                         MaxLength="10"
+                         Height="40"
+                         VerticalContentAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Classes="save-button"
+                        Margin="8,0,0,0"
+                        Command="{Binding SaveCustomCodeCommand}"
+                        IsVisible="{Binding IsSaveCodeButtonVisible}">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <icons:MaterialIcon Kind="ContentSave" Width="16" Height="16"/>
+                    <TextBlock Text="保存"/>
+                  </StackPanel>
+                </Button>
+              </Grid>
+              <TextBlock Text="{Binding CustomCodeStatusText}"
+                         FontSize="12"
+                         Foreground="{DynamicResource MaterialErrorBrush}"
+                         IsVisible="{Binding IsCustomCodeStatusVisible}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- ========== 玩家部分 ========== -->
+        <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                CornerRadius="12"
+                Padding="16">
+          <StackPanel Spacing="12">
+            <!-- 标题行 -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="AccountGroup"
+                                  Width="20"
+                                  Height="20"
+                                  Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+              <TextBlock Text="玩家"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <!-- 状态指示 -->
+              <Border Background="{Binding PlayerBadgeColor}"
+                      CornerRadius="4"
+                      Padding="6,2"
+                      Margin="8,0,0,0"
+                      VerticalAlignment="Center">
+                <TextBlock Text="{Binding PlayerBadgeText}"
+                           FontSize="11"
+                           Foreground="White"/>
+              </Border>
+              <!-- 帮助按钮 -->
+              <Button Classes="help-button"
+                      Classes.active="{Binding IsPlayerHelpVisible}"
+                      VerticalAlignment="Center"
+                      Margin="4,0,0,0"
+                      Command="{Binding TogglePlayerHelpCommand}">
+                <TextBlock Text="?" FontSize="12" HorizontalAlignment="Center"/>
+              </Button>
+            </StackPanel>
+
+            <Separator Background="{DynamicResource MaterialDividerBrush}"/>
+
+            <!-- 端口固定开关 -->
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0"
+                          Orientation="Horizontal"
+                          Spacing="6"
+                          VerticalAlignment="Center">
+                <icons:MaterialIcon Kind="LanConnect"
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+                <TextBlock Text="端口固定"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1"
+                            IsChecked="{Binding UseCustomPort, Mode=TwoWay}"
+                            VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- 玩家帮助说明 (动态折叠) -->
+            <Border Background="{DynamicResource MaterialSecondaryContainerBrush}"
+                    CornerRadius="8"
+                    Padding="12"
+                    IsVisible="{Binding IsPlayerHelpVisible}">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="Information"
+                                      Width="16"
+                                      Height="16"
+                                      Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+                  <TextBlock Text="端口固定说明"
+                             FontSize="13"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+                </StackPanel>
+                <TextBlock Text="自定义加入方的端口&#x0a;开启后加入IP将在下一次启动时更新为 127.0.0.1:自定义端口"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           LineHeight="20"
+                           Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+              </StackPanel>
+            </Border>
+
+            <!-- 自定义端口输入框 -->
+            <StackPanel IsVisible="{Binding UseCustomPort}"
+                        Spacing="8">
+              <TextBlock Text="自定义端口 (1-65535)"
+                         FontSize="13"
+                         Opacity="0.8"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0"
+                         Classes="underline-input"
+                         Text="{Binding CustomPort, Mode=TwoWay}"
+                         Watermark="输入端口号"
+                         MaxLength="5"
+                         Height="40"
+                         VerticalContentAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Classes="save-button"
+                        Margin="8,0,0,0"
+                        Command="{Binding SaveCustomPortCommand}"
+                        IsVisible="{Binding IsSavePortButtonVisible}">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <icons:MaterialIcon Kind="ContentSave" Width="16" Height="16"/>
+                    <TextBlock Text="保存"/>
+                  </StackPanel>
+                </Button>
+              </Grid>
+              <TextBlock Text="{Binding CustomPortStatusText}"
+                         FontSize="12"
+                         Foreground="{DynamicResource MaterialErrorBrush}"
+                         IsVisible="{Binding IsCustomPortStatusVisible}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- 提示信息 -->
+        <Border Background="{DynamicResource MaterialTertiaryContainerBrush}"
+                CornerRadius="8"
+                Padding="12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <icons:MaterialIcon Kind="Information"
+                                Width="16"
+                                Height="16"
+                                Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+            <TextBlock Text="设置将在重启后生效"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -1,0 +1,263 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="MinecraftConnectTool.Views.Pages.HomePage"
+             x:DataType="vm:HomePageViewModel">
+
+  <Design.DataContext>
+    <vm:HomePageViewModel />
+  </Design.DataContext>
+
+  <UserControl.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="BoxShadow" Value="0 2 8 0 #1A000000"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}"/>
+    </Style>
+    <Style Selector="Border.card:pointerover">
+      <Setter Property="BoxShadow" Value="0 4 16 0 #26000000"/>
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="28,24" Spacing="20">
+      <!-- 标题区域 -->
+      <StackPanel Spacing="4">
+        <TextBlock Text="首页"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        <TextBlock Text="欢迎使用 Minecraft Connect Tool"
+                   FontSize="16"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 普通云公告 -->
+      <Border x:Name="CloudAlertBorder"
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              BorderBrush="{DynamicResource MaterialPrimaryBrush}"
+              BorderThickness="1"
+              CornerRadius="12"
+              Padding="12,9"
+              IsVisible="False">
+        <Grid ColumnDefinitions="Auto,Auto,*">
+          <icons:MaterialIcon Grid.Column="0"
+                              Kind="InformationCircle"
+                              Width="18"
+                              Height="18"
+                              Margin="0,0,6,0"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"
+                              VerticalAlignment="Top"/>
+          <TextBlock Grid.Column="1"
+                     Text="公告"
+                     FontSize="13"
+                     FontWeight="SemiBold"
+                     Margin="0,0,6,0"
+                     Foreground="{DynamicResource MaterialPrimaryBrush}"
+                     VerticalAlignment="Top"/>
+          <TextBlock Grid.Column="2"
+                     x:Name="CloudAlertText"
+                     FontSize="13"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Grid>
+      </Border>
+
+      <!-- 功能卡片网格 -->
+      <UniformGrid Columns="2" Rows="2" Margin="0,9">
+        <!-- P2P卡片 -->
+        <Border Classes="card"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Margin="6"
+                Padding="17">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 图标在左上角 -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                    CornerRadius="12"
+                    Width="48"
+                    Height="48"
+                    HorizontalAlignment="Left">
+              <icons:MaterialIcon Kind="LanConnect"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Border>
+            
+            <!-- 文字内容 -->
+            <StackPanel Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+              <TextBlock Text="P2P模式"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="点对点连接，直接与朋友联机"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- Link卡片 -->
+        <Border Classes="card"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Margin="6"
+                Padding="17">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 图标在左上角 -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialSecondaryContainerBrush}"
+                    CornerRadius="12"
+                    Width="48"
+                    Height="48"
+                    HorizontalAlignment="Left">
+              <icons:MaterialIcon Kind="LinkVariant"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Border>
+            
+            <!-- 文字内容 -->
+            <StackPanel Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+              <TextBlock Text="Link模式"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="链接模式，通过服务器中转连接"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- 更新卡片 -->
+        <Border Classes="card"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Margin="6"
+                Padding="17">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 图标在左上角 -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialTertiaryContainerBrush}"
+                    CornerRadius="12"
+                    Width="48"
+                    Height="48"
+                    HorizontalAlignment="Left">
+              <icons:MaterialIcon Kind="Update"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Border>
+            
+            <!-- 文字内容 -->
+            <StackPanel Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+              <TextBlock Text="检查更新"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="获取最新版本和功能"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- 设置卡片 -->
+        <Border Classes="card"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Margin="6"
+                Padding="17">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 图标在左上角 - 使用Primary颜色确保可见 -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource MaterialPrimaryContainerBrush}"
+                    CornerRadius="12"
+                    Width="48"
+                    Height="48"
+                    HorizontalAlignment="Left">
+              <icons:MaterialIcon Kind="Cog"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Border>
+            
+            <!-- 文字内容 -->
+            <StackPanel Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+              <TextBlock Text="设置"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="自定义应用程序选项"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </UniformGrid>
+
+      <!-- 快速开始区域 -->
+      <Border Classes="card"
+              Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="16"
+              Padding="20"
+              Margin="6,0">
+        <StackPanel Spacing="12">
+          <TextBlock Text="快速开始"
+                     FontSize="20"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="选择左侧导航栏中的 P2P模式 或 Link模式 开始联机游戏。P2P模式适合与朋友直接连接，Link模式适合通过服务器中转。"
+                     FontSize="14"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                     Opacity="0.8"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

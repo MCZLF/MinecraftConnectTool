@@ -1,0 +1,657 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MinecraftConnectTool.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:material="using:Material.Styles"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             xmlns:controls="using:MinecraftConnectTool.Controls"
+             mc:Ignorable="d" d:DesignWidth="930" d:DesignHeight="775"
+        x:Class="MinecraftConnectTool.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/IconGroup3000.ico"
+        Title="Minecraft Connect Tool"
+        Width="1080"
+        Height="720"
+        MinWidth="750"
+        MinHeight="675"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialPaperBrush}"
+        TransparencyLevelHint="Mica"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Window.Resources>
+    <!-- 照片背景画刷 -->
+    <ImageBrush x:Key="PhotoBackgroundBrush"
+                Stretch="UniformToFill"
+                Opacity="0.4"/>
+  </Window.Resources>
+
+  <Window.Styles>
+    <!-- 页面切换淡入淡出动画 -->
+    <Style Selector="TransitioningContentControl">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    
+    <!-- 导航按钮样式 -->
+    <Style Selector="Button.navigation">
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    
+    <!-- 窗口控制按钮样式 - 关闭按钮特殊处理 -->
+    <Style Selector="Button.window-control">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+      <Setter Property="Transitions" Value="{x:Null}"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderThickness="0"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.window-control:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="Button.window-control:pressed">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+    </Style>
+    
+    <!-- 关闭按钮特殊样式 - 红色悬停 -->
+    <Style Selector="Button.close-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+      <Setter Property="Transitions" Value="{x:Null}"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderThickness="0"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.close-button:pointerover">
+      <Setter Property="Background" Value="#E81123"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="Button.close-button:pressed">
+      <Setter Property="Background" Value="#F1707A"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="RenderTransform" Value="{x:Null}"/>
+    </Style>
+  </Window.Styles>
+
+  <Grid>
+    <!-- 背景图片层 - 纯静态渲染，不参与动画 -->
+    <Image x:Name="BackgroundImage"
+           Stretch="UniformToFill"
+           Opacity="0"
+           IsVisible="False"
+           ZIndex="0"/>
+
+    <!-- 背景遮罩层 - 用于半透明效果 -->
+    <Rectangle x:Name="BackgroundOverlay"
+               Fill="{DynamicResource MaterialPaperBrush}"
+               Opacity="1"
+               ZIndex="1"/>
+
+    <!-- 自定义标题栏 - 支持拖动 -->
+    <Grid x:Name="TitleBar" Height="40" VerticalAlignment="Top" ZIndex="100">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      
+      <!-- 标题栏背景 - 允许拖动 -->
+      <Border Grid.Column="0" Grid.ColumnSpan="3" 
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              Opacity="0.8"
+              PointerPressed="OnTitleBarPointerPressed"/>
+      
+      <!-- 窗口图标和标题 - 允许拖动，放在最左边 -->
+      <StackPanel Grid.Column="0" 
+                  Orientation="Horizontal"
+                  VerticalAlignment="Center"
+                  Margin="16,0,0,0"
+                  Spacing="8"
+                  PointerPressed="OnTitleBarPointerPressed">
+        <Image Source="/IconGroup3000.ico" 
+               Width="20" 
+               Height="20"
+               VerticalAlignment="Center"
+               Stretch="UniformToFill"/>
+        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Bottom" Margin="0,0,0,2">
+          <TextBlock Text="Minecraft Connect Tool" 
+                     FontSize="12"
+                     Opacity="0.8"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                     VerticalAlignment="Bottom"/>
+          <TextBlock x:Name="VersionTextBlock"
+                     FontSize="10"
+                     Opacity="0.6"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                     VerticalAlignment="Bottom"
+                     Margin="0,0,0,1"/>
+        </StackPanel>
+      </StackPanel>
+      
+      <!-- 标题栏功能按钮 + 窗口控制按钮区域 -->
+      <StackPanel Grid.Column="2" 
+                  Orientation="Horizontal" 
+                  VerticalAlignment="Top"
+                  Height="40">
+        <!-- button2: 云公告按钮 (默认隐藏) -->
+        <Button x:Name="button2"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                IsVisible="False"
+                Click="button2_Click">
+          <icons:MaterialIcon Kind="BellOutline" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- button_mclogs: 云日志上传按钮 -->
+        <Button x:Name="button_mclogs"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                Click="button_mclogs_Click">
+          <icons:MaterialIcon Kind="CloudUpload" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- button1: 刷新按钮 -->
+        <Button x:Name="button1"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                Click="button1_Click">
+          <icons:MaterialIcon Kind="Refresh" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- button_color: 帮助按钮 -->
+        <Button x:Name="button_color"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                Click="button_color_Click">
+          <icons:MaterialIcon Kind="HelpCircleOutline" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- buttonSZ: 设置按钮 -->
+        <Button x:Name="buttonSZ"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                Click="buttonSZ_Click">
+          <icons:MaterialIcon Kind="CogOutline" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- 最小化按钮 -->
+        <Button x:Name="MinimizeButton"
+                Classes="window-control"
+                Width="46" 
+                Height="40"
+                Click="OnMinimizeButtonClick">
+          <icons:MaterialIcon Kind="WindowMinimize" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- 最大化按钮 -->
+        <Button x:Name="MaximizeButton"
+                Classes="window-control"
+                Width="46" 
+                Height="40"
+                Click="OnMaximizeButtonClick">
+          <icons:MaterialIcon x:Name="MaximizeIcon"
+                              Kind="WindowMaximize" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+        <!-- 关闭按钮 -->
+        <Button x:Name="CloseButton"
+                Classes="close-button"
+                Width="46" 
+                Height="40"
+                Click="OnCloseButtonClick">
+          <icons:MaterialIcon Kind="WindowClose" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- 主内容区域 -->
+    <Grid x:Name="MainContentGrid" Margin="0,40,0,0" ZIndex="10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="88"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 左侧导航栏 - Material Design 3 Navigation Rail -->
+      <Grid Grid.Column="0">
+        <!-- 左侧导航背景层 -->
+        <Border x:Name="LeftNavBackground"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                Opacity="1"
+                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                BorderThickness="0,0,1,0"/>
+        <!-- 左侧导航控件层 -->
+        <Border x:Name="LeftNavBorder"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                Opacity="1"
+                BorderBrush="{DynamicResource MaterialDividerBrush}"
+                BorderThickness="0,0,1,0">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+
+          <!-- Logo区域 -->
+          <Border Grid.Row="0" Padding="12,16">
+            <Border Background="{DynamicResource MaterialPrimaryBrush}"
+                    CornerRadius="12"
+                    Width="48"
+                    Height="48"
+                    HorizontalAlignment="Center">
+              <TextBlock Text="MCT"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         FontSize="14"
+                         FontWeight="Bold"
+                         Foreground="{DynamicResource MaterialOnPrimaryBrush}"/>
+            </Border>
+          </Border>
+
+          <!-- 导航菜单 -->
+          <StackPanel Grid.Row="1" Spacing="8" Margin="12,16">
+            <!-- 首页 -->
+            <Button x:Name="HomeButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="Home"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="HomeIndicator"
+                        Background="{DynamicResource MaterialSecondaryContainerBrush}"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="HomeIcon"
+                                      Kind="Home"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="HomeText"
+                           Text="首页"
+                           FontSize="12"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- P2P模式 -->
+            <Button x:Name="P2PButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="P2P"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="P2PIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="P2PIcon"
+                                      Kind="LanConnect"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="P2PText"
+                           Text="P2P"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- Link模式 -->
+            <Button x:Name="LinkButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="Link"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="LinkIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="LinkIcon"
+                                      Kind="LinkVariant"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="LinkText"
+                           Text="Link"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- ET -->
+            <Button x:Name="ETButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="ET"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="ETIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="ETIcon"
+                                      Kind="CodeBraces"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="ETText"
+                           Text="ET"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- 优化 -->
+            <Button x:Name="OptimizeButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="Optimize"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="OptimizeIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="OptimizeIcon"
+                                      Kind="RocketLaunch"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="OptimizeText"
+                           Text="优化"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- 检查更新 -->
+            <Button x:Name="UpdateButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="Update"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="UpdateIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="UpdateIcon"
+                                      Kind="Update"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="UpdateText"
+                           Text="更新"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+
+          <!-- 底部设置按钮 -->
+          <Border Grid.Row="2" Padding="12,16">
+            <Button x:Name="SettingsButton"
+                    Click="OnNavigationButtonClick"
+                    Tag="Settings"
+                    Classes="navigation"
+                    Width="64"
+                    Height="64"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center">
+              <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <Border x:Name="SettingsIndicator"
+                        Background="Transparent"
+                        CornerRadius="16"
+                        Width="56"
+                        Height="32"
+                        HorizontalAlignment="Center">
+                  <icons:MaterialIcon x:Name="SettingsIcon"
+                                      Kind="Cog"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="SettingsText"
+                           Text="设置"
+                           FontSize="12"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Opacity="0.7"
+                           HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+          </Border>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- 右侧内容区域 -->
+      <Grid Grid.Column="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 背景层 - 用于显示照片背景 -->
+        <Border x:Name="RightContentBackground" 
+                Background="{DynamicResource MaterialBackgroundBrush}" 
+                Opacity="1"/>
+        
+        <!-- 内容层 - 实际显示控件 -->
+        <Border x:Name="RightContentBorder" 
+                Background="{DynamicResource MaterialBackgroundBrush}" 
+                Opacity="1">
+          <Grid>
+          <!-- 页面内容 -->
+          <TransitioningContentControl x:Name="ContentControl"
+                                       Content="{Binding CurrentPage}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch">
+            <TransitioningContentControl.PageTransition>
+              <CrossFade Duration="0:0:0.3" />
+            </TransitioningContentControl.PageTransition>
+          </TransitioningContentControl>
+          
+          <!-- 水印 - 常驻显示右下角 -->
+          <Border x:Name="WatermarkBorder"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Margin="0,0,24,88"
+                  Padding="16,12"
+                  CornerRadius="8"
+                  Background="{DynamicResource MaterialSurfaceBrush}"
+                  Opacity="0.7">
+            <StackPanel Spacing="4">
+              <TextBlock x:Name="WatermarkLine1"
+                         Text="当前版本为早期技术预览版本"
+                         FontSize="11"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                         Opacity="0.9"/>
+              <TextBlock x:Name="WatermarkLine2"
+                         Text="若遇到问题请及时反馈ISSUE或Q群内"
+                         FontSize="10"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                         Opacity="0.7"/>
+            </StackPanel>
+          </Border>
+          
+          <!-- 问候语消息提示 - 底部居中 -->
+          <Border x:Name="GreetingBorder"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Bottom"
+                  Margin="0,0,0,24"
+                  Padding="24,12"
+                  CornerRadius="25"
+                  Background="{DynamicResource MaterialPrimaryBrush}"
+                  Opacity="0"
+                  IsVisible="False">
+            <TextBlock x:Name="GreetingText"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnPrimaryBrush}"/>
+          </Border>
+
+          <!-- 内存监控显示 - 仅在性能模式开启时显示，支持拖动 -->
+          <Canvas x:Name="MemoryMonitorCanvas"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  IsVisible="False">
+            <Border x:Name="MemoryMonitorBorder"
+                    Canvas.Left="24"
+                    Canvas.Bottom="24"
+                    Padding="12,8"
+                    CornerRadius="8"
+                    Background="{DynamicResource MaterialSurfaceBrush}"
+                    Opacity="0.9"
+                    Cursor="Hand"
+                    IsVisible="True">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon x:Name="MemoryIcon"
+                                    Kind="Memory"
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <TextBlock x:Name="MemoryText"
+                           FontSize="12"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+            </Border>
+          </Canvas>
+          
+          <!-- P2P/Link 停止悬浮按钮 - 跨页面显示 -->
+          <controls:FloatingStopButton x:Name="FloatingStopBtn"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Bottom"
+                                       Margin="0,0,39,34"
+                                       IsP2PRunning="{Binding IsP2PRunning}"
+                                       ToolTipText="{Binding StopButtonToolTip}"
+                                       Command="{Binding StopCoreCommand}"/>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

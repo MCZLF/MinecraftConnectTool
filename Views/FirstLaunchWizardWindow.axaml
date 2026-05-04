@@ -1,0 +1,613 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MinecraftConnectTool.ViewModels"
+        xmlns:icons="using:Material.Icons.Avalonia"
+        xmlns:controls="using:MinecraftConnectTool.Controls"
+        x:Class="MinecraftConnectTool.Views.FirstLaunchWizardWindow"
+        x:DataType="vm:FirstLaunchWizardViewModel"
+        Title="初次启动向导"
+        Width="800"
+        Height="600"
+        MinWidth="800"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        SystemDecorations="BorderOnly"
+        Background="{DynamicResource MaterialBackgroundBrush}">
+
+  <Window.Styles>
+    <Style Selector="TextBox#UsernameTextBox">
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+    </Style>
+    <Style Selector="TextBox#UsernameTextBox /template/ TextBlock#PART_Watermark">
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+      <Setter Property="Opacity" Value="0.8"/>
+    </Style>
+
+  </Window.Styles>
+
+  <Design.DataContext>
+    <vm:FirstLaunchWizardViewModel />
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto,*,Auto">
+    <!-- 顶部标题栏（带关闭按钮，可拖拽） -->
+    <Grid Grid.Row="0"
+          ColumnDefinitions="*,Auto"
+          Margin="16,12,16,0"
+          PointerPressed="OnTitleBarPointerPressed">
+      <TextBlock Grid.Column="0"
+                 Text="初次启动向导"
+                 FontSize="14"
+                 Opacity="0.7"
+                 VerticalAlignment="Center"
+                 Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      <Button Grid.Column="1"
+              Command="{Binding CloseWindowCommand}"
+              Background="Transparent"
+              BorderThickness="0"
+              Padding="8"
+              Width="36"
+              Height="36">
+        <icons:MaterialIcon Kind="Close"
+                            Width="20"
+                            Height="20"
+                            Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </Button>
+    </Grid>
+
+    <!-- 主内容区域 -->
+    <Grid Grid.Row="1">
+      <!-- 第一页：欢迎 -->
+      <Grid IsVisible="{Binding IsPage1Visible}"
+            RowDefinitions="*,Auto,*"
+            Margin="48,0">
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="16">
+          <icons:MaterialIcon Kind="HandWave"
+                              Width="64"
+                              Height="64"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="{Binding WelcomeTitle}"
+                     FontSize="36"
+                     FontWeight="Bold"
+                     HorizontalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="{Binding WelcomeSubtitle}"
+                     FontSize="24"
+                     FontWeight="Medium"
+                     HorizontalAlignment="Center"
+                     Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="{Binding WelcomeDescription}"
+                     FontSize="16"
+                     Opacity="0.7"
+                     HorizontalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- 第二页：用户名/游戏ID -->
+      <Grid IsVisible="{Binding IsPage2Visible}"
+            RowDefinitions="Auto,*,Auto"
+            Margin="48,32">
+        <StackPanel Grid.Row="0" Spacing="8">
+          <TextBlock Text="请问我们如何称呼您？"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="设置您的游戏ID，这将用于联机时显示"
+                     FontSize="14"
+                     Opacity="0.7"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    VerticalAlignment="Center"
+                    Spacing="24">
+          <!-- 游戏ID输入区 -->
+          <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                  CornerRadius="16"
+                  Padding="32">
+            <StackPanel Spacing="16">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <icons:MaterialIcon Kind="Account"
+                                    Width="24"
+                                    Height="24"
+                                    Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                <TextBlock Text="游戏ID"
+                           FontSize="18"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              <TextBox x:Name="UsernameTextBox"
+                       Text="{Binding Username}"
+                       Watermark="{Binding UsernamePlaceholder}"
+                       FontSize="16"
+                       Padding="16,12"
+                       CornerRadius="0"
+                       Background="Transparent"
+                       BorderBrush="{DynamicResource MaterialOutlineBrush}"
+                       BorderThickness="0,0,0,2"/>
+            </StackPanel>
+          </Border>
+
+          <!-- 查看教程区和性能模式并排 -->
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+            <!-- 查看教程区 -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource MaterialSurfaceBrush}"
+                    CornerRadius="16"
+                    Padding="24">
+              <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <icons:MaterialIcon Kind="BookOpen"
+                                      Width="24"
+                                      Height="24"
+                                      Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                  <TextBlock Text="查看教程"
+                             FontSize="18"
+                             FontWeight="Medium"
+                             Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </StackPanel>
+                <TextBlock Text="初次使用？查看官方教程了解如何使用本工具"
+                           FontSize="14"
+                           Opacity="0.7"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <Button Classes="outlined"
+                          Command="{Binding OpenWikiCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <icons:MaterialIcon Kind="Web" Width="18" Height="18"/>
+                      <TextBlock Text="官方知识库"/>
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="outlined"
+                          Command="{Binding OpenBilibiliCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <icons:MaterialIcon Kind="Video" Width="18" Height="18"/>
+                      <TextBlock Text="哔哩哔哩"/>
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- 性能模式 -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource MaterialSurfaceBrush}"
+                    CornerRadius="16"
+                    Padding="20">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <icons:MaterialIcon Kind="RocketLaunch"
+                                        Width="20"
+                                        Height="20"
+                                        Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                    <TextBlock Text="性能模式"
+                               FontSize="16"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding MemoryInfoText}"
+                             FontSize="11"
+                             Opacity="0.6"
+                             Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                </StackPanel>
+                <ToggleSwitch Grid.Column="1"
+                              IsChecked="{Binding EnablePerformanceMode, Mode=TwoWay}"
+                              VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </Grid>
+
+      <!-- 第三页：主题设置 -->
+      <Grid IsVisible="{Binding IsPage3Visible}"
+            RowDefinitions="Auto,*,Auto"
+            Margin="48,32">
+        <StackPanel Grid.Row="0" Spacing="8">
+          <TextBlock Text="设置主题"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="选择您喜欢的界面风格"
+                     FontSize="14"
+                     Opacity="0.7"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="不喜欢?暂时跳过,稍后您可以在设置中加载您喜欢的样式"
+                     FontSize="12"
+                     Opacity="0.6"
+                     Foreground="{DynamicResource MaterialPrimaryBrush}"
+                     Cursor="Hand"
+                     PointerPressed="OnSkipThemeTextPressed"
+                     Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="0,16,0,0" VerticalScrollBarVisibility="Visible">
+          <StackPanel Spacing="16">
+            <!-- 预设主题卡片 -->
+            <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                    CornerRadius="12"
+                    Padding="16">
+              <StackPanel Spacing="12">
+                <TextBlock Text="使用预设主题或自定义调整"
+                           FontSize="14"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <!-- 第一行预设 -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <!-- 预设1：鸣潮_守岸人 - 深色紫色 -->
+                  <Border Grid.Column="0"
+                          Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                          CornerRadius="10"
+                          BorderThickness="2"
+                          BorderBrush="Transparent"
+                          Padding="12">
+                    <Border.Styles>
+                      <Style Selector="Border[Tag=True]">
+                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+                      </Style>
+                    </Border.Styles>
+                    <Border.Tag>
+                      <Binding Path="IsPreset1Selected"/>
+                    </Border.Tag>
+                    <Button Command="{Binding ApplyPreset1Command}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                      <StackPanel Spacing="8">
+                        <Panel Height="80">
+                          <Border CornerRadius="8"
+                                  Background="#4A148C"/>
+                          <Image Source="{Binding Preset1Image}"
+                                 Stretch="UniformToFill"
+                                 Height="80">
+                            <Image.Clip>
+                              <RectangleGeometry Rect="0,0,300,80" RadiusX="8" RadiusY="8"/>
+                            </Image.Clip>
+                          </Image>
+                        </Panel>
+                        <TextBlock Text="鸣潮_守岸人"
+                                   FontSize="13"
+                                   FontWeight="Medium"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                        <TextBlock Text="深色紫调"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+
+                  <!-- 预设2：鸣潮_千咲 - 亮色浅蓝 -->
+                  <Border Grid.Column="1"
+                          Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                          CornerRadius="10"
+                          BorderThickness="2"
+                          BorderBrush="Transparent"
+                          Padding="12">
+                    <Border.Styles>
+                      <Style Selector="Border[Tag=True]">
+                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+                      </Style>
+                    </Border.Styles>
+                    <Border.Tag>
+                      <Binding Path="IsPreset2Selected"/>
+                    </Border.Tag>
+                    <Button Command="{Binding ApplyPreset2Command}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                      <StackPanel Spacing="8">
+                        <Panel Height="80">
+                          <Border CornerRadius="8"
+                                  Background="#64B5F6"/>
+                          <Image Source="{Binding Preset2Image}"
+                                 Stretch="UniformToFill"
+                                 Height="80">
+                            <Image.Clip>
+                              <RectangleGeometry Rect="0,0,300,80" RadiusX="8" RadiusY="8"/>
+                            </Image.Clip>
+                          </Image>
+                        </Panel>
+                        <TextBlock Text="鸣潮_千咲"
+                                   FontSize="13"
+                                   FontWeight="Medium"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                        <TextBlock Text="亮色晴天"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                </Grid>
+                
+                <!-- 第二行预设：有兽焉系列 -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <!-- 预设3：有兽焉_天禄 -->
+                  <Border Grid.Column="0"
+                          Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                          CornerRadius="10"
+                          BorderThickness="2"
+                          BorderBrush="Transparent"
+                          Padding="12">
+                    <Border.Styles>
+                      <Style Selector="Border[Tag=True]">
+                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+                      </Style>
+                    </Border.Styles>
+                    <Border.Tag>
+                      <Binding Path="IsPreset3Selected"/>
+                    </Border.Tag>
+                    <Button Command="{Binding ApplyPreset3Command}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                      <StackPanel Spacing="8">
+                        <Panel Height="80">
+                          <Border CornerRadius="8"
+                                  Background="#87CEEB"/>
+                          <Image Source="{Binding Preset3Image}"
+                                 Stretch="UniformToFill"
+                                 Height="80">
+                            <Image.Clip>
+                              <RectangleGeometry Rect="0,0,300,80" RadiusX="8" RadiusY="8"/>
+                            </Image.Clip>
+                          </Image>
+                        </Panel>
+                        <TextBlock Text="有兽焉_天禄"
+                                   FontSize="13"
+                                   FontWeight="Medium"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                        <TextBlock Text="浅色浅蓝"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+
+                  <!-- 预设4：有兽焉_辟邪 -->
+                  <Border Grid.Column="1"
+                          Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                          CornerRadius="10"
+                          BorderThickness="2"
+                          BorderBrush="Transparent"
+                          Padding="12">
+                    <Border.Styles>
+                      <Style Selector="Border[Tag=True]">
+                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryContainerBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryBrush}"/>
+                      </Style>
+                    </Border.Styles>
+                    <Border.Tag>
+                      <Binding Path="IsPreset4Selected"/>
+                    </Border.Tag>
+                    <Button Command="{Binding ApplyPreset4Command}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                      <StackPanel Spacing="8">
+                        <Panel Height="80">
+                          <Border CornerRadius="8"
+                                  Background="#FF6B6B"/>
+                          <Image Source="{Binding Preset4Image}"
+                                 Stretch="UniformToFill"
+                                 Height="80">
+                            <Image.Clip>
+                              <RectangleGeometry Rect="0,0,300,80" RadiusX="8" RadiusY="8"/>
+                            </Image.Clip>
+                          </Image>
+                        </Panel>
+                        <TextBlock Text="有兽焉_辟邪"
+                                   FontSize="13"
+                                   FontWeight="Medium"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                        <TextBlock Text="浅色浅红"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                      </StackPanel>
+                    </Button>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <!-- 基础设置 -->
+            <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                    CornerRadius="16"
+                    Padding="20">
+              <StackPanel Spacing="16">
+                <TextBlock Text="基础设置"
+                           FontSize="16"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+
+                <!-- 深色/亮色模式 -->
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="{Binding IsDarkMode, Converter={StaticResource BoolToDarkModeTextConverter}}"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <TextBlock Text="切换应用程序的明暗主题"
+                               FontSize="12"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <ToggleSwitch Grid.Column="1"
+                                IsChecked="{Binding IsDarkMode, Mode=TwoWay}"
+                                VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- 彩色主题 -->
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="彩色主题"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <TextBlock Text="启用自定义主题色"
+                               FontSize="12"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <ToggleSwitch Grid.Column="1"
+                                IsChecked="{Binding EnableColorMode, Mode=TwoWay}"
+                                VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- 主题色选择 -->
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding EnableColorMode}">
+                  <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="选择主题色"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <TextBlock Text="自定义应用程序的主色调"
+                               FontSize="12"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <controls:ColorPickerButton Grid.Column="1"
+                                SelectedColor="{Binding AccentColor, Mode=TwoWay}"
+                                MixIntensity="{Binding MixIntensity, Mode=TwoWay}"
+                                Title="选择主题色"
+                                VerticalAlignment="Center"
+                                Width="40"
+                                Height="40"/>
+                </Grid>
+
+                <!-- 混色浓度 -->
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding EnableColorMode}">
+                  <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="混色浓度"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <TextBlock Text="{Binding MixIntensity, StringFormat='{}{0:P0}'}"
+                               FontSize="12"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <Slider Grid.Column="1"
+                          Width="150"
+                          Minimum="0.01"
+                          Maximum="1.00"
+                          Value="{Binding MixIntensity, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+
+      <!-- 第四页：用户须知（暂时隐藏） -->
+      <!--
+      <Grid IsVisible="{Binding IsPage4Visible}"
+            RowDefinitions="Auto,*,Auto"
+            Margin="48,32">
+        <StackPanel Grid.Row="0" Spacing="8">
+          <TextBlock Text="{Binding UserNoticeTitle}"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="24"
+                Margin="0,16,0,0">
+          <ScrollViewer>
+            <TextBlock Text="{Binding UserNoticeContent}"
+                       FontSize="14"
+                       TextWrapping="Wrap"
+                       LineHeight="24"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+      -->
+    </Grid>
+
+    <!-- 底部导航栏 -->
+    <Grid Grid.Row="2"
+          ColumnDefinitions="Auto,*,Auto,Auto"
+          Margin="32,24"
+          VerticalAlignment="Bottom">
+      <!-- 进度指示器 -->
+      <StackPanel Grid.Column="0"
+                  Orientation="Horizontal"
+                  Spacing="8"
+                  VerticalAlignment="Center">
+        <TextBlock Text="{Binding CurrentPage}"
+                   FontSize="14"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        <TextBlock Text="/"
+                   FontSize="14"
+                   Opacity="0.5"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+        <TextBlock Text="{Binding TotalPages}"
+                   FontSize="14"
+                   Opacity="0.5"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 进度条 -->
+      <ProgressBar Grid.Column="1"
+                   Value="{Binding ProgressValue}"
+                   Maximum="100"
+                   Margin="16,0"
+                   VerticalAlignment="Center"
+                   Height="4"/>
+
+      <!-- 一键跳过按钮 -->
+      <Button Grid.Column="2"
+              Content="一键跳过"
+              Command="{Binding SkipWizardCommand}"
+              Classes="outlined"
+              Padding="16,10"
+              Margin="0,0,12,0"
+              VerticalAlignment="Center"/>
+
+      <!-- 导航按钮 -->
+      <StackPanel Grid.Column="3"
+                  Orientation="Horizontal"
+                  Spacing="12">
+        <Button Content="← Back"
+                Command="{Binding PreviousPageCommand}"
+                IsVisible="{Binding CurrentPage, Converter={StaticResource IntGreaterThanOneConverter}}"
+                Classes="outlined"
+                Padding="20,10"/>
+        <Button Content="{Binding NextButtonText}"
+                Command="{Binding NextPageCommand}"
+                Classes="filled"
+                Padding="20,10"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

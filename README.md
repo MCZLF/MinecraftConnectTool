@@ -346,14 +346,10 @@ MinecraftConnectTool/
 |:---:|:---:|
 | 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) |
 
-</div>
-
----
-
-<div align="center">
+<br>
 
 **Made with 💚 by MCZLF Studio**
 
-[🌟 Star](https://github.com/MCZLF/MinecraftConnectTool) · [🐛 Issues](https://github.com/MCZLF/MinecraftConnectTool/issues) · [� 知识库](https://mct.mczlf.loft.games)
+[🌟 Star](https://github.com/MCZLF/MinecraftConnectTool) · [🐛 Issues](https://github.com/MCZLF/MinecraftConnectTool/issues)
 
 </div>

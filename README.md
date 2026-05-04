@@ -134,17 +134,17 @@ Frp/P2P 混合联机方案
 
 ## 📋 系统需求
 
-- Windows 7 SP1 及以上 x64 / x86
-- **.NET Framework 4.7.2**（Win10 1803+ 已内置；低版本系统首次启动会弹微软官方安装向导，按提示一键装完即可）
-- 无需 Java、无需额外运行时、无网络端口手动放行要求
+- Windows 10 1809 及以上 x64 / x86 / ARM64
+- **.NET 8.0 运行时**（首次启动会自动检测并提示安装）
+- 无需 Java、无网络端口手动放行要求
 
 ---
 
 ## 🚀 下载 & 运行
 
-1. 访问 [`https://github.com/MCZLF/MinecraftConnectTool/releases`](https://github.com/MCZLF/MinecraftConnectTool/releases) 页面下载唯一文件 `MCT.exe`（单文件，~35 MB）。
+1. 访问 [`https://github.com/MCZLF/MinecraftConnectTool/releases`](https://github.com/MCZLF/MinecraftConnectTool/releases) 页面下载对应平台的安装包。
 2. 双击启动：
-   - 若系统缺少 .NET 4.7.2，会自动跳转微软官方安装页，装完重启工具即可。
+   - 若系统缺少 .NET 8.0，会自动跳转微软官方安装页，装完重启工具即可。
    - 首次启动会弹出 **WDF（Windows Defender 防火墙）授权** 提示，**建议把"专用 / 公用"两个框都勾上**，否则可能打洞失败。
 
 > [!CAUTION]
@@ -207,7 +207,7 @@ Frp/P2P 混合联机方案
 
 | 问题 | 一句话解决 |
 |:---|:---|
-| 双击没反应 | 先装 .NET Framework 4.7.2，再右键「以管理员身份运行」 |
+| 双击没反应 | 先装 [.NET 8.0 运行时](https://dotnet.microsoft.com/download/dotnet/8.0)，再右键「以管理员身份运行」 |
 | 防火墙提示 | 看见 WDF 弹窗全点「允许」；若错过，手动把 `MCT.exe` 加出入站白名单 |
 | 一直"打洞中" | 双方重启工具 → 换 4G 热点 → 校园网/企业网可能被封 P2P，无解 |
 | 游戏版本不同 | 保证 MC 版本、Mod 完全一致，否则连上也会秒掉 |
@@ -340,8 +340,20 @@ MinecraftConnectTool/
 
 <div align="center">
 
+## 📚 MCT 官方知识库
+
+**遇到问题？查看详细文档：**
+
+🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games)
+
+</div>
+
+---
+
+<div align="center">
+
 **Made with 💚 by MCZLF Studio**
 
-[🌟 Star](https://github.com/MCZLF/MinecraftConnectTool) · [🐛 Issues](https://github.com/MCZLF/MinecraftConnectTool/issues) · [📖 Wiki](https://github.com/MCZLF/MinecraftConnectTool/wiki)
+[🌟 Star](https://github.com/MCZLF/MinecraftConnectTool) · [🐛 Issues](https://github.com/MCZLF/MinecraftConnectTool/issues) · [� 知识库](https://mct.mczlf.loft.games)
 
 </div>

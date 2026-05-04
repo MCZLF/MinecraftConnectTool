@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://free.picui.cn/free/2026/05/04/69f829881dbab.ico" width="120" alt="MCT Icon">
+
 # 🎮 Minecraft Connect Tool
 
 **基于 OpenP2P，轻量便携简单易用的高速不限速联机工具**
@@ -9,7 +11,28 @@
 [![Avalonia](https://img.shields.io/badge/Avalonia-UI-8B00FF?style=flat-square)](https://avaloniaui.net/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-<img src="https://raw.githubusercontent.com/MCZLF/MinecraftConnectTool/0.0.7/docs/screenshots/preview.png" width="800" alt="MCT Preview">
+</div>
+
+---
+
+## 🖼️ 界面展示
+
+<div align="center">
+
+### 🏠 主界面
+<img src="https://free.picui.cn/free/2026/05/04/69f8288d99cdd.png" width="800" alt="主界面">
+
+### 🔗 P2P 联机界面
+<img src="https://free.picui.cn/free/2026/05/04/69f8289d6068e.png" width="800" alt="P2P界面">
+
+### 🏢 Link & 房间管理
+<img src="https://free.picui.cn/free/2026/05/04/69f82882d2085.png" width="800" alt="Link&房间管理">
+
+### ⚙️ 设置
+<img src="https://free.picui.cn/free/2026/05/04/69f8289cd7103.png" width="800" alt="设置">
+
+### 🚀 网络优化
+<img src="https://free.picui.cn/free/2026/05/04/69f828a55e5a3.png" width="800" alt="网络优化">
 
 </div>
 

@@ -1,0 +1,185 @@
+name: AutoBuild
+
+on:
+  push:
+    branches:
+      - '0.0.7'
+
+env:
+  VERSION: '0.0.7'
+
+jobs:
+  build-windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows x64
+        run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          Rename-Item -Path "bin\Release\net8.0\win-x64\publish\MinecraftConnectTool.exe" -NewName "${{ env.VERSION }}_AutoBuild_${timestamp}_Win_X64.exe"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Win_X64
+          path: bin/Release/net8.0/win-x64/publish/*.exe
+
+  build-windows-x86:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows x86
+        run: dotnet publish -c Release -r win-x86 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          Rename-Item -Path "bin\Release\net8.0\win-x86\publish\MinecraftConnectTool.exe" -NewName "${{ env.VERSION }}_AutoBuild_${timestamp}_Win_X86.exe"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Win_X86
+          path: bin/Release/net8.0/win-x86/publish/*.exe
+
+  build-windows-arm64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows ARM64
+        run: dotnet publish -c Release -r win-arm64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          Rename-Item -Path "bin\Release\net8.0\win-arm64\publish\MinecraftConnectTool.exe" -NewName "${{ env.VERSION }}_AutoBuild_${timestamp}_Win_Arm64.exe"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Win_Arm64
+          path: bin/Release/net8.0/win-arm64/publish/*.exe
+
+  build-linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Linux x64
+        run: dotnet publish -c Release -r linux-x64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          mv bin/Release/net8.0/linux-x64/publish/MinecraftConnectTool "${{ env.VERSION }}_AutoBuild_${timestamp}_Linux_X64"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux_X64
+          path: bin/Release/net8.0/linux-x64/publish/${{ env.VERSION }}_AutoBuild_*_Linux_X64
+
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Linux ARM64
+        run: dotnet publish -c Release -r linux-arm64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          mv bin/Release/net8.0/linux-arm64/publish/MinecraftConnectTool "${{ env.VERSION }}_AutoBuild_${timestamp}_Linux_Arm64"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux_Arm64
+          path: bin/Release/net8.0/linux-arm64/publish/${{ env.VERSION }}_AutoBuild_*_Linux_Arm64
+
+  build-macos-x64:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish macOS x64
+        run: dotnet publish -c Release -r osx-x64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          mv bin/Release/net8.0/osx-x64/publish/MinecraftConnectTool "${{ env.VERSION }}_AutoBuild_${timestamp}_MacOS_X64"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS_X64
+          path: bin/Release/net8.0/osx-x64/publish/${{ env.VERSION }}_AutoBuild_*_MacOS_X64
+
+  build-macos-arm64:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish macOS ARM64
+        run: dotnet publish -c Release -r osx-arm64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Rename Output
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          mv bin/Release/net8.0/osx-arm64/publish/MinecraftConnectTool "${{ env.VERSION }}_AutoBuild_${timestamp}_MacOS_Arm64"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS_Arm64
+          path: bin/Release/net8.0/osx-arm64/publish/${{ env.VERSION }}_AutoBuild_*_MacOS_Arm64

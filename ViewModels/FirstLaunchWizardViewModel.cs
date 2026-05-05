@@ -136,16 +136,19 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         _isInitializingPerformanceMode = true;
         try
         {
-            // 获取物理内存大小（MB）
-            var totalMemoryMB = GetTotalPhysicalMemoryMB();
-            TotalMemoryGB = totalMemoryMB / 1024; // 转换为GB
-            IsLowMemoryDevice = totalMemoryMB <= 4096; // ≤4GB
-            
-            // 低内存设备自动开启性能模式
-            if (IsLowMemoryDevice)
+            // 尝试获取物理内存大小（MB）
+            if (TryGetTotalPhysicalMemoryMB(out var totalMemoryMB))
             {
-                EnablePerformanceMode = true;
+                TotalMemoryGB = totalMemoryMB / 1024; // 转换为GB
+                IsLowMemoryDevice = totalMemoryMB <= 4096; // ≤4GB
+                
+                // 低内存设备自动开启性能模式
+                if (IsLowMemoryDevice)
+                {
+                    EnablePerformanceMode = true;
+                }
             }
+            // 获取失败不处理，保持默认状态
             
             // 设置内存信息文本
             UpdateMemoryInfoText();
@@ -157,32 +160,88 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 获取物理内存大小（MB）
+    /// 尝试获取物理内存大小（MB）
     /// </summary>
-    private static long GetTotalPhysicalMemoryMB()
+    /// <param name="totalMemoryMB">输出的内存大小（MB）</param>
+    /// <returns>是否成功获取</returns>
+    private static bool TryGetTotalPhysicalMemoryMB(out long totalMemoryMB)
     {
+        totalMemoryMB = 0;
+        
         try
         {
-            // 使用 GC.GetGCMemoryInfo 获取内存信息
-            // TotalAvailableMemoryBytes 在 .NET 6+ 返回的是 GC 可用的内存限制
-            // 通常接近物理内存大小
+            // 方法1: 使用 GC.GetGCMemoryInfo 获取内存信息
             var gcInfo = GC.GetGCMemoryInfo();
             var totalMemoryBytes = gcInfo.TotalAvailableMemoryBytes;
+            totalMemoryMB = totalMemoryBytes / 1024 / 1024;
             
-            // 转换为 MB
-            var totalMemoryMB = totalMemoryBytes / 1024 / 1024;
-            
-            // 如果检测到的内存小于 1GB，可能是受限环境，返回默认值
-            if (totalMemoryMB < 1024)
+            // 如果 GC 方法获取的内存合理（大于 2GB），认为成功
+            if (totalMemoryMB >= 2048)
             {
-                return 16384; // 默认假设16GB
+                return true;
             }
             
-            return totalMemoryMB;
+            // 方法2: 使用 System.Diagnostics 获取物理内存 (Windows)
+            #if WINDOWS
+            try
+            {
+                var computerInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                totalMemoryMB = (long)(computerInfo.TotalPhysicalMemory / 1024 / 1024);
+                if (totalMemoryMB >= 1024)
+                {
+                    return true;
+                }
+            }
+            catch { }
+            #endif
+            
+            // 方法3: 读取 /proc/meminfo (Linux)
+            if (OperatingSystem.IsLinux() && File.Exists("/proc/meminfo"))
+            {
+                try
+                {
+                    var memInfo = File.ReadAllText("/proc/meminfo");
+                    var match = System.Text.RegularExpressions.Regex.Match(memInfo, @"MemTotal:\s+(\d+)\s+kB");
+                    if (match.Success && long.TryParse(match.Groups[1].Value, out var memKB))
+                    {
+                        totalMemoryMB = memKB / 1024;
+                        return true;
+                    }
+                }
+                catch { }
+            }
+            
+            // 方法4: 使用 sysctl (macOS)
+            if (OperatingSystem.IsMacOS())
+            {
+                try
+                {
+                    var psi = new System.Diagnostics.ProcessStartInfo("sysctl", "-n hw.memsize")
+                    {
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
+                    using var process = System.Diagnostics.Process.Start(psi);
+                    if (process != null)
+                    {
+                        var output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+                        if (long.TryParse(output.Trim(), out var memBytes))
+                        {
+                            totalMemoryMB = memBytes / 1024 / 1024;
+                            return true;
+                        }
+                    }
+                }
+                catch { }
+            }
+            
+            // 所有方法都失败
+            return false;
         }
         catch
         {
-            return 16384; // 默认假设16GB
+            return false;
         }
     }
 

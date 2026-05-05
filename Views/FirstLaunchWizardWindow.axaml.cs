@@ -13,9 +13,6 @@ public partial class FirstLaunchWizardWindow : Window
         InitializeComponent();
         var viewModel = new FirstLaunchWizardViewModel();
         DataContext = viewModel;
-        
-        // 初始化性能模式检测
-        viewModel.InitializePerformanceMode();
     }
 
     private void InitializeComponent()

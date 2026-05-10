@@ -299,8 +299,8 @@ public partial class LinkPageViewModel : ViewModelBase
                 StatusBadgeText = "已连接";
             }},
             { "sdwan init ok", () => {
-                StatusBadgeState = BadgeState.Warning;
-                StatusBadgeText = role == "1" ? "正在等待被连接..." : "正在尝试连接...";
+                StatusBadgeState = role == "1" ? BadgeState.Waiting : BadgeState.Warning;
+                StatusBadgeText = role == "1" ? "正在等待被玩家连接,快去邀请好友加入房间吧" : "正在尝试连接...";
             }},
             { "connection ok", () => {
                 StatusBadgeState = role == "1" ? BadgeState.Success : BadgeState.Warning;
@@ -1082,5 +1082,6 @@ public enum BadgeState
     Success,
     Warning,
     Error,
-    Info
+    Info,
+    Waiting // 等待被连接 - 绿色底 + 时钟图标
 }

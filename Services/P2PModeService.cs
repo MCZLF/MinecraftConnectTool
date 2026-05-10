@@ -120,8 +120,9 @@ public class P2PModeService : IDisposable
                 StatusChanged?.Invoke(this, ("Success", "已连接")); 
             }},
             { "sdwan init ok", () => {
-                string badgeText = role == "1" ? "正在等待被连接..." : "正在尝试连接...";
-                StatusChanged?.Invoke(this, ("Warn", badgeText));
+                string badgeText = role == "1" ? "正在等待被玩家连接,快去邀请好友加入房间吧" : "正在尝试连接...";
+                string badgeState = role == "1" ? "Waiting" : "Warn";
+                StatusChanged?.Invoke(this, (badgeState, badgeText));
             }},
             { "connection ok", () => {
                 string badgeState = role == "1" ? "Success" : "Warn";

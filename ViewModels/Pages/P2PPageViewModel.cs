@@ -96,7 +96,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         Success,
         Warn,
         Error,
-        Processing
+        Processing,
+        Waiting // 我也是服了，怎么那么多人问这是怎么回事呀
     }
 
     #endregion
@@ -404,6 +405,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         StatusBadgeState = e.BadgeState switch
         {
             "Success" => BadgeState.Success,
+            "Waiting" => BadgeState.Waiting,
             "Warn" => BadgeState.Warn,
             "Error" => BadgeState.Error,
             _ => BadgeState.Processing

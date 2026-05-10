@@ -486,6 +486,10 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnIsDarkModeChanged(bool value)
     {
         ThemeService.Instance.IsDarkMode = value;
+        
+        // 主题切换时刷新动画速度和渲染方式按钮的颜色
+        OnPropertyChanged(nameof(AnimationSpeed));
+        OnPropertyChanged(nameof(RenderingMode));
     }
 
     partial void OnNoNotifyWhenStartChanged(bool value)

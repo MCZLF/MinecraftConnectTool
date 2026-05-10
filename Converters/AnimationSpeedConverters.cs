@@ -19,9 +19,8 @@ public class AnimationSpeedToBackgroundConverter : IValueConverter
         {
             if (currentSpeed == targetSpeed)
             {
-                // 选中状态 - 使用主题主色
-                // 返回一个标记，让XAML使用DynamicResource
-                return new SolidColorBrush(GetThemeColor("MaterialPrimaryBrush"));
+                // 选中状态 - 使用主题主色容器色
+                return new SolidColorBrush(GetThemeColor("MaterialPrimaryContainerBrush", Color.Parse("#EADDFF")));
             }
         }
         // 未选中状态 - 透明
@@ -33,7 +32,7 @@ public class AnimationSpeedToBackgroundConverter : IValueConverter
         throw new NotImplementedException();
     }
 
-    private static Color GetThemeColor(string resourceKey)
+    private static Color GetThemeColor(string resourceKey, Color defaultColor)
     {
         if (Application.Current?.Resources.TryGetValue(resourceKey, out var resource) == true)
         {
@@ -46,8 +45,7 @@ public class AnimationSpeedToBackgroundConverter : IValueConverter
                 return color;
             }
         }
-        // 默认颜色
-        return Color.Parse("#6750A4");
+        return defaultColor;
     }
 }
 
@@ -62,8 +60,8 @@ public class AnimationSpeedToForegroundConverter : IValueConverter
         {
             if (currentSpeed == targetSpeed)
             {
-                // 选中状态 - 使用主题OnPrimary色（白色或深色）
-                return new SolidColorBrush(GetThemeColor("MaterialOnPrimaryBrush", Colors.White));
+                // 选中状态 - 使用主题OnPrimaryContainer色（参考HomePage卡片设计）
+                return new SolidColorBrush(GetThemeColor("MaterialOnPrimaryContainerBrush", Color.Parse("#21005D")));
             }
         }
         // 未选中状态 - 使用主题表面文字色
@@ -103,7 +101,8 @@ public class RenderingModeToBackgroundConverter : IValueConverter
         {
             if (currentMode == targetMode)
             {
-                return new SolidColorBrush(GetThemeColor("MaterialPrimaryBrush"));
+                // 选中状态 - 使用主题主色容器色（参考HomePage卡片设计）
+                return new SolidColorBrush(GetThemeColor("MaterialPrimaryContainerBrush", Color.Parse("#EADDFF")));
             }
         }
         return new SolidColorBrush(Colors.Transparent);
@@ -114,7 +113,7 @@ public class RenderingModeToBackgroundConverter : IValueConverter
         throw new NotImplementedException();
     }
 
-    private static Color GetThemeColor(string resourceKey)
+    private static Color GetThemeColor(string resourceKey, Color defaultColor)
     {
         if (Application.Current?.Resources.TryGetValue(resourceKey, out var resource) == true)
         {
@@ -127,7 +126,7 @@ public class RenderingModeToBackgroundConverter : IValueConverter
                 return color;
             }
         }
-        return Color.Parse("#6750A4");
+        return defaultColor;
     }
 }
 
@@ -142,7 +141,8 @@ public class RenderingModeToForegroundConverter : IValueConverter
         {
             if (currentMode == targetMode)
             {
-                return new SolidColorBrush(GetThemeColor("MaterialOnPrimaryBrush", Colors.White));
+                // 选中状态 - 使用主题OnPrimaryContainer色（参考HomePage卡片设计）
+                return new SolidColorBrush(GetThemeColor("MaterialOnPrimaryContainerBrush", Color.Parse("#21005D")));
             }
         }
         return new SolidColorBrush(GetThemeColor("MaterialOnSurfaceBrush", Color.Parse("#E6E1E5")));

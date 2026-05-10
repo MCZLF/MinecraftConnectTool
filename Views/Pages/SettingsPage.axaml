@@ -998,33 +998,34 @@
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
           </StackPanel>
 
-          <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
-            <Button Classes="outlined"
-                    Command="{Binding OpenGitHubCommand}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <icons:MaterialIcon Kind="Github" Width="18" Height="18"/>
-                <TextBlock Text="GitHub"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="outlined"
-                    Command="{Binding OpenEmailCommand}">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <icons:MaterialIcon Kind="Email" Width="18" Height="18"/>
-                <TextBlock Text="联系我们"/>
-              </StackPanel>
-            </Button>
-          </StackPanel>
-
-          <!-- Restart按钮 -->
-          <Button Classes="filled"
-                  HorizontalAlignment="Right"
-                  Margin="0,16,0,0"
-                  Command="{Binding RestartApplicationCommand}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <icons:MaterialIcon Kind="Restart" Width="18" Height="18"/>
-              <TextBlock Text="Restart"/>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+              <Button Classes="outlined"
+                      Command="{Binding OpenGitHubCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="Github" Width="18" Height="18"/>
+                  <TextBlock Text="GitHub"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="outlined"
+                      Command="{Binding OpenEmailCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="Email" Width="18" Height="18"/>
+                  <TextBlock Text="联系我们"/>
+                </StackPanel>
+              </Button>
             </StackPanel>
-          </Button>
+
+            <!-- Restart按钮 -->
+            <Button Grid.Column="1"
+                    Classes="filled"
+                    Command="{Binding RestartApplicationCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="Restart" Width="18" Height="18"/>
+                <TextBlock Text="Restart"/>
+              </StackPanel>
+            </Button>
+          </Grid>
         </StackPanel>
       </Border>
 

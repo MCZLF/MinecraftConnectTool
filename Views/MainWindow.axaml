@@ -110,6 +110,21 @@
       <Setter Property="Opacity" Value="0.7"/>
       <Setter Property="RenderTransform" Value="{x:Null}"/>
     </Style>
+    
+    <!-- 导航按钮悬停动画效果 -->
+    <Style Selector="Button.navigation">
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.navigation:pointerover">
+      <Setter Property="RenderTransform" Value="scale(1.05)"/>
+    </Style>
+    <Style Selector="Button.navigation:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.95)"/>
+    </Style>
   </Window.Styles>
 
   <Grid>

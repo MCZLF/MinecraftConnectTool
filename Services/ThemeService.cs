@@ -94,6 +94,11 @@ public class ThemeService
     /// </summary>
     public event EventHandler? AnimationSpeedChanged;
 
+    /// <summary>
+    /// 全局文字加粗设置变更事件
+    /// </summary>
+    public event EventHandler? GlobalBoldTextChanged;
+
     private bool _isDarkMode = true;
     private bool _simulateFluentDesign = false;
     private bool _enableColorMode = false;
@@ -106,6 +111,7 @@ public class ThemeService
     private AnimationSpeed _animationSpeed = AnimationSpeed.Medium;
     private double _customAnimationDuration = 200;
     private RenderingMode _renderingMode = RenderingMode.SystemDefault;
+    private bool _enableGlobalBoldText = false;
 
     private void InitializeTheme()
     {
@@ -159,6 +165,9 @@ public class ThemeService
         {
             _renderingMode = parsedRenderingMode;
         }
+
+        // 读取全局文字加粗设置
+        _enableGlobalBoldText = ConfigService.Read<bool>("BoldTextOnPrint", false);
     }
 
     private static bool GetSystemTheme()
@@ -425,6 +434,23 @@ public class ThemeService
     /// 渲染方式变更事件
     /// </summary>
     public event EventHandler? RenderingModeChanged;
+
+    /// <summary>
+    /// 是否启用全局文字加粗
+    /// </summary>
+    public bool EnableGlobalBoldText
+    {
+        get => _enableGlobalBoldText;
+        set
+        {
+            if (_enableGlobalBoldText != value)
+            {
+                _enableGlobalBoldText = value;
+                ConfigService.Write("BoldTextOnPrint", value);
+                GlobalBoldTextChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
 
     public void Initialize()
     {

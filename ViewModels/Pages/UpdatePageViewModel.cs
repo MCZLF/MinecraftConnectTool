@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MinecraftConnectTool.Services;
@@ -62,22 +64,12 @@ public partial class UpdatePageViewModel : ViewModelBase
     private const string Stable_Download_Api = $"{Api_Base_Url}/Win_X64/Latest.zip";
     private const string Stable_UpdateLog_Api = $"{Api_Base_Url}/updatelog";
 
-    // ==================== GitHub 镜像源前缀 (已弃用) ====================
-    private const string Mirror_Cloudflare = "https://gh-proxy.org/";
-    private const string Mirror_HK = "https://hk.gh-proxy.org/";
-    private const string Mirror_Fastly = "https://cdn.gh-proxy.org/";
-
-    // ==================== 测试版/内测版 API (新API) ====================
-    // 测试版 (Preview)
-    private const string Preview_Version_Api = $"{Api_Base_Url}/Preview/version";
-    private const string Preview_Download_Api = $"{Api_Base_Url}/Preview/Latest.zip";
-    private const string Preview_UpdateLog_Api = $"{Api_Base_Url}/Preview/updatelog";
-
-    // 内测版 (Nightly)
-    private const string Nightly_Version_Api = $"{Api_Base_Url}/Nightly/version";
-    private const string Nightly_Download_Api = $"{Api_Base_Url}/Nightly/Latest.zip";
-    private const string Nightly_UpdateLog_Api = $"{Api_Base_Url}/Nightly/updatelog";
-    private const string Nightly_List_Api = $"{Api_Base_Url}/Nightly/List";
+    // ==================== GitHub Actions API ====================
+    private const string GitHub_Api_Base = "https://api.github.com";
+    private const string GitHub_Owner = "MCZLF";
+    private const string GitHub_Repo = "MinecraftConnectTool";
+    private const string GitHub_Actions_Url = $"{GitHub_Api_Base}/repos/{GitHub_Owner}/{GitHub_Repo}/actions/runs";
+    private const string GitHub_Artifacts_Url = $"{GitHub_Api_Base}/repos/{GitHub_Owner}/{GitHub_Repo}/actions/runs";
 
     #endregion
 
@@ -96,7 +88,7 @@ public partial class UpdatePageViewModel : ViewModelBase
     private string _updateChannelIcon = "Api";
 
     [ObservableProperty]
-    private string _updateLogContent = "喵喵喵？检查一下更新？";
+    private string _updateLogContent = "点击「检查更新」按钮获取最新版本信息";
 
     [ObservableProperty]
     private string _updateButtonText = "立即更新";
@@ -120,13 +112,28 @@ public partial class UpdatePageViewModel : ViewModelBase
     private bool _isDebugVisible = true;
 
     [ObservableProperty]
-    private string _betaTipTitle = "如需使用测试通道，请在设置中开启接收测试更新";
-
-    [ObservableProperty]
-    private string _betaTipContent = "测试用户如需降级回正式版，直接在设置中关闭接收测试更新并重新检查更新即可";
-
-    [ObservableProperty]
     private bool _isChecking = false;
+
+    [ObservableProperty]
+    private bool _canUpdateFromActions = false;
+
+    [ObservableProperty]
+    private string _actionsVersion = "Actions版本: 获取中...";
+
+    [ObservableProperty]
+    private string _actionsVersionShort = "";
+
+    [ObservableProperty]
+    private string _actionsCommitSha = "";
+
+    [ObservableProperty]
+    private bool _isActionsChannel = false;
+
+    [ObservableProperty]
+    private string _switchChannelButtonText = "切换至Action版本";
+
+    [ObservableProperty]
+    private string _switchChannelButtonIcon = "Github";
 
     #endregion
 
@@ -145,6 +152,12 @@ public partial class UpdatePageViewModel : ViewModelBase
     
     private readonly HttpClient _httpClient;
     private readonly Random _random;
+    
+    // Actions 通道 commit 信息
+    private string _latestCommitMessage = "";
+    private string _latestCommitSha = "";
+    private string _latestCommitAuthor = "";
+    private string _latestCommitDate = "";
 
     #endregion
 
@@ -201,6 +214,7 @@ public partial class UpdatePageViewModel : ViewModelBase
         _ = Task.Run(async () =>
         {
             await CheckUpdateAsync();
+            await CheckGitHubActionsVersionAsync();
         });
     }
 
@@ -226,57 +240,15 @@ public partial class UpdatePageViewModel : ViewModelBase
 
     private void InitializeUrls()
     {
-        bool getPreUpdate = ConfigService.Read("getpreupdate", false);
-
         // 获取当前平台架构
         var (platform, architecture) = GetCurrentPlatformInfo();
 
-        // 非Windows平台强制使用正式版
-        if (!OperatingSystem.IsWindows())
-        {
-            getPreUpdate = false;
-        }
+        UpdateChannel = "正式通道";
+        UpdateChannelIcon = "Api";
+        _updateLogUrl = Stable_UpdateLog_Api; // 正式版更新日志
 
-        if (getPreUpdate)
-        {
-            // 测试模式下显示关闭提示
-            BetaTipTitle = "如需关闭测试通道，请在设置中关闭接收测试更新";
-            BetaTipContent = "测试版本可能存在未修复的问题，如需稳定使用请切换回正式版";
-
-            // 简化内测逻辑：如果设备在名单中，自动切换到内测模式
-            bool isInNightlyList = CheckName();
-
-            if (isInNightlyList)
-            {
-                UpdateChannel = "内测";
-                UpdateChannelIcon = "Flask";
-                _updateLogUrl = Nightly_UpdateLog_Api;
-
-                // 根据平台架构选择对应的内测版本API
-                (_versionUrl, _downloadUrl) = GetPreviewApiUrls(platform, architecture, true);
-            }
-            else
-            {
-                UpdateChannel = "测试";
-                UpdateChannelIcon = "ClockOutline";
-                _updateLogUrl = Preview_UpdateLog_Api;
-
-                // 根据平台架构选择对应的测试版本API
-                (_versionUrl, _downloadUrl) = GetPreviewApiUrls(platform, architecture, false);
-            }
-        }
-        else
-        {
-            // 正式版显示开启提示
-            BetaTipTitle = "如需使用测试通道，请在设置中开启接收测试更新";
-            BetaTipContent = "测试用户如需降级回正式版，直接在设置中关闭接收测试更新并重新检查更新即可";
-            UpdateChannel = "默认";
-            UpdateChannelIcon = "Api";
-            _updateLogUrl = Stable_UpdateLog_Api; // 正式版更新日志
-
-            // 根据平台架构选择对应的正式版本API
-            (_versionUrl, _downloadUrl) = GetStableApiUrls(platform, architecture);
-        }
+        // 根据平台架构选择对应的正式版本API
+        (_versionUrl, _downloadUrl) = GetStableApiUrls(platform, architecture);
 
         // 应用GitHub镜像源转换
         ApplyGitHubMirror();
@@ -422,132 +394,6 @@ public partial class UpdatePageViewModel : ViewModelBase
         
         return (versionUrl, downloadUrl);
     }
-    
-    /// <summary>
-    /// 获取测试/内测版API地址
-    /// </summary>
-    private (string versionUrl, string downloadUrl) GetPreviewApiUrls(string platform, string architecture, bool isNightly)
-    {
-        // 测试版和内测版目前使用相同的回退逻辑
-        // 后续可以为不同平台配置专门的测试版API
-        
-        string versionUrl = platform switch
-        {
-            "Windows" => architecture switch
-            {
-                "X86" => Windows_X86_Version_Api,
-                "X64" => Windows_X64_Version_Api,
-                "Arm64" => Windows_Arm64_Version_Api,
-                _ => ""
-            },
-            "Linux" => architecture switch
-            {
-                "X64" => Linux_X64_Version_Api,
-                "Arm" => Linux_Arm_Version_Api,
-                "Arm64" => Linux_Arm64_Version_Api,
-                _ => ""
-            },
-            "MacOS" => architecture switch
-            {
-                "X64" => MacOS_X64_Version_Api,
-                "Arm64" => MacOS_Arm64_Version_Api,
-                _ => ""
-            },
-            _ => ""
-        };
-        
-        string downloadUrl = platform switch
-        {
-            "Windows" => architecture switch
-            {
-                "X86" => Windows_X86_Download_Api,
-                "X64" => Windows_X64_Download_Api,
-                "Arm64" => Windows_Arm64_Download_Api,
-                _ => ""
-            },
-            "Linux" => architecture switch
-            {
-                "X64" => Linux_X64_Download_Api,
-                "Arm" => Linux_Arm_Download_Api,
-                "Arm64" => Linux_Arm64_Download_Api,
-                _ => ""
-            },
-            "MacOS" => architecture switch
-            {
-                "X64" => MacOS_X64_Download_Api,
-                "Arm64" => MacOS_Arm64_Download_Api,
-                _ => ""
-            },
-            _ => ""
-        };
-        
-        // 如果特定平台的API未配置，使用测试版/内测版共用API
-        if (string.IsNullOrEmpty(versionUrl))
-        {
-            if (isNightly)
-            {
-                versionUrl = Nightly_Version_Api;
-                downloadUrl = Nightly_Download_Api;
-            }
-            else
-            {
-                versionUrl = Preview_Version_Api;
-                downloadUrl = Preview_Download_Api;
-            }
-        }
-        
-        return (versionUrl, downloadUrl);
-    }
-
-    /// <summary>
-    /// 检查内测名单
-    /// </summary>
-    private bool CheckName()
-    {
-        string listUrl = Nightly_List_Api;
-        string machineName = Environment.MachineName;
-
-        try
-        {
-            string tempPath = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
-            if (!Directory.Exists(tempPath))
-            {
-                Directory.CreateDirectory(tempPath);
-            }
-
-            string filePath = Path.Combine(tempPath, "list.txt");
-
-            using (var client = new HttpClient())
-            {
-                // 添加 User-Agent 请求头，避免 405 错误
-                client.DefaultRequestHeaders.Add("User-Agent", "MinecraftConnectTool/1.0");
-                client.DownloadFile(listUrl, filePath);
-            }
-
-            bool contains = false;
-            string[] lines = File.ReadAllLines(filePath);
-            foreach (string line in lines)
-            {
-                if (line.Trim() == machineName)
-                {
-                    contains = true;
-                    break;
-                }
-            }
-
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-
-            return contains;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"检查内测名单失败: {ex.Message}");
-            return false;
-        }
-    }
 
     #endregion
 
@@ -635,7 +481,186 @@ public partial class UpdatePageViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task SwitchChannelAsync()
+    {
+        if (IsActionsChannel)
+        {
+            // 切换回正式通道
+            await SwitchToStableChannelAsync();
+        }
+        else
+        {
+            // 切换到 Actions 通道
+            await SwitchToActionsChannelAsync();
+        }
+    }
+
+    private async Task SwitchToActionsChannelAsync()
+    {
+        if (!CanUpdateFromActions) return;
+        
+        // 显示确认对话框（使用全局 Modal）
+        bool confirmed = await ShowConfirmDialogAsync(
+            "切换至 Actions 通道",
+            "确定要切换到 GitHub Actions 自动构建版本吗？",
+            "这是自动构建版本，非正式发布版本！\n\n• 包含最新的更新内容\n• 但可能包含未发现的 Bug\n• 可能不如正式版本稳定\n• 建议仅在测试环境使用");
+        if (!confirmed)
+        {
+            return; // 用户取消
+        }
+        
+        // 切换到 Actions 通道
+        IsActionsChannel = true;
+        SwitchChannelButtonText = "切换为正式通道";
+        SwitchChannelButtonIcon = "ArrowLeft";
+        
+        // 更新云端版本显示为 Actions 版本格式
+        if (!string.IsNullOrEmpty(ActionsVersionShort) && !string.IsNullOrEmpty(ActionsCommitSha))
+        {
+            CloudVersion = $"云端版本: {ActionsVersionShort}({ActionsCommitSha})";
+        }
+        else
+        {
+            CloudVersion = $"云端版本: Actions Build";
+        }
+        
+        // 更新通道标识
+        UpdateChannel = "Actions (自动构建)";
+        UpdateChannelIcon = "Github";
+        
+        // 更新日志显示 Actions 信息
+        await LoadActionsUpdateLogAsync();
+        
+        // 切换到 Actions 通道后立即启用更新按钮
+        CanUpdate = true;
+        HasNewUpdate = true;
+        UpdateButtonText = "立即更新";
+        UpdateButtonIcon = "ArrowUpBold";
+    }
+
+    private async Task SwitchToStableChannelAsync()
+    {
+        // 切换回正式通道
+        IsActionsChannel = false;
+        SwitchChannelButtonText = "切换至Action版本";
+        SwitchChannelButtonIcon = "Github";
+        
+        // 恢复正式版本信息
+        CloudVersion = $"云端版本: {_cloudVersionRaw}";
+        UpdateChannel = "正式通道";
+        UpdateChannelIcon = "Api";
+        
+        // 恢复正式通道日志
+        try
+        {
+            string updateLog = await FetchUpdateLogAsync();
+            SetUpdateLog(updateLog);
+        }
+        catch
+        {
+            UpdateLogContent = "点击「检查更新」按钮获取最新版本信息";
+        }
+        
+        // 检查是否需要更新
+        string currentVersion = MainWindow.version;
+        if (currentVersion == _cloudVersionRaw)
+        {
+            CanUpdate = false;
+            HasNewUpdate = false;
+            UpdateButtonText = "已是最新版本";
+            UpdateButtonIcon = "CheckCircle";
+        }
+        else
+        {
+            CanUpdate = true;
+            HasNewUpdate = true;
+            UpdateButtonText = "立即更新";
+            UpdateButtonIcon = "ArrowUpBold";
+        }
+    }
+
+    /// <summary>
+    /// 获取 MainWindowViewModel 实例
+    /// </summary>
+    private MainWindowViewModel? GetMainWindowViewModel()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            if (desktop.MainWindow?.DataContext is MainWindowViewModel vm)
+            {
+                return vm;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 显示全局确认对话框
+    /// </summary>
+    private async Task<bool> ShowConfirmDialogAsync(string title, string message, string detail)
+    {
+        var mainVm = GetMainWindowViewModel();
+        if (mainVm != null)
+        {
+            return await mainVm.ShowGlobalModalAsync(title, message, detail);
+        }
+        // 如果无法获取 MainWindowViewModel，默认返回 true
+        return true;
+    }
+
+    private Task LoadActionsUpdateLogAsync()
+    {
+        try
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("═══ GitHub Actions 自动构建版本 ═══");
+            sb.AppendLine();
+            sb.AppendLine("⚠️ 警告：这是自动构建版本，非正式发布版本！");
+            sb.AppendLine("   包含最新的更新内容，但可能不稳定。");
+            
+            if (!string.IsNullOrEmpty(_latestCommitMessage))
+            {
+                sb.AppendLine();
+                sb.AppendLine($"📋 最新提交 ({_latestCommitSha}):");
+                sb.AppendLine($"   {_latestCommitMessage}");
+            }
+            
+            if (!string.IsNullOrEmpty(_latestCommitAuthor))
+            {
+                sb.AppendLine($"👤 作者: {_latestCommitAuthor}");
+            }
+            
+            if (!string.IsNullOrEmpty(_latestCommitDate))
+            {
+                sb.AppendLine($"📅 时间: {_latestCommitDate}");
+            }
+            
+            sb.AppendLine();
+            sb.AppendLine("💡 如需稳定版本，请点击「切换为正式通道」按钮");
+            
+            UpdateLogContent = sb.ToString();
+        }
+        catch
+        {
+            UpdateLogContent = "═══ GitHub Actions 自动构建版本 ═══\n\n⚠️ 警告：这是自动构建版本，非正式发布版本！\n   包含最新的更新内容，但可能不稳定。\n\n💡 如需稳定版本，请切换回正式通道。";
+        }
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
     private async Task UpdateNowAsync()
+    {
+        if (IsActionsChannel)
+        {
+            await UpdateFromActionsAsync();
+        }
+        else
+        {
+            await UpdateFromStableAsync();
+        }
+    }
+
+    private async Task UpdateFromStableAsync()
     {
         if (!CanUpdate) return;
         
@@ -644,8 +669,117 @@ public partial class UpdatePageViewModel : ViewModelBase
         
         try
         {
+            var (platform, architecture) = GetCurrentPlatformInfo();
+            
+            string? currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName);
+            if (string.IsNullOrEmpty(currentDirectory))
+            {
+                currentDirectory = AppContext.BaseDirectory;
+                if (string.IsNullOrEmpty(currentDirectory))
+                    throw new Exception("无法获取当前目录");
+            }
+
+            string currentProcessName = Path.GetFileName(Process.GetCurrentProcess().MainModule?.FileName) ?? "MinecraftConnectTool.exe";
+            string fileExtension = Path.GetExtension(currentProcessName);
+
+            Random random = new();
+            int randomNum = random.Next(10000, 100000);
+            string oldFileName = $"MinecraftConnectTool_Old{randomNum}{fileExtension}";
+            string oldFilePath = Path.Combine(currentDirectory, oldFileName);
+            string currentFilePath = Path.Combine(currentDirectory, currentProcessName);
+
+            await Task.Run(() => File.Move(currentFilePath, oldFilePath));
+
+            string zipFileName = $"MCTUpdatePack_{randomNum}.zip";
+            string zipFilePath = Path.Combine(currentDirectory, zipFileName);
+            string extractDir = Path.Combine(currentDirectory, $"MCTExtract_{randomNum}");
+
+            try
+            {
+                using (var response = await _httpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                {
+                    response.EnsureSuccessStatusCode();
+                    long totalBytes = response.Content.Headers.ContentLength ?? 0;
+                    long downloadedBytes = 0;
+
+                    using (var httpStream = await response.Content.ReadAsStreamAsync())
+                    using (var fileStream = new FileStream(zipFilePath, FileMode.Create, FileAccess.Write, FileShare.Write, bufferSize: 8192, useAsync: true))
+                    {
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        while ((bytesRead = await httpStream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                        {
+                            await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                            downloadedBytes += bytesRead;
+                            if (totalBytes > 0)
+                                ProgressValue = (int)((downloadedBytes * 80) / totalBytes);
+                        }
+                    }
+                }
+
+                ProgressValue = 85;
+                Directory.CreateDirectory(extractDir);
+                await Task.Run(() => ZipFile.ExtractToDirectory(zipFilePath, extractDir));
+
+                ProgressValue = 90;
+                string extractedFile = FindExecutableInDirectory(extractDir, platform);
+                if (string.IsNullOrEmpty(extractedFile))
+                    throw new Exception("解压后未找到可执行文件");
+
+                ProgressValue = 95;
+                File.Move(extractedFile, currentFilePath);
+                ProgressValue = 100;
+            }
+            finally
+            {
+                CleanupTempFiles(zipFilePath, extractDir);
+            }
+
+            switch (platform)
+            {
+                case "Windows":
+                    await ExecuteWindowsUpdate(currentDirectory, currentProcessName, oldFileName);
+                    break;
+                case "Linux":
+                    await ExecuteLinuxUpdate(currentDirectory, currentProcessName, oldFileName);
+                    break;
+                case "MacOS":
+                    await ExecuteMacOSUpdate(currentDirectory, currentProcessName, oldFileName);
+                    break;
+                default:
+                    throw new NotSupportedException($"不支持的平台: {platform}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"下载更新失败: {ex.Message}");
+            UpdateLogContent = $"下载更新失败: {ex.Message}";
+            IsProgressVisible = false;
+            ProgressValue = 0;
+        }
+    }
+
+    [RelayCommand]
+    private async Task UpdateFromActionsAsync()
+    {
+        if (!CanUpdateFromActions) return;
+        
+        IsProgressVisible = true;
+        ProgressValue = 0;
+        
+        try
+        {
             // 获取当前平台信息
             var (platform, architecture) = GetCurrentPlatformInfo();
+            
+            // 获取 GitHub Actions 最新构建的下载链接
+            string? artifactUrl = await FetchGitHubActionsArtifactUrlAsync(platform, architecture);
+            if (string.IsNullOrEmpty(artifactUrl))
+            {
+                UpdateLogContent = "无法获取 GitHub Actions 构建版本，请稍后重试或前往 GitHub 手动下载";
+                IsProgressVisible = false;
+                return;
+            }
             
             // 使用进程主模块路径获取应用程序目录（比 AppContext.BaseDirectory 更可靠）
             string? currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName);
@@ -682,7 +816,7 @@ public partial class UpdatePageViewModel : ViewModelBase
             try
             {
                 // 下载ZIP文件
-                using (var response = await _httpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                using (var response = await _httpClient.GetAsync(artifactUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
                     response.EnsureSuccessStatusCode();
                     long totalBytes = response.Content.Headers.ContentLength ?? 0;
@@ -903,6 +1037,264 @@ del /f /q ""%~nx0""";
     #endregion
 
     #region 网络请求
+
+    /// <summary>
+    /// 获取 GitHub Actions 最新构建的 artifact 下载链接
+    /// </summary>
+    private async Task<string?> FetchGitHubActionsArtifactUrlAsync(string platform, string architecture)
+    {
+        try
+        {
+            // 构建 artifact 名称模式（匹配实际的 artifact 命名）
+            string artifactName = platform switch
+            {
+                "Windows" => architecture switch
+                {
+                    "X64" => "Win_X64",
+                    "Arm64" => "Win_Arm64",
+                    _ => "Win_X64"
+                },
+                "Linux" => architecture switch
+                {
+                    "X64" => "Linux_X64",
+                    "Arm64" => "Linux_Arm64",
+                    _ => "Linux_X64"
+                },
+                "MacOS" => architecture switch
+                {
+                    "X64" => "MacOS_X64",
+                    "Arm64" => "MacOS_Arm64",
+                    _ => "MacOS_X64"
+                },
+                _ => "Win_X64"
+            };
+
+            // 创建新的 HttpClient 用于 GitHub API，添加必要的请求头
+            using var githubClient = new HttpClient();
+            githubClient.DefaultRequestHeaders.Add("User-Agent", "MinecraftConnectTool/1.0");
+            githubClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            githubClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+
+            // 获取最新的 workflow runs（不限制分支）
+            string runsUrl = $"{GitHub_Actions_Url}?status=completed&per_page=1";
+            using var runsResponse = await githubClient.GetAsync(runsUrl);
+            
+            if (!runsResponse.IsSuccessStatusCode)
+            {
+                Debug.WriteLine($"获取 GitHub Actions runs 失败: {runsResponse.StatusCode}");
+                return null;
+            }
+
+            string runsJson = await runsResponse.Content.ReadAsStringAsync();
+            using var runsDoc = System.Text.Json.JsonDocument.Parse(runsJson);
+            
+            if (!runsDoc.RootElement.TryGetProperty("workflow_runs", out var runsElement) || 
+                runsElement.GetArrayLength() == 0)
+            {
+                Debug.WriteLine("没有找到 workflow runs");
+                return null;
+            }
+
+            var firstRun = runsElement[0];
+            if (!firstRun.TryGetProperty("id", out var runIdElement))
+            {
+                Debug.WriteLine("无法获取 run id");
+                return null;
+            }
+
+            long runId = runIdElement.GetInt64();
+            
+            // 获取该 run 的 artifacts
+            string artifactsUrl = $"{GitHub_Artifacts_Url}/{runId}/artifacts";
+            using var artifactsResponse = await githubClient.GetAsync(artifactsUrl);
+            
+            if (!artifactsResponse.IsSuccessStatusCode)
+            {
+                Debug.WriteLine($"获取 artifacts 失败: {artifactsResponse.StatusCode}");
+                return null;
+            }
+
+            string artifactsJson = await artifactsResponse.Content.ReadAsStringAsync();
+            using var artifactsDoc = System.Text.Json.JsonDocument.Parse(artifactsJson);
+            
+            if (!artifactsDoc.RootElement.TryGetProperty("artifacts", out var artifactsElement))
+            {
+                Debug.WriteLine("没有找到 artifacts");
+                return null;
+            }
+
+            // 查找匹配的 artifact
+            foreach (var artifact in artifactsElement.EnumerateArray())
+            {
+                if (artifact.TryGetProperty("name", out var nameElement) &&
+                    nameElement.GetString()?.StartsWith(artifactName) == true)
+                {
+                    if (artifact.TryGetProperty("id", out var idElement))
+                    {
+                        long artifactId = idElement.GetInt64();
+                        // 使用 nightly.link 绕过 GitHub 身份验证
+                        string nightlyLink = $"https://nightly.link/{GitHub_Owner}/{GitHub_Repo}/actions/artifacts/{artifactId}.zip";
+                        Debug.WriteLine($"找到 artifact: {nameElement.GetString()}, nightly.link: {nightlyLink}");
+                        return nightlyLink;
+                    }
+                }
+            }
+
+            // 如果没有找到精确匹配，返回第一个 artifact
+            foreach (var artifact in artifactsElement.EnumerateArray())
+            {
+                if (artifact.TryGetProperty("id", out var idElement))
+                {
+                    long artifactId = idElement.GetInt64();
+                    // 使用 nightly.link 绕过 GitHub 身份验证
+                    string nightlyLink = $"https://nightly.link/{GitHub_Owner}/{GitHub_Repo}/actions/artifacts/{artifactId}.zip";
+                    Debug.WriteLine($"使用第一个 artifact, nightly.link: {nightlyLink}");
+                    return nightlyLink;
+                }
+            }
+
+            Debug.WriteLine("没有找到任何 artifact");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"获取 GitHub Actions artifact URL 失败: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 检查 GitHub Actions 是否有新版本
+    /// </summary>
+    private async Task CheckGitHubActionsVersionAsync()
+    {
+        try
+        {
+            // 创建新的 HttpClient 用于 GitHub API，添加必要的请求头
+            using var githubClient = new HttpClient();
+            githubClient.DefaultRequestHeaders.Add("User-Agent", "MinecraftConnectTool/1.0");
+            githubClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            githubClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+            
+            // 先尝试获取任意分支的最新 completed run
+            string runsUrl = $"{GitHub_Actions_Url}?status=completed&per_page=1";
+            using var response = await githubClient.GetAsync(runsUrl);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                
+                if (doc.RootElement.TryGetProperty("workflow_runs", out var runsElement) && 
+                    runsElement.GetArrayLength() > 0)
+                {
+                    var firstRun = runsElement[0];
+                    if (firstRun.TryGetProperty("run_number", out var runNumberElement))
+                    {
+                        int runNumber = runNumberElement.GetInt32();
+                        string? headBranch = null;
+                        string? headSha = null;
+                        
+                        if (firstRun.TryGetProperty("head_branch", out var branchElement))
+                            headBranch = branchElement.GetString();
+                        if (firstRun.TryGetProperty("head_sha", out var shaElement))
+                            headSha = shaElement.GetString();
+                        
+                        ActionsVersion = $"Actions版本: Build #{runNumber} ({headBranch})";
+                        CanUpdateFromActions = true;
+                        
+                        // 获取最新 commit 信息并更新到日志区
+                        await FetchLatestCommitInfoAsync(githubClient, headBranch, headSha);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine($"GitHub API 返回错误: {response.StatusCode}");
+                string errorContent = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine($"错误详情: {errorContent}");
+            }
+            
+            ActionsVersion = "Actions版本: 获取失败";
+            CanUpdateFromActions = false;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"检查 GitHub Actions 版本失败: {ex.Message}");
+            ActionsVersion = "Actions版本: 获取失败";
+            CanUpdateFromActions = false;
+        }
+    }
+
+    /// <summary>
+    /// 获取最新 commit 信息
+    /// </summary>
+    private async Task FetchLatestCommitInfoAsync(HttpClient githubClient, string? branch, string? headSha)
+    {
+        try
+        {
+            string commitsUrl = !string.IsNullOrEmpty(branch) 
+                ? $"{GitHub_Api_Base}/repos/{GitHub_Owner}/{GitHub_Repo}/commits?sha={branch}&per_page=1"
+                : $"{GitHub_Api_Base}/repos/{GitHub_Owner}/{GitHub_Repo}/commits?per_page=1";
+            
+            using var response = await githubClient.GetAsync(commitsUrl);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                
+                if (doc.RootElement.GetArrayLength() > 0)
+                {
+                    var commit = doc.RootElement[0];
+                    string? sha = commit.TryGetProperty("sha", out var shaElement) 
+                        ? shaElement.GetString()?.Substring(0, 7) 
+                        : headSha?.Substring(0, 7);
+                    
+                    string? message = null;
+                    string? author = null;
+                    string? date = null;
+                    
+                    if (commit.TryGetProperty("commit", out var commitElement))
+                    {
+                        if (commitElement.TryGetProperty("message", out var msgElement))
+                            message = msgElement.GetString();
+                        if (commitElement.TryGetProperty("author", out var authorElement))
+                        {
+                            if (authorElement.TryGetProperty("name", out var nameElement))
+                                author = nameElement.GetString();
+                            if (authorElement.TryGetProperty("date", out var dateElement))
+                            {
+                                date = dateElement.GetString();
+                                if (DateTime.TryParse(date, out var dt))
+                                    date = dt.ToString("yyyy-MM-dd HH:mm");
+                            }
+                        }
+                    }
+                    
+                    // 存储 commit 信息供后续使用
+                    _latestCommitSha = sha ?? "";
+                    _latestCommitMessage = message ?? "";
+                    _latestCommitAuthor = author ?? "";
+                    _latestCommitDate = date ?? "";
+                    
+                    // 设置 Actions 版本号格式: 0.0.7(4690dca)
+                    ActionsVersionShort = "0.0.7"; // 从分支名或配置中获取版本号
+                    ActionsCommitSha = _latestCommitSha;
+                    
+                    // 不再直接更新日志，等待用户切换到 Actions 通道后才显示
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"获取 commit 信息失败: {ex.Message}");
+            // 仅存储错误信息，不直接更新日志显示
+            _latestCommitMessage = "";
+            _latestCommitSha = "";
+        }
+    }
 
     private async Task<string> FetchCloudVersionAsync()
     {

@@ -220,26 +220,21 @@
             </Grid>
           </StackPanel>
 
-          <!-- 语言设置 -->
+          <!-- 全局文字加粗 -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">
-              <TextBlock Text="语言"
+              <TextBlock Text="全局文字加粗"
                          FontSize="16"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="{Binding Language}"
+              <TextBlock Text="将所有页面的文字自动加粗显示（部分文本可能不支持自动加粗）"
                          FontSize="14"
                          Opacity="0.7"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
             </StackPanel>
-            <Button Grid.Column="1"
-                    Classes="outlined"
-                    VerticalAlignment="Center">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <icons:MaterialIcon Kind="Translate" Width="18" Height="18"/>
-                <TextBlock Text="更改"/>
-              </StackPanel>
-            </Button>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding EnableGlobalBoldText, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
           </Grid>
         </StackPanel>
       </Border>
@@ -838,24 +833,6 @@
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
                           IsChecked="{Binding AllowProbe, Mode=TwoWay}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-
-          <!-- 接收测试更新 (已禁用 - 暂不可用) -->
-          <Grid ColumnDefinitions="*,Auto" Opacity="0.5">
-            <StackPanel Grid.Column="0" Spacing="4">
-              <TextBlock Text="接收测试更新"
-                         FontSize="16"
-                         FontWeight="Medium"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="接收最新的构建版本更新，可能存在未修复的问题 (暂不可用)"
-                         FontSize="14"
-                         Opacity="0.7"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
-                          IsChecked="False"
-                          IsEnabled="False"
                           VerticalAlignment="Center"/>
           </Grid>
 

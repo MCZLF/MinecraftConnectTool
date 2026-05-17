@@ -48,6 +48,24 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _stopButtonToolTip = "关闭核心";
 
+    #region 全局 Modal 属性
+
+    [ObservableProperty]
+    private bool _isGlobalModalVisible = false;
+
+    [ObservableProperty]
+    private string _globalModalTitle = "";
+
+    [ObservableProperty]
+    private string _globalModalMessage = "";
+
+    [ObservableProperty]
+    private string _globalModalDetail = "";
+
+    private TaskCompletionSource<bool>? _globalModalTcs;
+
+    #endregion
+
     public MainWindowViewModel()
     {
         _pageCacheService = new PageCacheService();
@@ -163,6 +181,46 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _navigationService.RefreshCurrentPage();
     }
+
+    #region 全局 Modal 方法
+
+    /// <summary>
+    /// 显示全局确认对话框
+    /// </summary>
+    public Task<bool> ShowGlobalModalAsync(string title, string message, string detail)
+    {
+        GlobalModalTitle = title;
+        GlobalModalMessage = message;
+        GlobalModalDetail = detail;
+        IsGlobalModalVisible = true;
+
+        _globalModalTcs = new TaskCompletionSource<bool>();
+        return _globalModalTcs.Task;
+    }
+
+    /// <summary>
+    /// 隐藏全局对话框
+    /// </summary>
+    public void HideGlobalModal()
+    {
+        IsGlobalModalVisible = false;
+    }
+
+    [RelayCommand]
+    private void GlobalModalConfirm()
+    {
+        _globalModalTcs?.TrySetResult(true);
+        IsGlobalModalVisible = false;
+    }
+
+    [RelayCommand]
+    private void GlobalModalCancel()
+    {
+        _globalModalTcs?.TrySetResult(false);
+        IsGlobalModalVisible = false;
+    }
+
+    #endregion
 
     private Control CreatePage(string pageKey)
     {

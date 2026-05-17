@@ -603,22 +603,9 @@ public partial class LinkPageViewModel : ViewModelBase
             StatusBadgeState = BadgeState.Success;
             StatusBadgeText = "Online";
 
-            // 创建玩家管理房间（使用端口作为房间代码）
-            var roomCode = port;
-            if (!string.IsNullOrEmpty(roomCode))
-            {
-                var playerListSuccess = await _playerListService.CreateRoomAsync(roomCode);
-                IsPlayerListConnected = playerListSuccess;
-                if (playerListSuccess)
-                {
-                    log("玩家管理房间已创建");
-                }
-                else
-                {
-                    log("玩家管理房间创建失败，但不影响联机功能");
-                }
-            }
-
+            // 玩家管理房间将在检测到提示码后创建（使用提示码作为房间代码）
+            // 修复：2026-05-10 删除此处重复创建房间的代码，避免与提示码检测处的创建逻辑冲突
+            // 原代码使用 port 作为 roomCode，而正确的 roomCode 应该是提示码
             // 更新全局状态
             P2PStateService.SetRunning(true, CoreMode.Link);
         }
@@ -633,6 +620,7 @@ public partial class LinkPageViewModel : ViewModelBase
     }
 
     // ========== 加入联机房间 ==========
+    
     [RelayCommand]
     public async Task JoinRoomAsync()
     {

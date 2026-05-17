@@ -141,6 +141,105 @@
                Opacity="1"
                ZIndex="1"/>
 
+    <!-- 全局 Modal 遮罩层 - 覆盖整个窗口 -->
+    <Grid x:Name="GlobalModalOverlay"
+          IsVisible="{Binding IsGlobalModalVisible}"
+          ZIndex="10000"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+      <!-- 半透明背景遮罩 - 高不透明度 -->
+      <Border Background="#CC000000"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"/>
+      
+      <!-- 对话框容器 - 窗口整体居中 -->
+      <Grid HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource MaterialSurfaceBrush}"
+                BoxShadow="0 16 48 0 #60000000"
+                CornerRadius="8"
+                Padding="0"
+                Width="400"
+                MinHeight="200">
+          <Grid RowDefinitions="Auto,*">
+            <!-- 顶部警告色条 -->
+            <Border Grid.Row="0"
+                    Height="4"
+                    Background="{DynamicResource MaterialErrorBrush}"
+                    CornerRadius="8,8,0,0"/>
+            
+            <!-- Modal 内容 -->
+            <StackPanel Grid.Row="1" Spacing="0">
+              <!-- 图标和标题区域 -->
+              <StackPanel Spacing="12" Margin="24,20,24,16">
+                <!-- 警告图标 -->
+                <Border Width="56"
+                        Height="56"
+                        CornerRadius="28"
+                        HorizontalAlignment="Center"
+                        Background="{DynamicResource MaterialErrorContainerBrush}">
+                  <icons:MaterialIcon Kind="AlertCircle"
+                                      Width="28"
+                                      Height="28"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Foreground="{DynamicResource MaterialErrorBrush}"/>
+                </Border>
+                
+                <!-- 标题 -->
+                <TextBlock Text="{Binding GlobalModalTitle}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              
+              <!-- 消息内容 -->
+              <StackPanel Spacing="6" Margin="24,0,24,16">
+                <TextBlock Text="{Binding GlobalModalMessage}"
+                           FontSize="14"
+                           FontWeight="Medium"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource MaterialErrorBrush}"/>
+                <TextBlock Text="{Binding GlobalModalDetail}"
+                           FontSize="13"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Opacity="0.8"
+                           LineHeight="20"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              </StackPanel>
+              
+              <!-- 按钮区域 -->
+              <StackPanel Orientation="Horizontal"
+                          HorizontalAlignment="Center"
+                          Spacing="12"
+                          Margin="24,8,24,20">
+                <Button Command="{Binding GlobalModalCancelCommand}"
+                        Width="90"
+                        Height="36"
+                        CornerRadius="18"
+                        Classes="outlined">
+                  <TextBlock Text="取消" FontSize="13"/>
+                </Button>
+                <Button Command="{Binding GlobalModalConfirmCommand}"
+                        Width="90"
+                        Height="36"
+                        CornerRadius="18"
+                        Classes="accent">
+                  <TextBlock Text="确认" FontSize="13" FontWeight="Medium"/>
+                </Button>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+
     <!-- 自定义标题栏 - 支持拖动 -->
     <Grid x:Name="TitleBar" Height="40" VerticalAlignment="Top" ZIndex="100">
       <Grid.ColumnDefinitions>

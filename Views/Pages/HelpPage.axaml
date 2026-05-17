@@ -6,7 +6,7 @@
   <ScrollViewer>
     <StackPanel Margin="24" Spacing="16">
       <!-- 标题 -->
-      <TextBlock Text="Hi,"
+      <TextBlock Text="{Binding UserName, StringFormat='Hi, {0}'}"
                  FontSize="32"
                  FontWeight="Light"
                  Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>

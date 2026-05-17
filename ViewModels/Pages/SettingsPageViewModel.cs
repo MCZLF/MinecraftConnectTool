@@ -158,6 +158,12 @@ public partial class SettingsPageViewModel : ViewModelBase
     [ObservableProperty]
     private RenderingMode _renderingMode = RenderingMode.SystemDefault;
 
+    /// <summary>
+    /// 启用全局文字加粗
+    /// </summary>
+    [ObservableProperty]
+    private bool _enableGlobalBoldText;
+
     #endregion
 
     #region 功能设置
@@ -445,6 +451,9 @@ public partial class SettingsPageViewModel : ViewModelBase
 
         // 渲染方式
         RenderingMode = ThemeService.Instance.RenderingMode;
+
+        // 全局文字加粗
+        EnableGlobalBoldText = ThemeService.Instance.EnableGlobalBoldText;
 
         // 功能设置 - Relay强制关闭
         EnableRelay = false;
@@ -1197,6 +1206,11 @@ public partial class SettingsPageViewModel : ViewModelBase
         {
             ShowToast($"渲染方式已切换为 {GetRenderingModeDisplayName(value)}，重启后生效", true);
         }
+    }
+
+    partial void OnEnableGlobalBoldTextChanged(bool value)
+    {
+        ThemeService.Instance.EnableGlobalBoldText = value;
     }
 
     private string GetRenderingModeDisplayName(RenderingMode mode) => mode switch

@@ -216,52 +216,69 @@
     <!-- 底部区域 -->
     <Grid Grid.Row="3" Margin="0,16,0,0">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
 
-      <!-- 测试通道提示 -->
+      <!-- 更新提示 -->
       <Border Grid.Column="0"
               Background="{DynamicResource MaterialSurfaceBrush}"
               CornerRadius="12"
-              Padding="16">
-        <StackPanel Orientation="Horizontal" Spacing="12">
+              Padding="12"
+              MaxWidth="400">
+        <StackPanel Orientation="Horizontal" Spacing="8">
           <icons:MaterialIcon Kind="Information" 
-                              Width="24" 
-                              Height="24"
+                              Width="20" 
+                              Height="20"
                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
           <StackPanel>
-            <TextBlock Text="{Binding BetaTipTitle}"
+            <TextBlock Text="新版本不再区分不同更新通道，统一合并为正式通道"
                        FontSize="14"
                        FontWeight="Medium"
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            <TextBlock Text="{Binding BetaTipContent}"
+            <TextBlock Text="如需获取最新构建版本，请切换为 GitHub Actions 通道以下载自动构建版本"
                        FontSize="12"
                        Opacity="0.8"
-                       Margin="0,4,0,0"
+                       Margin="0,2,0,0"
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
           </StackPanel>
         </StackPanel>
       </Border>
 
+      <!-- 切换通道按钮 -->
+      <Button Grid.Column="2"
+              Command="{Binding SwitchChannelCommand}"
+              IsEnabled="{Binding CanUpdateFromActions}"
+              Height="44"
+              Padding="16,0"
+              Margin="8,0"
+              CornerRadius="22"
+              Classes="outlined">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <icons:MaterialIcon Kind="{Binding SwitchChannelButtonIcon}" Width="20" Height="20"/>
+          <TextBlock Text="{Binding SwitchChannelButtonText}" 
+                     FontSize="14" 
+                     FontWeight="Medium"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </Button>
+
       <!-- 检查更新按钮 -->
-      <Button Grid.Column="1"
+      <Button Grid.Column="3"
               Command="{Binding CheckUpdateCommand}"
-              Height="52"
-              Padding="24,0"
-              Margin="16,0,0,0"
-              CornerRadius="26">
-        <Button.ContentTemplate>
-          <DataTemplate>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <icons:MaterialIcon Kind="Refresh" Width="24" Height="24"/>
-              <TextBlock Text="检查更新" 
-                         FontSize="16" 
-                         FontWeight="Bold"
-                         VerticalAlignment="Center"/>
-            </StackPanel>
-          </DataTemplate>
-        </Button.ContentTemplate>
+              Height="44"
+              Padding="16,0"
+              Margin="8,0,0,0"
+              CornerRadius="22">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <icons:MaterialIcon Kind="Refresh" Width="20" Height="20"/>
+          <TextBlock Text="检查更新" 
+                     FontSize="14" 
+                     FontWeight="Medium"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
       </Button>
     </Grid>
   </Grid>

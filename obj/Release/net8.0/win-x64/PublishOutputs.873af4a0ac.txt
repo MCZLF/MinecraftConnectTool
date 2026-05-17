@@ -1,1 +1,1 @@
-D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\publish\0.0.7Pre03_SP2_win-x64_MCT.exe
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\publish\MinecraftConnectTool.exe

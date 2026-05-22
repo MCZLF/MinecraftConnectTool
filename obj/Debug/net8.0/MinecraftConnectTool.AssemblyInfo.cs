@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("MCZLF Studio")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("MinecraftConnectTool")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4690dca517c7ae76f33fe414a0a9129e1db8f7ae")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+372b64134fb3ef425c3e6516a732a5a386de76c6")]
 [assembly: System.Reflection.AssemblyProductAttribute("MinecraftConnectTool")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MinecraftConnectTool")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

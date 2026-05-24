@@ -993,7 +993,6 @@
               </Button>
             </StackPanel>
 
-            <!-- Restart按钮 -->
             <Button Grid.Column="1"
                     Classes="filled"
                     Command="{Binding RestartApplicationCommand}">

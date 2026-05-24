@@ -1142,6 +1142,45 @@ public partial class SettingsPageViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void OpenSponsor()
+    {
+        try
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://ifdian.net/a/linfon18",
+                UseShellExecute = true
+            };
+            System.Diagnostics.Process.Start(psi);
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"无法打开链接: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenThanks()
+    {
+        try
+        {
+            var mainWindow = Avalonia.Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow as Views.MainWindow
+                : null;
+
+            if (mainWindow != null)
+            {
+                _ = mainWindow.ShowPanelThanksAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"打开鸣谢页面失败: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// 修改用户名
     /// </summary>

@@ -1371,6 +1371,25 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// 显示贡献者与鸣谢PanelThanks
+    /// </summary>
+    public async Task ShowPanelThanksAsync()
+    {
+        var panelThanks = new RightPage.PanelThanks();
+        var drawerWindow = await ShowRightDrawerAsync(panelThanks, 380);
+
+        panelThanks.CloseRequested += async (s, e) =>
+        {
+            if (drawerWindow.Content is Grid grid &&
+                grid.Children.Count > 1 &&
+                grid.Children[1] is Border border)
+            {
+                await CloseRightDrawerAsync(drawerWindow, grid, border, 380);
+            }
+        };
+    }
+
+    /// <summary>
     /// 显示自定义邀请信息PanelInviteEdit
     /// </summary>
     public async Task ShowPanelInviteEditAsync()

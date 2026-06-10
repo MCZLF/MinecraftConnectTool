@@ -142,8 +142,6 @@ public partial class PanelThanks : UserControl
         {
             var sponsors = await AfdianService.FetchAllSponsorsAsync();
 
-            panel.Children.Add(CreateSectionHeader());
-
             if (sponsors.Count == 0)
             {
                 var emptyText = new TextBlock
@@ -156,14 +154,18 @@ public partial class PanelThanks : UserControl
                     Margin = new Avalonia.Thickness(0, 8, 0, 0)
                 };
                 panel.Children.Add(emptyText);
-                return;
+            }
+            else
+            {
+                foreach (var sponsor in sponsors)
+                {
+                    var card = CreateSponsorCard(sponsor);
+                    panel.Children.Add(card);
+                }
             }
 
-            foreach (var sponsor in sponsors)
-            {
-                var card = CreateSponsorCard(sponsor);
-                panel.Children.Add(card);
-            }
+            // 在整个列表最底下添加说明小字
+            panel.Children.Add(CreateFooterNote());
         }
         catch (Exception ex)
         {
@@ -181,52 +183,28 @@ public partial class PanelThanks : UserControl
         }
     }
 
-    private Border CreateSectionHeader()
+    private Border CreateFooterNote()
     {
         return new Border
         {
-            Margin = new Avalonia.Thickness(0, 16, 0, 4),
+            Margin = new Avalonia.Thickness(0, 12, 0, 0),
             Padding = new Avalonia.Thickness(0, 4, 0, 4),
             Child = new StackPanel
             {
                 Spacing = 2,
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 Children =
                 {
-                    new StackPanel
-                    {
-                        Orientation = Avalonia.Layout.Orientation.Horizontal,
-                        Spacing = 8,
-                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                        Children =
-                        {
-                            new MaterialIcon
-                            {
-                                Kind = Material.Icons.MaterialIconKind.HeartOutline,
-                                Width = 14,
-                                Height = 14,
-                                Foreground = GetBrush("MaterialPrimaryBrush")
-                            },
-                            new TextBlock
-                            {
-                                Text = "赞助者 · 爱发电",
-                                FontSize = 13,
-                                FontWeight = Avalonia.Media.FontWeight.Medium,
-                                Foreground = GetBrush("MaterialOnSurfaceBrush"),
-                                Opacity = 0.6
-                            },
-                            new MaterialIcon
-                            {
-                                Kind = Material.Icons.MaterialIconKind.HeartOutline,
-                                Width = 14,
-                                Height = 14,
-                                Foreground = GetBrush("MaterialPrimaryBrush")
-                            }
-                        }
-                    },
                     new TextBlock
                     {
                         Text = "该列表包含 MCT联机工具箱与MCZLF服务器的所有数据",
+                        FontSize = 10,
+                        Foreground = GetBrush("MaterialOnSurfaceBrush"),
+                        Opacity = 0.35,
+                        TextAlignment = Avalonia.Media.TextAlignment.Center
+                    },
+                    new TextBlock
+                    {
+                        Text = "排名不分先后",
                         FontSize = 10,
                         Foreground = GetBrush("MaterialOnSurfaceBrush"),
                         Opacity = 0.35,

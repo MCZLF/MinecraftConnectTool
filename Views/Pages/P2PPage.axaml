@@ -83,19 +83,19 @@
                     Spacing="12"
                     VerticalAlignment="Top">
           <!-- 平台支持标签 -->
-          <Border Background="{DynamicResource MaterialSecondaryContainerBrush}"
+          <Border Background="{DynamicResource MaterialTertiaryContainerBrush}"
                   CornerRadius="8"
                   Padding="10,6"
                   VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <icons:MaterialIcon Kind="MicrosoftWindows"
+              <icons:MaterialIcon Kind="DesktopTower"
                                  Width="16"
                                  Height="16"
-                                 Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
-              <TextBlock Text="当前版本仅支持Windows"
+                                 Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+              <TextBlock Text="Win / Linux / Mac"
                          FontSize="12"
                          FontWeight="Medium"
-                         Foreground="{DynamicResource MaterialOnSecondaryContainerBrush}"
+                         Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"
                          VerticalAlignment="Center"/>
             </StackPanel>
           </Border>

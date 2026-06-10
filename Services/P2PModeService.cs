@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -19,6 +20,12 @@ namespace MinecraftConnectTool.Services;
 /// </summary>
 public class P2PModeService : IDisposable
 {
+    // ========== 平台检测 ==========
+    private static bool IsWindows => OperatingSystem.IsWindows();
+    private static bool IsLinux => OperatingSystem.IsLinux();
+    private static bool IsMacOS => OperatingSystem.IsMacOS();
+    private static bool IsArm64 => RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
+    
     // Token配置
     public string tokenNormal = "17073157824633806511";
     public string tokenTest = "7196174974940052261";
@@ -47,12 +54,26 @@ public class P2PModeService : IDisposable
     
     // 核心文件路径
     private string CoreDirectory => Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
-    private string CoreFilePath => Path.Combine(CoreDirectory, "main.exe");
+    private string CoreFileName => IsWindows ? "main.exe" : "main"; // Linux/Mac 没有 .exe 后缀
+    private string CoreFilePath => Path.Combine(CoreDirectory, CoreFileName);
     
-    // MD5校验值
-    private string Md5Normal => "08160296509deac13e7d12c8754de9ef";
-    private string Md5Admin => "29d76fc2626c66925621d475f3a6827a";
-    private string Md532Bit => "640ffdaa2a7b249d9c301102419a69cb";
+    // 基础URL
+    private string BaseUrl => "https://api.mct.mczlf.loft.games/Core";
+    
+    // Windows MD5校验值
+    private string Md5Win64Admin => "4956da633c933f24d881d24e8d7f4cd7";      // windows_amd64.exe (管理员)
+    private string Md5Win32Admin => "974ffb54c1d70063e0ad01ad18bda921";       // windows_386.exe (管理员)
+    private string Md5WinArm64Admin => "8009b6eccd5245916fa51578c96535db";    // windows_arm64.exe (管理员)
+    private string Md5Win64Normal => "08160296509deac13e7d12c8754de9ef";      // 旧版64位 (无管理员)
+    private string Md5Win32Normal => "640ffdaa2a7b249d9c301102419a69cb";      // 旧版32位 (无管理员)
+    
+    // macOS MD5校验值
+    private string Md5Mac64 => "b62023dfd075f2aee6c8a24314453424";            // darwin_amd64
+    private string Md5MacArm64 => "ff2572742af5db37c03f0bf4dc53f683";         // darwin_arm64
+    
+    // Linux MD5校验值
+    private string Md5Linux64 => "87e9e902db0f13084cb354abc07f5e65";          // linux_amd64
+    private string Md5LinuxArm64 => "50140e0a82b5f12334b59f0f4aff104a";       // linux_arm64
     
     // 当前进程
     private Process? _currentProcess;
@@ -266,29 +287,86 @@ public class P2PModeService : IDisposable
             tsm = "M" + tsm + "C";
         }
         
-        // 注意：TsmGenerated 事件在下载完成后触发，避免 InfoBar 遮挡进度条
+        // 注意：TsmGenerated 事件在下载完成后触发，避免 InfoBar 遮挡下载进度条
         log($"您的提示码为 {tsm}");
+        
+        // 记录平台信息
+        string platformInfo = $"平台: {(IsWindows ? "Windows" : IsLinux ? "Linux" : IsMacOS ? "macOS" : "Unknown")} " +
+                              $"架构: {(IsArm64 ? "ARM64" : Environment.Is64BitOperatingSystem ? "x64" : "x86")}";
+        log(platformInfo);
         
         // 确定下载URL和MD5
         string url;
         string fileMd5;
-        if (Environment.Is64BitOperatingSystem)
+        if (IsWindows)
         {
             if (admin)
             {
-                url = "https://api.mct.mczlf.loft.games/main32413.exe";
-                fileMd5 = Md5Admin;
+                // 管理员模式：支持64位、32位、ARM64
+                if (IsArm64)
+                {
+                    url = $"{BaseUrl}/windows_arm64.exe";
+                    fileMd5 = Md5WinArm64Admin;
+                }
+                else if (Environment.Is64BitOperatingSystem)
+                {
+                    url = $"{BaseUrl}/windows_amd64.exe";
+                    fileMd5 = Md5Win64Admin;
+                }
+                else
+                {
+                    url = $"{BaseUrl}/windows_386.exe";
+                    fileMd5 = Md5Win32Admin;
+                }
             }
             else
             {
-                url = "https://api.mct.mczlf.loft.games/mainnew.exe";
-                fileMd5 = Md5Normal;
+                // 非管理员模式：仅支持旧版64位和32位，不支持ARM64
+                if (Environment.Is64BitOperatingSystem)
+                {
+                    url = "https://api.mct.mczlf.loft.games/mainnew.exe";
+                    fileMd5 = Md5Win64Normal;
+                }
+                else
+                {
+                    url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
+                    fileMd5 = Md5Win32Normal;
+                }
+            }
+        }
+        else if (IsMacOS)
+        {
+            // macOS：支持AMD64和ARM64
+            if (IsArm64)
+            {
+                url = $"{BaseUrl}/darwin_arm64";
+                fileMd5 = Md5MacArm64;
+            }
+            else
+            {
+                url = $"{BaseUrl}/darwin_amd64";
+                fileMd5 = Md5Mac64;
+            }
+        }
+        else if (IsLinux)
+        {
+            // Linux：支持AMD64和ARM64
+            if (IsArm64)
+            {
+                url = $"{BaseUrl}/linux_arm64";
+                fileMd5 = Md5LinuxArm64;
+            }
+            else
+            {
+                url = $"{BaseUrl}/linux_amd64";
+                fileMd5 = Md5Linux64;
             }
         }
         else
         {
-            url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
-            fileMd5 = Md532Bit;
+            log("不支持的操作系统");
+            role = "0";
+            return false;
         }
         
         // 检查并下载核心
@@ -298,11 +376,7 @@ public class P2PModeService : IDisposable
             string? md5Hash = GetFileMD5Hash(CoreFilePath);
             if (md5Hash == fileMd5)
             {
-                log("64位核心已存在且安全校验通过");
-            }
-            else if (md5Hash == Md532Bit)
-            {
-                log("32位核心已存在且安全校验通过");
+                log("核心已存在且安全校验通过");
             }
             else if (md5Hash == null)
             {
@@ -336,6 +410,28 @@ public class P2PModeService : IDisposable
             {
                 role = "0";
                 return false;
+            }
+            
+            // Linux/Mac 需要添加执行权限
+            if (IsLinux || IsMacOS)
+            {
+                try
+                {
+                    Process chmodProcess = new Process();
+                    chmodProcess.StartInfo.FileName = "chmod";
+                    chmodProcess.StartInfo.Arguments = $"+x \"{CoreFilePath}\"";
+                    chmodProcess.StartInfo.UseShellExecute = false;
+                    chmodProcess.StartInfo.RedirectStandardOutput = true;
+                    chmodProcess.StartInfo.RedirectStandardError = true;
+                    chmodProcess.StartInfo.CreateNoWindow = true;
+                    chmodProcess.Start();
+                    await chmodProcess.WaitForExitAsync();
+                    log("已添加执行权限");
+                }
+                catch (Exception ex)
+                {
+                    log($"添加执行权限失败: {ex.Message}");
+                }
             }
         }
         
@@ -374,15 +470,14 @@ public class P2PModeService : IDisposable
         }
         
         // 二次校验
-        if (!File.Exists(CoreFilePath) || !new[] { fileMd5, Md532Bit }.Contains(GetFileMD5Hash(CoreFilePath)))
+        if (!File.Exists(CoreFilePath) || GetFileMD5Hash(CoreFilePath) != fileMd5)
         {
             log("二次校验失败,进程已终止");
             await stopp2p();
             return false;
         }
         
-        string? actualMd5 = GetFileMD5Hash(CoreFilePath);
-        log($"{(actualMd5 == fileMd5 ? "64" : "32")}位核心校验通过，二次校验成功");
+        log("核心校验通过，二次校验成功");
         
         // 启动进程
         if (await StartProcessAsync(arguments))
@@ -481,26 +576,83 @@ public class P2PModeService : IDisposable
         string joinAddress = $"127.0.0.1:{randomPort}";
         log($"您的加入地址为 {joinAddress}");
         
-        // 确定下载URL
+        // 记录平台信息
+        string platformInfo = $"平台: {(IsWindows ? "Windows" : IsLinux ? "Linux" : IsMacOS ? "macOS" : "Unknown")} " +
+                              $"架构: {(IsArm64 ? "ARM64" : Environment.Is64BitOperatingSystem ? "x64" : "x86")}";
+        log(platformInfo);
+        
+        // 确定下载URL和MD5
         string url;
         string fileMd5;
-        if (Environment.Is64BitOperatingSystem)
+        if (IsWindows)
         {
             if (admin)
             {
-                url = "https://api.mct.mczlf.loft.games/main32413.exe";
-                fileMd5 = Md5Admin;
+                // 管理员模式：支持64位、32位、ARM64
+                if (IsArm64)
+                {
+                    url = $"{BaseUrl}/windows_arm64.exe";
+                    fileMd5 = Md5WinArm64Admin;
+                }
+                else if (Environment.Is64BitOperatingSystem)
+                {
+                    url = $"{BaseUrl}/windows_amd64.exe";
+                    fileMd5 = Md5Win64Admin;
+                }
+                else
+                {
+                    url = $"{BaseUrl}/windows_386.exe";
+                    fileMd5 = Md5Win32Admin;
+                }
             }
             else
             {
-                url = "https://api.mct.mczlf.loft.games/mainnew.exe";
-                fileMd5 = Md5Normal;
+                // 非管理员模式：仅支持旧版64位和32位，不支持ARM64
+                if (Environment.Is64BitOperatingSystem)
+                {
+                    url = "https://api.mct.mczlf.loft.games/mainnew.exe";
+                    fileMd5 = Md5Win64Normal;
+                }
+                else
+                {
+                    url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
+                    fileMd5 = Md5Win32Normal;
+                }
+            }
+        }
+        else if (IsMacOS)
+        {
+            // macOS：支持AMD64和ARM64
+            if (IsArm64)
+            {
+                url = $"{BaseUrl}/darwin_arm64";
+                fileMd5 = Md5MacArm64;
+            }
+            else
+            {
+                url = $"{BaseUrl}/darwin_amd64";
+                fileMd5 = Md5Mac64;
+            }
+        }
+        else if (IsLinux)
+        {
+            // Linux：支持AMD64和ARM64
+            if (IsArm64)
+            {
+                url = $"{BaseUrl}/linux_arm64";
+                fileMd5 = Md5LinuxArm64;
+            }
+            else
+            {
+                url = $"{BaseUrl}/linux_amd64";
+                fileMd5 = Md5Linux64;
             }
         }
         else
         {
-            url = "https://api.mct.mczlf.loft.games/mainnew32.exe";
-            fileMd5 = Md532Bit;
+            log("不支持的操作系统");
+            role = "0";
+            return false;
         }
         
         // 检查并下载核心
@@ -510,11 +662,7 @@ public class P2PModeService : IDisposable
             string? md5Hash = GetFileMD5Hash(CoreFilePath);
             if (md5Hash == fileMd5)
             {
-                log("64位核心已存在且安全校验通过");
-            }
-            else if (md5Hash == Md532Bit)
-            {
-                log("32位核心已存在且安全校验通过");
+                log("核心已存在且安全校验通过");
             }
             else
             {
@@ -541,6 +689,28 @@ public class P2PModeService : IDisposable
             {
                 role = "0";
                 return false;
+            }
+            
+            // Linux/Mac 需要添加执行权限
+            if (IsLinux || IsMacOS)
+            {
+                try
+                {
+                    Process chmodProcess = new Process();
+                    chmodProcess.StartInfo.FileName = "chmod";
+                    chmodProcess.StartInfo.Arguments = $"+x \"{CoreFilePath}\"";
+                    chmodProcess.StartInfo.UseShellExecute = false;
+                    chmodProcess.StartInfo.RedirectStandardOutput = true;
+                    chmodProcess.StartInfo.RedirectStandardError = true;
+                    chmodProcess.StartInfo.CreateNoWindow = true;
+                    chmodProcess.Start();
+                    await chmodProcess.WaitForExitAsync();
+                    log("已添加执行权限");
+                }
+                catch (Exception ex)
+                {
+                    log($"添加执行权限失败: {ex.Message}");
+                }
             }
         }
         
@@ -585,13 +755,13 @@ public class P2PModeService : IDisposable
         }
         
         // 二次校验
-        if (!File.Exists(CoreFilePath) || !new[] { fileMd5, Md532Bit }.Contains(GetFileMD5Hash(CoreFilePath)))
+        if (!File.Exists(CoreFilePath) || GetFileMD5Hash(CoreFilePath) != fileMd5)
         {
             log("二次校验失败,进程已终止");
             await stopp2p();
             return false;
         }
-        log($"{(GetFileMD5Hash(CoreFilePath) == fileMd5 ? "64" : "32")}位核心校验通过，二次校验成功");
+        log("核心校验通过，二次校验成功");
         
         // 启动进程
         if (await StartProcessAsync(arguments))
@@ -749,12 +919,21 @@ public class P2PModeService : IDisposable
             if (useoldway)
             {
                 // 旧版方式：显示窗口
-                Process.Start(new ProcessStartInfo()
+                var startInfo = new ProcessStartInfo()
                 {
                     FileName = CoreFilePath,
                     Arguments = arguments,
                     UseShellExecute = true
-                });
+                };
+                
+                // Linux/Mac 使用 bash 来启动，避免参数解析问题
+                if (IsLinux || IsMacOS)
+                {
+                    startInfo.FileName = "/bin/bash";
+                    startInfo.Arguments = $"-c \"{CoreFilePath} {arguments}\"";
+                }
+                
+                Process.Start(startInfo);
             }
             else
             {
@@ -768,6 +947,13 @@ public class P2PModeService : IDisposable
                 _currentProcess.StartInfo.CreateNoWindow = true;
                 _currentProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 _currentProcess.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+                
+                // Linux/Mac 使用 bash 来启动，避免参数解析问题
+                if (IsLinux || IsMacOS)
+                {
+                    _currentProcess.StartInfo.FileName = "/bin/bash";
+                    _currentProcess.StartInfo.Arguments = $"-c \"{CoreFilePath} {arguments}\"";
+                }
                 
                 _currentProcess.OutputDataReceived += (sender, e) =>
                 {

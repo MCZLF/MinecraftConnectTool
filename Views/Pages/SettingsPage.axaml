@@ -925,7 +925,7 @@
                            Foreground="{DynamicResource MaterialPrimaryBrush}"
                            Background="{DynamicResource MaterialSurfaceVariantBrush}"/>
               <TextBlock IsVisible="{Binding IsNetworkOptimizing}"
-                         Text="{Binding NetworkOptimizationProgress, StringFormat='{}{0}%'}}"
+                         Text="{Binding NetworkOptimizationProgress, StringFormat='{}{0}%'}"
                          FontSize="12"
                          Opacity="0.7"
                          Margin="0,4,0,0"

@@ -195,9 +195,9 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
     // 预设图片原图URL
     private const string Preset1OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/shouanren.png";
-    private const string Preset2OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/qianxiao.jpg";
-    private const string Preset3OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/bg1.jpeg";
-    private const string Preset4OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/bg2.jpeg";
+    private const string Preset2OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/lucia.jpg";
+    private const string Preset3OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/mcback.jpg";
+    private const string Preset4OriginalUrl = "https://api.mct.mczlf.loft.games/WebResource/YouShouBack.jpg";
 
     #endregion
 
@@ -263,9 +263,9 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ApplyPreset2()
+    private async Task ApplyPreset2()
     {
-        // 预设2：鸣潮_千咲 - 亮色模式，浅蓝色（偏白，晴天），背景模糊10%，控件不模糊35%
+        // 预设2：战双帕弥什_祝你幸福露西亚 - 亮色模式，橙色主题，照片背景lucia.jpg，透明度10%，控件不透明度40%，混色浓度0.1
         IsPreset1Selected = false;
         IsPreset2Selected = true;
         IsPreset3Selected = false;
@@ -274,13 +274,13 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
         IsDarkMode = false;
         EnableColorMode = true;
-        AccentColor = Color.Parse("#64B5F6"); // 浅蓝色加深（晴天蓝）
+        AccentColor = Color.Parse("#FF9800"); // 橙色
         MixIntensity = 0.10;
         EnablePhotoBackground = true;
-        // 千咲图片太大，直接使用缩略图
-        PhotoBackgroundPath = Preset2ImagePath;
+        // 下载并应用完整图片
+        PhotoBackgroundPath = await DownloadFullImageAsync(Preset2OriginalUrl, "lucia_full.jpg");
         BackgroundOpacity = 0.10;
-        ControlOpacity = 0.35;
+        ControlOpacity = 0.40;
 
         ApplyThemeSettings();
     }
@@ -288,22 +288,22 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset3()
     {
-        // 预设3：有兽焉_天禄 - 亮色浅蓝主题，照片背景bg1.jpeg，透明度10%，控件不透明度40%，混色浓度0.12
+        // 预设3：Minecraft_清晨 - 深色模式，绿色主题，照片背景mcback.jpg，透明度14%，控件不透明度45%，混色浓度0.12
         IsPreset1Selected = false;
         IsPreset2Selected = false;
         IsPreset3Selected = true;
         IsPreset4Selected = false;
         IsCustomSelected = false;
 
-        IsDarkMode = false;
+        IsDarkMode = true;
         EnableColorMode = true;
-        AccentColor = Color.Parse("#87CEEB"); // 浅蓝
+        AccentColor = Color.Parse("#8BC34A"); // 绿色
         MixIntensity = 0.12;
         EnablePhotoBackground = true;
         // 下载并应用完整图片
-        PhotoBackgroundPath = await DownloadFullImageAsync(Preset3OriginalUrl, "bg1_full.jpeg");
-        BackgroundOpacity = 0.10;
-        ControlOpacity = 0.40;
+        PhotoBackgroundPath = await DownloadFullImageAsync(Preset3OriginalUrl, "mcback_full.jpg");
+        BackgroundOpacity = 0.14;
+        ControlOpacity = 0.45;
 
         ApplyThemeSettings();
     }
@@ -311,22 +311,22 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset4()
     {
-        // 预设4：有兽焉_辟邪 - 亮色标准浅红主题，照片背景bg2.jpeg，透明度10%，控件不透明度40%，混色浓度0.12
+        // 预设4：有兽焉_合照 - 深色模式，黄绿主题，照片背景YouShouBack.jpg，透明度15%，控件不透明度45%，混色浓度0.12
         IsPreset1Selected = false;
         IsPreset2Selected = false;
         IsPreset3Selected = false;
         IsPreset4Selected = true;
         IsCustomSelected = false;
 
-        IsDarkMode = false;
+        IsDarkMode = true;
         EnableColorMode = true;
-        AccentColor = Color.Parse("#FF6B6B"); // 标准浅红
+        AccentColor = Color.Parse("#CDDC39"); // 黄绿
         MixIntensity = 0.12;
         EnablePhotoBackground = true;
         // 下载并应用完整图片
-        PhotoBackgroundPath = await DownloadFullImageAsync(Preset4OriginalUrl, "bg2_full.jpeg");
-        BackgroundOpacity = 0.10;
-        ControlOpacity = 0.40;
+        PhotoBackgroundPath = await DownloadFullImageAsync(Preset4OriginalUrl, "YouShouBack_full.jpg");
+        BackgroundOpacity = 0.15;
+        ControlOpacity = 0.45;
 
         ApplyThemeSettings();
     }
@@ -470,7 +470,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
             var dialogContent = new ExtensionUI.MD3MessageDialog
             {
                 Title = "确认跳过",
-                Message = "一键跳过将使用默认设置完成初始化。\n\n您可以在「设置」中随时修改这些选项。",
+                Message = "一键跳过将使用默认设置完成初始化。\n\n您可以在「设置」中随时修改这些选项~",
                 IconKind = Material.Icons.MaterialIconKind.HelpCircle
             };
 
@@ -536,18 +536,18 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     private static readonly string[] AllPresetImageFiles = new[]
     {
         "shouanren.png",
-        "qianxiao.jpg",
-        "bg1.jpeg",
-        "bg2.jpeg"
+        "lucia.jpg",
+        "mcback.jpg",
+        "YouShouBack.jpg"
     };
 
     // 所有完整图片文件名列表
     private static readonly string[] AllFullImageFiles = new[]
     {
         "shouanren_full.png",
-        "qianxiao_full.jpg",
-        "bg1_full.jpeg",
-        "bg2_full.jpeg"
+        "lucia_full.jpg",
+        "mcback_full.jpg",
+        "YouShouBack_full.jpg"
     };
 
     public FirstLaunchWizardViewModel()
@@ -555,9 +555,9 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         // 先设置默认图片路径
         var configDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp");
         Preset1ImagePath = Path.Combine(configDir, "shouanren.png");
-        Preset2ImagePath = Path.Combine(configDir, "qianxiao.jpg");
-        Preset3ImagePath = Path.Combine(configDir, "bg1.jpeg");
-        Preset4ImagePath = Path.Combine(configDir, "bg2.jpeg");
+        Preset2ImagePath = Path.Combine(configDir, "lucia.jpg");
+        Preset3ImagePath = Path.Combine(configDir, "mcback.jpg");
+        Preset4ImagePath = Path.Combine(configDir, "YouShouBack.jpg");
 
         // 初始化时加载当前主题设置
         LoadCurrentThemeSettings();
@@ -570,74 +570,58 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     /// </summary>
     private async Task DownloadPresetImagesAsync()
     {
+        var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
+        var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+        Directory.CreateDirectory(configDir);
+
+        // 每个预设独立try-catch，防止单个失败阻断后续下载
+        await DownloadSinglePresetAsync(configDir, "shouanren.png",
+            "https://api.mct.mczlf.loft.games/WebResource/shouanren.png",
+            path => { Preset1ImagePath = path; },
+            bmp => { Preset1Image = bmp; });
+
+        await DownloadSinglePresetAsync(configDir, "lucia.jpg",
+            "https://api.mct.mczlf.loft.games/WebResource/lucia.jpg",
+            path => { Preset2ImagePath = path; },
+            bmp => { Preset2Image = bmp; });
+
+        await DownloadSinglePresetAsync(configDir, "mcback.jpg",
+            "https://api.mct.mczlf.loft.games/WebResource/mcback.jpg",
+            path => { Preset3ImagePath = path; },
+            bmp => { Preset3Image = bmp; });
+
+        await DownloadSinglePresetAsync(configDir, "YouShouBack.jpg",
+            "https://api.mct.mczlf.loft.games/WebResource/YouShouBack.jpg",
+            path => { Preset4ImagePath = path; },
+            bmp => { Preset4Image = bmp; });
+    }
+
+    /// <summary>
+    /// 下载单个预设图片，异常不影响其他预设
+    /// </summary>
+    private async Task DownloadSinglePresetAsync(string configDir, string fileName, string url,
+        Action<string> setImagePath, Action<Bitmap?> setImage)
+    {
         try
         {
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
-            Directory.CreateDirectory(configDir);
-
-            using var httpClient = new HttpClient();
-            httpClient.Timeout = TimeSpan.FromSeconds(30);
-
-            // 下载预设1：鸣潮_守岸人
-            var preset1Path = Path.Combine(configDir, "shouanren.png");
-            if (!File.Exists(preset1Path))
+            var filePath = Path.Combine(configDir, fileName);
+            if (!File.Exists(filePath))
             {
-                var url = "https://api.mct.mczlf.loft.games/WebResource/shouanren.png";
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(30);
                 var bytes = await httpClient.GetByteArrayAsync(url);
-                await File.WriteAllBytesAsync(preset1Path, bytes);
+                await File.WriteAllBytesAsync(filePath, bytes);
             }
-            Preset1ImagePath = preset1Path;
-            if (File.Exists(preset1Path))
+            setImagePath(filePath);
+            if (File.Exists(filePath))
             {
-                Preset1Image = await LoadThumbnailAsync(preset1Path, 300, 80);
-            }
-
-            // 下载预设2：鸣潮_千咲
-            var preset2Path = Path.Combine(configDir, "qianxiao.jpg");
-            if (!File.Exists(preset2Path))
-            {
-                var url = "https://api.mct.mczlf.loft.games/WebResource/qianxiao.jpg";
-                var bytes = await httpClient.GetByteArrayAsync(url);
-                await File.WriteAllBytesAsync(preset2Path, bytes);
-            }
-            Preset2ImagePath = preset2Path;
-            if (File.Exists(preset2Path))
-            {
-                Preset2Image = await LoadThumbnailAsync(preset2Path, 300, 80);
-            }
-
-            // 下载预设3：有兽焉_天禄
-            var preset3Path = Path.Combine(configDir, "bg1.jpeg");
-            if (!File.Exists(preset3Path))
-            {
-                var url = "https://api.mct.mczlf.loft.games/WebResource/bg1.jpeg";
-                var bytes = await httpClient.GetByteArrayAsync(url);
-                await File.WriteAllBytesAsync(preset3Path, bytes);
-            }
-            Preset3ImagePath = preset3Path;
-            if (File.Exists(preset3Path))
-            {
-                Preset3Image = await LoadThumbnailAsync(preset3Path, 300, 80);
-            }
-
-            // 下载预设4：有兽焉_辟邪
-            var preset4Path = Path.Combine(configDir, "bg2.jpeg");
-            if (!File.Exists(preset4Path))
-            {
-                var url = "https://api.mct.mczlf.loft.games/WebResource/bg2.jpeg";
-                var bytes = await httpClient.GetByteArrayAsync(url);
-                await File.WriteAllBytesAsync(preset4Path, bytes);
-            }
-            Preset4ImagePath = preset4Path;
-            if (File.Exists(preset4Path))
-            {
-                Preset4Image = await LoadThumbnailAsync(preset4Path, 300, 80);
+                var bmp = await LoadThumbnailAsync(filePath, 300, 80);
+                setImage(bmp);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"下载预设图片失败: {ex.Message}");
+            Console.WriteLine($"下载预设图片失败 {fileName}: {ex.Message}");
         }
     }
 

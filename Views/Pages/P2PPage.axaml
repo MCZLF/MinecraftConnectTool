@@ -92,7 +92,7 @@
                                  Width="16"
                                  Height="16"
                                  Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
-              <TextBlock Text="Win / Linux / Mac"
+              <TextBlock Text="Win / Linux / Mac / Android"
                          FontSize="12"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"

@@ -58,8 +58,33 @@ public static class CrashReportService
     /// </summary>
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
+        // 忽略 Linux DBus 相关异常（如 AppMenu.Registrar 服务不存在）
+        if (IsDBusException(e.Exception))
+        {
+            e.SetObserved();
+            return;
+        }
+        
         GenerateCrashReport(e.Exception, "未观察到的任务异常", false);
         e.SetObserved(); // 标记为已观察，防止进程终止
+    }
+    
+    /// <summary>
+    /// 检查是否为 DBus 相关异常
+    /// </summary>
+    private static bool IsDBusException(AggregateException exception)
+    {
+        foreach (var inner in exception.Flatten().InnerExceptions)
+        {
+            var typeName = inner.GetType().FullName ?? "";
+            if (typeName.Contains("DBus") || 
+                inner.Message.Contains("DBus") ||
+                inner.Message.Contains("org.freedesktop"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>

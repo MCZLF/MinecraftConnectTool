@@ -287,7 +287,7 @@
                     </Button>
                   </Border>
 
-                  <!-- 预设2：鸣潮_千咲 - 亮色浅蓝 -->
+                  <!-- 预设2：战双帕弥什_祝你幸福露西亚 - 亮色橙色 -->
                   <Border Grid.Column="1"
                           Background="{DynamicResource MaterialSurfaceVariantBrush}"
                           CornerRadius="10"
@@ -311,7 +311,7 @@
                       <StackPanel Spacing="8">
                         <Panel Height="80">
                           <Border CornerRadius="8"
-                                  Background="#64B5F6"/>
+                                  Background="#FF9800"/>
                           <Image Source="{Binding Preset2Image}"
                                  Stretch="UniformToFill"
                                  Height="80">
@@ -320,12 +320,12 @@
                             </Image.Clip>
                           </Image>
                         </Panel>
-                        <TextBlock Text="鸣潮_千咲"
+                        <TextBlock Text="战双帕弥什_祝你幸福露西亚"
                                    FontSize="13"
                                    FontWeight="Medium"
                                    HorizontalAlignment="Center"
                                    Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-                        <TextBlock Text="亮色晴天"
+                        <TextBlock Text="亮色橙调"
                                    FontSize="11"
                                    Opacity="0.7"
                                    HorizontalAlignment="Center"
@@ -335,9 +335,9 @@
                   </Border>
                 </Grid>
                 
-                <!-- 第二行预设：有兽焉系列 -->
+                <!-- 第二行预设 -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                  <!-- 预设3：有兽焉_天禄 -->
+                  <!-- 预设3：Minecraft_清晨 -->
                   <Border Grid.Column="0"
                           Background="{DynamicResource MaterialSurfaceVariantBrush}"
                           CornerRadius="10"
@@ -361,7 +361,7 @@
                       <StackPanel Spacing="8">
                         <Panel Height="80">
                           <Border CornerRadius="8"
-                                  Background="#87CEEB"/>
+                                  Background="#8BC34A"/>
                           <Image Source="{Binding Preset3Image}"
                                  Stretch="UniformToFill"
                                  Height="80">
@@ -370,12 +370,12 @@
                             </Image.Clip>
                           </Image>
                         </Panel>
-                        <TextBlock Text="有兽焉_天禄"
+                        <TextBlock Text="Minecraft_清晨"
                                    FontSize="13"
                                    FontWeight="Medium"
                                    HorizontalAlignment="Center"
                                    Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-                        <TextBlock Text="浅色浅蓝"
+                        <TextBlock Text="深色绿调"
                                    FontSize="11"
                                    Opacity="0.7"
                                    HorizontalAlignment="Center"
@@ -408,7 +408,7 @@
                       <StackPanel Spacing="8">
                         <Panel Height="80">
                           <Border CornerRadius="8"
-                                  Background="#FF6B6B"/>
+                                  Background="#CDDC39"/>
                           <Image Source="{Binding Preset4Image}"
                                  Stretch="UniformToFill"
                                  Height="80">
@@ -417,12 +417,12 @@
                             </Image.Clip>
                           </Image>
                         </Panel>
-                        <TextBlock Text="有兽焉_辟邪"
+                        <TextBlock Text="有兽焉_合照"
                                    FontSize="13"
                                    FontWeight="Medium"
                                    HorizontalAlignment="Center"
                                    Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-                        <TextBlock Text="浅色浅红"
+                        <TextBlock Text="深色黄绿"
                                    FontSize="11"
                                    Opacity="0.7"
                                    HorizontalAlignment="Center"

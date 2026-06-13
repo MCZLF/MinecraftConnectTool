@@ -17,8 +17,10 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Path = System.IO.Path;
 using Material.Icons.Avalonia;
+using MinecraftConnectTool.Models;
 using MinecraftConnectTool.Services;
 using MinecraftConnectTool.ViewModels;
 using Material.Icons;
@@ -42,13 +44,19 @@ public partial class MainWindow : Window
     
     
     // 复用的JsonSerializerOptions
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
+    };
+    //==============================================================
     private readonly PlatformService _platformService;
     private readonly P2PModeService _p2pService;
     private readonly MemoryMonitorService? _memoryMonitorService;
     private MainWindowViewModel? _viewModel;
     private bool _isPerformanceModeEnabled;
+    private string _aiServerUrl = string.Empty;
+    private int _aiTimeoutSeconds = 120;
 
     public MainWindow()
     {
@@ -161,6 +169,63 @@ public partial class MainWindow : Window
 
         // 初始化页面切换动画时长
         UpdatePageTransitionDuration();
+        
+        // 检查 AI 功能远程配置
+        _ = CheckAiConfigAsync();
+    }
+
+    /// <summary>
+    /// 检查 AI 功能远程配置，控制 AI 按钮显示/隐藏
+    /// </summary>
+    private async Task CheckAiConfigAsync()
+    {
+        try
+        {
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            var json = await client.GetStringAsync("https://api.mct.mczlf.loft.games/007/analyze.json");
+            var config = JsonSerializer.Deserialize<AiRemoteConfig>(json, JsonOptions);
+
+            if (config == null)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    var btn = this.FindControl<Button>("buttonAI");
+                    if (btn != null) btn.IsVisible = false;
+                });
+                return;
+            }
+
+            if (!config.Enable)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    var btn = this.FindControl<Button>("buttonAI");
+                    if (btn != null) btn.IsVisible = false;
+                });
+                return;
+            }
+
+            _aiServerUrl = string.IsNullOrWhiteSpace(config.ServerIP)
+                ? "http://127.0.0.1:11451"
+                : config.ServerIP.TrimEnd('/');
+            _aiTimeoutSeconds = config.TimeoutSeconds > 0 ? config.TimeoutSeconds : 120;
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var btn = this.FindControl<Button>("buttonAI");
+                if (btn != null) btn.IsVisible = true;
+            });
+        }
+        catch (Exception ex)
+        {
+            // 请求失败时默认隐藏 AI 按钮，并输出调试信息
+            System.Diagnostics.Debug.WriteLine($"[AI Config] 获取远程配置失败: {ex.Message}");
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var btn = this.FindControl<Button>("buttonAI");
+                if (btn != null) btn.IsVisible = false;
+            });
+        }
     }
 
     /// <summary>
@@ -1233,6 +1298,60 @@ public partial class MainWindow : Window
         okButton.Click += (s, e) => dialogWindow.Close();
 
         await dialogWindow.ShowDialog(this);
+    }
+
+    private async void buttonAI_Click(object? sender, RoutedEventArgs e)
+    {
+        string logContent = string.Empty;
+        string pageName = string.Empty;
+
+        // 根据当前页面获取对应日志
+        if (_viewModel?.CurrentPage is Pages.LinkPage linkPage && linkPage.DataContext is ViewModels.Pages.LinkPageViewModel linkVm)
+        {
+            logContent = linkVm.LogText ?? string.Empty;
+            pageName = "Link模式";
+        }
+        else if (_viewModel?.CurrentPage is Pages.P2PPage p2pPage && p2pPage.DataContext is ViewModels.Pages.P2PPageViewModel p2pVm)
+        {
+            logContent = p2pVm.LogText ?? string.Empty;
+            pageName = "P2P模式";
+        }
+        else
+        {
+            // 其他页面：读取全局 APPLog.ini
+            string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+            if (File.Exists(logFilePath))
+            {
+                logContent = File.ReadAllText(logFilePath);
+            }
+            pageName = "全局日志";
+        }
+
+        if (string.IsNullOrWhiteSpace(logContent))
+        {
+            logContent = "暂无日志内容";
+        }
+
+        var panel = new RightPage.PanelAiAnalyze(logContent, _aiServerUrl, pageName, _aiTimeoutSeconds);
+        var drawer = await ShowRightDrawerAsync(panel, 420);
+
+        // 绑定关闭事件
+        if (panel.DataContext is ViewModels.RightPage.PanelAiAnalyzeViewModel vm)
+        {
+            vm.CloseRequested += async (s, ev) =>
+            {
+                if (drawer != null)
+                {
+                    var grid = drawer.Content as Grid;
+                    if (grid != null &&
+                        grid.Children.Count > 1 &&
+                        grid.Children[1] is Border border)
+                    {
+                        await CloseRightDrawerAsync(drawer, grid, border, 420);
+                    }
+                }
+            };
+        }
     }
 
     private void button2_Click(object? sender, RoutedEventArgs e)

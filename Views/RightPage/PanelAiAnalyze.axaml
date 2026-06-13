@@ -1,0 +1,400 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MinecraftConnectTool.ViewModels.RightPage"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             xmlns:rp="clr-namespace:MinecraftConnectTool.Views.RightPage"
+             x:Class="MinecraftConnectTool.Views.RightPage.PanelAiAnalyze"
+             x:DataType="vm:PanelAiAnalyzeViewModel"
+             Width="420">
+  <UserControl.Styles>
+    <Style Selector="Button.back-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,4"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.back-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <Style Selector="Button.action-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8"/>
+      <Setter Property="Width" Value="36"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.action-button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+    </Style>
+    <!-- 信息标签样式 -->
+    <Style Selector="Border.info-tag">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceBrush}"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="8,5"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineVariantBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 顶部标题栏 -->
+    <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0">
+      <Button Grid.Column="0"
+              x:Name="BackButton"
+              Classes="back-button"
+              VerticalAlignment="Center"
+              Margin="8,0,0,0"
+              Command="{Binding CloseCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <icons:MaterialIcon Kind="ArrowLeft" Width="16" Height="16" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="Back" FontSize="14" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </StackPanel>
+      </Button>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <icons:MaterialIcon Kind="Sparkles" Width="18" Height="18" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        <TextBlock Text="AI 日志分析" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        <TextBlock Text="{Binding PageName, StringFormat='({0})'}" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Foreground="{DynamicResource MaterialOnSurfaceBrush}" IsVisible="{Binding PageName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+      </StackPanel>
+
+      <Button Grid.Column="2"
+              Classes="action-button"
+              VerticalAlignment="Center"
+              Margin="0,0,4,0"
+              Command="{Binding CopyCommand}"
+              IsVisible="{Binding Result, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+              ToolTip.Tip="复制分析结果">
+        <icons:MaterialIcon Kind="ContentCopy" Width="18" Height="18" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </Button>
+
+      <Button Grid.Column="3"
+              Classes="action-button"
+              VerticalAlignment="Center"
+              Margin="0,0,4,0"
+              Command="{Binding AnalyzeCommand}"
+              IsVisible="{Binding !IsAnalyzing}"
+              ToolTip.Tip="重新分析">
+        <icons:MaterialIcon Kind="Refresh" Width="18" Height="18" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+      </Button>
+    </Grid>
+
+    <!-- 内容区域 -->
+    <Border Grid.Row="1"
+            Background="{DynamicResource MaterialSurfaceBrush}"
+            BorderBrush="{DynamicResource MaterialDividerBrush}"
+            BorderThickness="0,1,0,0">
+      <Grid>
+        <!-- 加载中动画 -->
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsAnalyzing}">
+          <StackPanel Orientation="Vertical" Spacing="16" HorizontalAlignment="Center">
+            <!-- 三颗星星交替旋转 -->
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+              <icons:MaterialIcon Kind="StarFourPoints"
+                                  Width="20" Height="20"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"
+                                  Opacity="0.3">
+                <icons:MaterialIcon.RenderTransform>
+                  <RotateTransform Angle="0" CenterX="10" CenterY="10"/>
+                </icons:MaterialIcon.RenderTransform>
+                <icons:MaterialIcon.Styles>
+                  <Style Selector="icons|MaterialIcon">
+                    <Style.Animations>
+                      <Animation Duration="0:0:0.9" IterationCount="INFINITE">
+                        <KeyFrame Cue="0%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="33%">
+                          <Setter Property="Opacity" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.3"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.3"/>
+                          <Setter Property="RotateTransform.Angle" Value="180"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="66%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="100%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                      </Animation>
+                    </Style.Animations>
+                  </Style>
+                </icons:MaterialIcon.Styles>
+              </icons:MaterialIcon>
+
+              <icons:MaterialIcon Kind="StarFourPoints"
+                                  Width="20" Height="20"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"
+                                  Opacity="0.3">
+                <icons:MaterialIcon.RenderTransform>
+                  <RotateTransform Angle="0" CenterX="10" CenterY="10"/>
+                </icons:MaterialIcon.RenderTransform>
+                <icons:MaterialIcon.Styles>
+                  <Style Selector="icons|MaterialIcon">
+                    <Style.Animations>
+                      <Animation Delay="0:0:0.15" Duration="0:0:0.9" IterationCount="INFINITE">
+                        <KeyFrame Cue="0%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="33%">
+                          <Setter Property="Opacity" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.3"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.3"/>
+                          <Setter Property="RotateTransform.Angle" Value="180"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="66%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="100%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                      </Animation>
+                    </Style.Animations>
+                  </Style>
+                </icons:MaterialIcon.Styles>
+              </icons:MaterialIcon>
+
+              <icons:MaterialIcon Kind="StarFourPoints"
+                                  Width="20" Height="20"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"
+                                  Opacity="0.3">
+                <icons:MaterialIcon.RenderTransform>
+                  <RotateTransform Angle="0" CenterX="10" CenterY="10"/>
+                </icons:MaterialIcon.RenderTransform>
+                <icons:MaterialIcon.Styles>
+                  <Style Selector="icons|MaterialIcon">
+                    <Style.Animations>
+                      <Animation Delay="0:0:0.3" Duration="0:0:0.9" IterationCount="INFINITE">
+                        <KeyFrame Cue="0%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="33%">
+                          <Setter Property="Opacity" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.3"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.3"/>
+                          <Setter Property="RotateTransform.Angle" Value="180"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="66%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="100%">
+                          <Setter Property="Opacity" Value="0.3"/>
+                          <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
+                          <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
+                          <Setter Property="RotateTransform.Angle" Value="360"/>
+                        </KeyFrame>
+                      </Animation>
+                    </Style.Animations>
+                  </Style>
+                </icons:MaterialIcon.Styles>
+              </icons:MaterialIcon>
+            </StackPanel>
+
+            <TextBlock Text="AI 正在分析日志..." FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding PageName, StringFormat='来源: {0}'}" FontSize="12" Opacity="0.5" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </Grid>
+
+        <!-- 错误提示 -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="20" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <icons:MaterialIcon Kind="AlertCircleOutline" Width="48" Height="48" Foreground="{DynamicResource MaterialErrorBrush}"/>
+          <TextBlock Text="{Binding ErrorMessage}" FontSize="14" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource MaterialErrorBrush}"/>
+          <Button Content="重试" Command="{Binding AnalyzeCommand}" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- 分析结果 -->
+        <ScrollViewer IsVisible="{Binding Result, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                      Margin="0,0,0,0">
+          <StackPanel Spacing="0">
+            <!-- 信息标签栏 -->
+            <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                    BorderBrush="{DynamicResource MaterialDividerBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="12,10">
+              <StackPanel Spacing="6">
+                <WrapPanel Orientation="Horizontal">
+                  <!-- 模型 -->
+                  <Border Classes="info-tag" IsVisible="{Binding ModelUsed, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,0,8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <icons:MaterialIcon Kind="Chip" Width="14" Height="14" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                      <TextBlock Text="{Binding ModelUsed}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </Border>
+                  <!-- 输入 tokens -->
+                  <Border Classes="info-tag" IsVisible="{Binding HasTokenInfo}" Margin="0,0,8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <icons:MaterialIcon Kind="ArrowCollapseLeft" Width="14" Height="14" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                      <TextBlock Text="{Binding InputTokens, StringFormat='输入token: {0}'}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </Border>
+                  <!-- 输出 tokens -->
+                  <Border Classes="info-tag" IsVisible="{Binding HasTokenInfo}" Margin="0,0,8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <icons:MaterialIcon Kind="ArrowCollapseRight" Width="14" Height="14" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                      <TextBlock Text="{Binding OutputTokens, StringFormat='输出token: {0}'}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </Border>
+                  <!-- 分析完成 -->
+                  <Border Classes="info-tag" IsVisible="{Binding !IsAnalyzing}" Margin="0,0,8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <icons:MaterialIcon Kind="CheckCircle" Width="14" Height="14" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                      <TextBlock Text="分析完成" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </Border>
+                  <!-- 用时 -->
+                  <Border Classes="info-tag" IsVisible="{Binding ElapsedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,0,0,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <icons:MaterialIcon Kind="TimerOutline" Width="14" Height="14" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                      <TextBlock Text="{Binding ElapsedText, StringFormat='用时: {0}'}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </Border>
+                </WrapPanel>
+                <!-- AI 生成提示 -->
+                <StackPanel Orientation="Horizontal" Spacing="4" Opacity="0.7">
+                  <icons:MaterialIcon Kind="InformationOutline" Width="12" Height="12" Foreground="{DynamicResource MaterialOnSurfaceBrush}" VerticalAlignment="Center"/>
+                  <TextBlock Text="AI 生成，仅供参考" FontSize="11" Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- 分区卡片列表 -->
+            <ItemsControl ItemsSource="{Binding Sections}" Margin="12,12,12,0">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="12"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:AiSection">
+                  <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                          CornerRadius="12"
+                          Padding="16"
+                          BorderBrush="{DynamicResource MaterialOutlineVariantBrush}"
+                          BorderThickness="1">
+                    <StackPanel Spacing="10">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Border Width="4" Height="16" CornerRadius="2" Background="{DynamicResource MaterialPrimaryBrush}"/>
+                        <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource MaterialPrimaryBrush}" VerticalAlignment="Center"/>
+                      </StackPanel>
+                      <ItemsControl ItemsSource="{Binding Blocks}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ContentBlock">
+                            <StackPanel Spacing="2">
+                              <!-- 普通文本 -->
+                              <rp:FormattedTextBlock MarkdownText="{Binding Text}"
+                                                     IsVisible="{Binding IsText}"
+                                                     FontSize="13"
+                                                     TextWrapping="Wrap"
+                                                     LineHeight="22"
+                                                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                              <!-- 列表 -->
+                              <ItemsControl ItemsSource="{Binding ListItems}"
+                                            IsVisible="{Binding IsList}">
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate>
+                                    <rp:FormattedTextBlock MarkdownText="{Binding}"
+                                                           FontSize="13"
+                                                           TextWrapping="Wrap"
+                                                           LineHeight="22"
+                                                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                              <!-- 表格 -->
+                              <Border IsVisible="{Binding IsTable}"
+                                      Background="{DynamicResource MaterialSurfaceBrush}"
+                                      CornerRadius="8"
+                                      BorderBrush="{DynamicResource MaterialOutlineVariantBrush}"
+                                      BorderThickness="1"
+                                      Margin="0,4">
+                                <ItemsControl ItemsSource="{Binding TableLines}">
+                                  <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TableLine">
+                                      <ItemsControl ItemsSource="{Binding Cells}">
+                                        <ItemsControl.ItemsPanel>
+                                          <ItemsPanelTemplate>
+                                            <UniformGrid Columns="{Binding ColumnCount}"/>
+                                          </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                          <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource MaterialOutlineVariantBrush}"
+                                                    BorderThickness="0,0,1,1"
+                                                    Padding="8,5">
+                                              <TextBlock Text="{Binding}"
+                                                         TextWrapping="Wrap"
+                                                         FontSize="12"
+                                                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                                            </Border>
+                                          </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                      </ItemsControl>
+                                    </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                              </Border>
+                            </StackPanel>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- 思考过程（折叠，放最下面） -->
+            <Border IsVisible="{Binding HasReasoning}"
+                    Margin="12,12,12,12"
+                    Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                    CornerRadius="12"
+                    BorderBrush="{DynamicResource MaterialOutlineVariantBrush}"
+                    BorderThickness="1">
+              <Expander IsExpanded="{Binding IsReasoningExpanded}"
+                        HorizontalAlignment="Stretch">
+                <Expander.Header>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <icons:MaterialIcon Kind="Brain" Width="16" Height="16" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+                    <TextBlock Text="思考过程" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource MaterialOnSurfaceBrush}" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Expander.Header>
+                <TextBlock Text="{Binding ReasoningContent}"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           LineHeight="20"
+                           Opacity="0.8"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                           Margin="8,4,8,12"/>
+              </Expander>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

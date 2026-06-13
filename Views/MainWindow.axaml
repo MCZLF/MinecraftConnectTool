@@ -286,6 +286,18 @@
                   Orientation="Horizontal" 
                   VerticalAlignment="Top"
                   Height="40">
+        <!-- buttonAI: AI 按钮 -->
+        <Button x:Name="buttonAI"
+                Classes="window-control"
+                Width="50" 
+                Height="40"
+                IsVisible="False"
+                Click="buttonAI_Click">
+          <icons:MaterialIcon Kind="Sparkles" 
+                              Width="16" 
+                              Height="16"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Button>
         <!-- button2: 云公告按钮 (默认隐藏) -->
         <Button x:Name="button2"
                 Classes="window-control"

@@ -73,6 +73,9 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/Pages/UpdatePage.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelAiAnalyze.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelAlert.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
@@ -80,4 +83,7 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelPlayerManager.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/MCZLFVisualStudio/0.0.7/MinecraftConnectTool/Views/RightPage/PanelThanks.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

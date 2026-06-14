@@ -17,10 +17,14 @@ public partial class P2PPage : UserControl
         DataContext = _viewModel;
         
         // 订阅日志变化事件，自动滚动到底部
-        if (_viewModel != null)
+        _viewModel.LogTextChanged += OnLogTextChanged;
+        _viewModel.OpenPlayerManagerRequested += OnOpenPlayerManagerRequested;
+        
+        // 绑定复制按钮点击事件（必须在 _viewModel 初始化之后）
+        var copyButton = this.FindControl<Button>("CopyButton");
+        if (copyButton != null)
         {
-            _viewModel.LogTextChanged += OnLogTextChanged;
-            _viewModel.OpenPlayerManagerRequested += OnOpenPlayerManagerRequested;
+            copyButton.Click += async (s, e) => await _viewModel.CopyInfoCommand.ExecuteAsync(null);
         }
     }
 
@@ -28,13 +32,6 @@ public partial class P2PPage : UserControl
     {
         AvaloniaXamlLoader.Load(this);
         _logScrollViewer = this.FindControl<ScrollViewer>("LogScrollViewer");
-        
-        // 绑定复制按钮点击事件
-        var copyButton = this.FindControl<Button>("CopyButton");
-        if (copyButton != null && _viewModel != null)
-        {
-            copyButton.Click += (s, e) => _viewModel.CopyInfoCommand.Execute(null);
-        }
     }
 
     /// <summary>

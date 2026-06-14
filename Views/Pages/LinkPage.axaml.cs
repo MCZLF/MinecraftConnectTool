@@ -30,6 +30,13 @@ public partial class LinkPage : UserControl
         // 订阅打开玩家管理面板事件
         _viewModel.OpenPlayerManagerRequested += OnOpenPlayerManagerRequested;
 
+        // 绑定复制按钮点击事件（必须在 _viewModel 初始化之后）
+        var copyButton = this.FindControl<Button>("CopyButton");
+        if (copyButton != null)
+        {
+            copyButton.Click += async (s, e) => await _viewModel.CopyPromptCodeAsync();
+        }
+
         // 控件卸载时取消订阅
         Unloaded += (s, e) =>
         {
@@ -64,13 +71,6 @@ public partial class LinkPage : UserControl
                     });
                 }
             };
-        }
-        
-        // 绑定复制按钮点击事件
-        var copyButton = this.FindControl<Button>("CopyButton");
-        if (copyButton != null && _viewModel != null)
-        {
-            copyButton.Click += async (s, e) => await _viewModel.CopyPromptCodeAsync();
         }
     }
 

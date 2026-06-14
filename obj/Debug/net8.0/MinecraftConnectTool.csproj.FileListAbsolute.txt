@@ -908,8 +908,6 @@ D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\build_test13\runtimes\osx\native
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\build_test13\runtimes\win-arm64\native\libSkiaSharp.dll
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\build_test13\runtimes\win-x64\native\libSkiaSharp.dll
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\build_test13\runtimes\win-x86\native\libSkiaSharp.dll
-D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\MinecraftConnectTool.csproj.AssemblyReference.cache
-D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\Avalonia\Resources.Inputs.cache
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\MinecraftConnectTool.exe
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\MinecraftConnectTool.deps.json
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\MinecraftConnectTool.runtimeconfig.json
@@ -980,6 +978,8 @@ D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\runtimes\osx\na
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\runtimes\win-arm64\native\libSkiaSharp.dll
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\runtimes\win-x64\native\libSkiaSharp.dll
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\bin\Debug\net8.0\runtimes\win-x86\native\libSkiaSharp.dll
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\MinecraftConnectTool.csproj.AssemblyReference.cache
+D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\Avalonia\Resources.Inputs.cache
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\Avalonia\resources
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\MinecraftConnectTool.GeneratedMSBuildEditorConfig.editorconfig
 D:\MCZLFVisualStudio\0.0.7\MinecraftConnectTool\obj\Debug\net8.0\MinecraftConnectTool.AssemblyInfoInputs.cache

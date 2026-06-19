@@ -885,6 +885,16 @@ public partial class MainWindow : Window
         
         if (line1 != null) line1.Text = WatermarkText;
         if (line2 != null) line2.Text = "若遇到问题请及时反馈ISSUE或Q群内";
+
+        // 双击水印区域打开链接
+        watermarkBorder.DoubleTapped += (s, e) =>
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://www.bilibili.com/video/BV1GJ411x7h7") { UseShellExecute = true });
+            }
+            catch { }
+        };
     }
 
     private void SetupWindowForPlatform()

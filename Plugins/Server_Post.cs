@@ -83,9 +83,6 @@ namespace MinecraftConnectTool
                 {
                     TcpClient client = server.AcceptTcpClient();
                     Console.WriteLine("Connected!");
-
-                    // 处理客户端连接的独立线程或任务
-                    // 使用异步方式可以提高性能，这里使用同步方式演示
                     HandleClient(client, mbpost);
                 }
             }

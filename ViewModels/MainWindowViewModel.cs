@@ -122,6 +122,23 @@ public partial class MainWindowViewModel : ViewModelBase
                 }
             }
         }
+        else if (P2PStateService.CurrentMode == CoreMode.ET)
+        {
+            // 停止ET核心 - 通过获取当前页面来执行停止
+            if (CurrentPage is ETPage etPage && etPage.DataContext is ETPageViewModel etVm)
+            {
+                await etVm.StopET();
+            }
+            else
+            {
+                // 如果当前不在ET页面，尝试从缓存获取
+                var etPageFromCache = _pageCacheService.GetOrCreatePage("ET", () => new ETPage());
+                if (etPageFromCache?.DataContext is ETPageViewModel etVmCached)
+                {
+                    await etVmCached.StopET();
+                }
+            }
+        }
         else
         {
             // 停止P2P核心 - 通过获取当前页面来执行停止
@@ -143,9 +160,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void UpdateStopButtonToolTip()
     {
-        StopButtonToolTip = P2PStateService.CurrentMode == CoreMode.Link
-            ? "关闭Link核心"
-            : "关闭P2P核心";
+        StopButtonToolTip = P2PStateService.CurrentMode switch
+        {
+            CoreMode.Link => "关闭Link核心",
+            CoreMode.ET => "关闭ET核心",
+            _ => "关闭P2P核心"
+        };
     }
 
     private void InitializeNavigationItems()

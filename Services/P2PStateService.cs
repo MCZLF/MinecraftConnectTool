@@ -9,7 +9,8 @@ public enum CoreMode
 {
     None,
     P2P,
-    Link
+    Link,
+    ET
 }
 
 /// <summary>

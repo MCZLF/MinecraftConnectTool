@@ -8,6 +8,62 @@ using MinecraftConnectTool.ViewModels.Pages;
 namespace MinecraftConnectTool.Converters;
 
 /// <summary>
+/// ET模式指示灯状态转换为背景色
+/// </summary>
+public class ETBadgeStateToBrushConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is ETPageViewModel.BadgeState state)
+        {
+            return state switch
+            {
+                ETPageViewModel.BadgeState.Success => new SolidColorBrush(Color.Parse("#4CAF50")),
+                ETPageViewModel.BadgeState.Waiting => new SolidColorBrush(Color.Parse("#dfc092")),
+                ETPageViewModel.BadgeState.Warning => new SolidColorBrush(Color.Parse("#FF9800")),
+                ETPageViewModel.BadgeState.Error => new SolidColorBrush(Color.Parse("#F44336")),
+                ETPageViewModel.BadgeState.Info => new SolidColorBrush(Color.Parse("#2196F3")),
+                _ => new SolidColorBrush(Color.Parse("#9E9E9E"))
+            };
+        }
+        return new SolidColorBrush(Color.Parse("#9E9E9E"));
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// ET模式指示灯状态转换为图标
+/// </summary>
+public class ETBadgeStateToIconConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is ETPageViewModel.BadgeState state)
+        {
+            return state switch
+            {
+                ETPageViewModel.BadgeState.Success => MaterialIconKind.CheckCircle,
+                ETPageViewModel.BadgeState.Waiting => MaterialIconKind.ProgressClock,
+                ETPageViewModel.BadgeState.Warning => MaterialIconKind.Alert,
+                ETPageViewModel.BadgeState.Error => MaterialIconKind.CloseCircle,
+                ETPageViewModel.BadgeState.Info => MaterialIconKind.InformationCircle,
+                _ => MaterialIconKind.InformationCircle
+            };
+        }
+        return MaterialIconKind.InformationCircle;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
 /// 指示灯状态转换为背景色
 /// </summary>
 public class BadgeStateToBrushConverter : IValueConverter

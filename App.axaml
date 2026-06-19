@@ -60,6 +60,8 @@
     <!-- 指示灯状态转换器 -->
     <converters:BadgeStateToBrushConverter x:Key="BadgeStateToBrushConverter"/>
     <converters:BadgeStateToIconConverter x:Key="BadgeStateToIconConverter"/>
+    <converters:ETBadgeStateToBrushConverter x:Key="ETBadgeStateToBrushConverter"/>
+    <converters:ETBadgeStateToIconConverter x:Key="ETBadgeStateToIconConverter"/>
 
     <!-- 整数到布尔值转换器 -->
     <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>

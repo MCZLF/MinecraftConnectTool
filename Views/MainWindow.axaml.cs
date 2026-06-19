@@ -796,6 +796,16 @@ public partial class MainWindow : Window
             Debug.WriteLine($"停止多播服务异常: {ex.Message}");
         }
 
+        // 停止ET核心
+        try
+        {
+            _ = ETModeService.Instance.StopETAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"停止ET核心异常: {ex.Message}");
+        }
+
         // 释放内存监控服务
         _memoryMonitorService?.Dispose();
     }
@@ -825,6 +835,11 @@ public partial class MainWindow : Window
         {
             // Link模式 - 通过事件通知Link页面停止
             LinkStopRequested?.Invoke(this, EventArgs.Empty);
+        }
+        else if (P2PStateService.CurrentMode == CoreMode.ET)
+        {
+            // ET模式
+            _ = ETModeService.Instance.StopETAsync();
         }
         else
         {
@@ -1316,6 +1331,11 @@ public partial class MainWindow : Window
             logContent = p2pVm.LogText ?? string.Empty;
             pageName = "P2P模式";
         }
+        else if (_viewModel?.CurrentPage is Pages.ETPage etPage && etPage.DataContext is ViewModels.Pages.ETPageViewModel etVm)
+        {
+            logContent = etVm.LogText ?? string.Empty;
+            pageName = "ET模式";
+        }
         else
         {
             // 其他页面：读取全局 APPLog.ini
@@ -1538,6 +1558,26 @@ public partial class MainWindow : Window
 
         // 绑定关闭事件
         panelPlayerManager.CloseRequested += async (s, e) =>
+        {
+            if (drawerWindow.Content is Grid grid &&
+                grid.Children.Count > 1 &&
+                grid.Children[1] is Border border)
+            {
+                await CloseRightDrawerAsync(drawerWindow, grid, border, 380);
+            }
+        };
+    }
+
+    /// <summary>
+    /// 显示ET房间列表面板ETRoomList
+    /// </summary>
+    public async Task ShowETRoomListAsync()
+    {
+        var etRoomList = new RightPage.ETRoomList();
+        var drawerWindow = await ShowRightDrawerAsync(etRoomList, 380);
+
+        // 绑定关闭事件
+        etRoomList.CloseRequested += async (s, e) =>
         {
             if (drawerWindow.Content is Grid grid &&
                 grid.Children.Count > 1 &&

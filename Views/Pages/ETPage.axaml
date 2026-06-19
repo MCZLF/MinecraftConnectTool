@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
              xmlns:icons="using:Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="700"
              x:Class="MinecraftConnectTool.Views.Pages.ETPage"
              x:DataType="vm:ETPageViewModel">
 
@@ -12,86 +12,339 @@
     <vm:ETPageViewModel />
   </Design.DataContext>
 
-  <Grid>
-    <ScrollViewer>
-      <StackPanel Margin="32" Spacing="24">
-        <!-- 标题区域 -->
-        <StackPanel Spacing="8">
-          <TextBlock Text="ET"
-                     FontSize="32"
-                     FontWeight="Bold"
-                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
-          <TextBlock Text="基于EasyTier的联机模式，目前正在开发"
-                     FontSize="16"
-                     Opacity="0.7"
-                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
-        </StackPanel>
+  <UserControl.Styles>
+    <Style Selector="Button.pill">
+      <Setter Property="CornerRadius" Value="24"/>
+    </Style>
+  </UserControl.Styles>
 
-        <!-- 状态卡片 -->
-        <Border Background="{DynamicResource MaterialSurfaceBrush}"
-                CornerRadius="16"
-                Padding="24">
-          <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
-            <Border Grid.Column="0"
-                    Background="{DynamicResource MaterialPrimaryContainerBrush}"
-                    CornerRadius="12"
-                    Width="56"
-                    Height="56"
-                    Margin="0,0,16,0">
-              <icons:MaterialIcon Kind="CodeBraces"
-                                  Width="28"
-                                  Height="28"
-                                  Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"
-                                  HorizontalAlignment="Center"
+  <Grid Margin="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- 顶部区域：标题 -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 标题区域 -->
+      <StackPanel Grid.Column="0" Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <icons:MaterialIcon Kind="LanConnect"
+                              Width="32"
+                              Height="32"
+                              Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="ET 模式"
+                     FontSize="28"
+                     FontWeight="Bold"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <!-- 状态指示灯 -->
+          <Border IsVisible="{Binding IsStatusBadgeVisible}"
+                  Background="{Binding StatusBadgeState, Converter={StaticResource ETBadgeStateToBrushConverter}}"
+                  CornerRadius="4"
+                  Padding="6,2"
+                  Margin="12,0,0,0"
+                  VerticalAlignment="Center"
+                  MaxWidth="300">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <icons:MaterialIcon Kind="{Binding StatusBadgeState, Converter={StaticResource ETBadgeStateToIconConverter}}"
+                                  Width="14"
+                                  Height="14"
+                                  Foreground="{DynamicResource MaterialOnPrimaryBrush}"
                                   VerticalAlignment="Center"/>
-            </Border>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-              <TextBlock Text="{Binding PageText}"
-                         FontSize="18"
+              <TextBlock Text="{Binding StatusBadgeText}"
+                         FontSize="11"
                          FontWeight="Medium"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="{Binding StatusText}"
-                         FontSize="14"
-                         Opacity="0.7"
-                         Margin="0,4,0,0"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                         Foreground="{DynamicResource MaterialOnPrimaryBrush}"
+                         VerticalAlignment="Center"
+                         TextTrimming="CharacterEllipsis"
+                         ToolTip.Tip="{Binding StatusBadgeText}"/>
             </StackPanel>
-          </Grid>
+          </Border>
+        </StackPanel>
+        <TextBlock Text="基于 EasyTier + Scaffolding 协议的联机模式"
+                   FontSize="14"
+                   Opacity="0.7"
+                   Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+      </StackPanel>
+
+      <!-- 右上角：平台标签 + 房间管理 -->
+      <StackPanel Grid.Column="1"
+                  Orientation="Horizontal"
+                  Spacing="12"
+                  VerticalAlignment="Top">
+        <!-- 平台支持标签 -->
+        <Border Background="{DynamicResource MaterialTertiaryContainerBrush}"
+                CornerRadius="8"
+                Padding="10,6"
+                VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <icons:MaterialIcon Kind="DesktopTower"
+                                Width="16"
+                                Height="16"
+                                Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
+            <TextBlock Text="Win / Linux / Mac"
+                       FontSize="12"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
         </Border>
 
-        <!-- 占位内容 -->
+        <!-- 房间管理按钮 -->
+        <Button Content="房间管理"
+                Height="40"
+                VerticalAlignment="Center"
+                Command="{Binding OpenPlayerManagerCommand}"
+                IsVisible="{Binding IsETRunningForPanel}">
+          <Button.ContentTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <icons:MaterialIcon Kind="AccountGroup" Width="18" Height="18"/>
+                <TextBlock Text="房间管理" VerticalAlignment="Center"/>
+              </StackPanel>
+            </DataTemplate>
+          </Button.ContentTemplate>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- 信息栏：提示码/加入地址 -->
+    <Grid Grid.Row="1" Margin="0,0,0,16">
+      <TextBlock Text="使用 EasyTier 的去中心化虚拟网络进行联机"
+                 FontSize="16"
+                 FontWeight="Medium"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+
+      <ProgressBar Value="{Binding ProgressValue}"
+                   Maximum="100"
+                   IsVisible="{Binding IsProgressVisible}"
+                   Height="4"
+                   Margin="0,24,0,0"
+                   VerticalAlignment="Top"
+                   IsIndeterminate="False">
+        <ProgressBar.Transitions>
+          <Transitions>
+            <DoubleTransition Property="Value" Duration="0:0:0.3"/>
+          </Transitions>
+        </ProgressBar.Transitions>
+      </ProgressBar>
+
+      <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="12"
+              Padding="16"
+              IsVisible="{Binding IsAlertVisible}"
+              ZIndex="1">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <icons:MaterialIcon Grid.Column="0"
+                              Kind="Information"
+                              Width="24"
+                              Height="24"
+                              Margin="0,0,12,0"
+                              Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Grid.Column="1"
+                     Text="{Binding AlertText}"
+                     VerticalAlignment="Center"
+                     FontSize="16"
+                     FontWeight="Medium"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <Button Grid.Column="2"
+                  Command="{Binding CopyInfoCommand}"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  Padding="8,4"
+                  Margin="12,0,0,0">
+            <TextBlock Text="复制"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </Button>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- 主内容区域 -->
+    <Grid Grid.Row="2" Margin="0,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="320" MinWidth="280" MaxWidth="400"/>
+        <ColumnDefinition Width="*" MinWidth="300"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 左侧操作面板 -->
+      <StackPanel Grid.Column="0" Spacing="16">
+        <!-- 开启联机房间 -->
         <Border Background="{DynamicResource MaterialSurfaceBrush}"
                 CornerRadius="16"
-                Padding="32"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-          <StackPanel Spacing="16" HorizontalAlignment="Center">
-            <icons:MaterialIcon Kind="CodeBraces"
-                                Width="64"
-                                Height="64"
-                                Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"
-                                Opacity="0.5"/>
-            <TextBlock Text="ET 功能开发中..."
-                       FontSize="20"
-                       HorizontalAlignment="Center"
-                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            <TextBlock Text="基于EasyTier的联机模式"
-                       FontSize="14"
-                       Opacity="0.6"
-                       HorizontalAlignment="Center"
-                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                Padding="20">
+          <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="LanConnect"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="开启联机房间"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <Button Content="开启联机房间"
+                    Command="{Binding OpenRoomCommand}"
+                    Height="48"
+                    Classes="pill"
+                    HorizontalAlignment="Stretch">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <icons:MaterialIcon Kind="Play" Width="20" Height="20"/>
+                    <TextBlock Text="开启联机房间" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
+          </StackPanel>
+        </Border>
+
+        <!-- 加入联机房间 -->
+        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                CornerRadius="16"
+                Padding="20">
+          <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="Key"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+              <TextBlock Text="加入联机房间"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+
+            <!-- 提示码输入 -->
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <icons:MaterialIcon Grid.Column="0" Kind="Key" Width="20" Height="20" Margin="12,0,8,0" Foreground="{DynamicResource MaterialOnSurfaceBrush}" VerticalAlignment="Center"/>
+              <TextBox Grid.Column="1"
+                       Text="{Binding JoinPromptCode}"
+                       Watermark="输入提示码 (U/XXXX-XXXX-XXXX-XXXX)"
+                       Height="44"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"
+                       BorderBrush="{DynamicResource MaterialOutlineBrush}"
+                       BorderThickness="0,0,0,1"
+                       Background="Transparent"/>
+            </Grid>
+
+            <Button Content="加入联机房间"
+                    Command="{Binding JoinRoomCommand}"
+                    Height="48"
+                    Classes="pill"
+                    HorizontalAlignment="Stretch">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <icons:MaterialIcon Kind="Login" Width="20" Height="20"/>
+                    <TextBlock Text="加入联机房间" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
           </StackPanel>
         </Border>
       </StackPanel>
-    </ScrollViewer>
 
-    <!-- 左下角提示 -->
-    <TextBlock Text="EasyTier有点麻烦,估计没那么快上"
-               FontSize="12"
-               Opacity="0.5"
-               Foreground="{DynamicResource MaterialOnSurfaceBrush}"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Bottom"
-               Margin="32,0,0,16"/>
+      <!-- 右侧日志区域 -->
+      <Border Grid.Column="1"
+              Background="{DynamicResource MaterialSurfaceBrush}"
+              CornerRadius="16"
+              Padding="20"
+              Margin="20,0,0,5">
+        <Grid RowDefinitions="Auto,*">
+          <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="8">
+              <icons:MaterialIcon Kind="TextBox"
+                                  Width="24"
+                                  Height="24"
+                                  Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="运行日志"
+                         FontSize="18"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="复制日志"
+                    Command="{Binding CopyLogCommand}"
+                    Theme="{DynamicResource MaterialFlatButtonTheme}"
+                    Foreground="{DynamicResource MaterialOnSurfaceBrush}">
+              <Button.ContentTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <icons:MaterialIcon Kind="ContentCopy" Width="16" Height="16"/>
+                    <TextBlock Text="复制日志" VerticalAlignment="Center" FontSize="13"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Button.ContentTemplate>
+            </Button>
+          </Grid>
+
+          <Border Grid.Row="1"
+                  Background="{DynamicResource MaterialBackgroundBrush}"
+                  CornerRadius="12"
+                  Padding="16">
+            <ScrollViewer x:Name="LogScrollViewer"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+              <TextBlock Text="{Binding LogText}"
+                         FontFamily="Consolas, monospace"
+                         FontSize="13"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+            </ScrollViewer>
+          </Border>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- 底部区域 -->
+    <Grid Grid.Row="3" Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+        <icons:MaterialIcon Kind="Alert"
+                            Width="18"
+                            Height="18"
+                            Opacity="0.7"
+                            Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+        <TextBlock Text="ET模式基于EasyTier去中心化网络，请勿多开核心! 请确保防火墙已放行"
+                   FontSize="12"
+                   Opacity="0.7"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource MaterialOnSurfaceVariantBrush}"/>
+      </StackPanel>
+    </Grid>
   </Grid>
 </UserControl>

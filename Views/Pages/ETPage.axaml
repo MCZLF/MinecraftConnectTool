@@ -36,11 +36,11 @@
       <!-- 标题区域 -->
       <StackPanel Grid.Column="0" Spacing="8">
         <StackPanel Orientation="Horizontal" Spacing="12">
-          <icons:MaterialIcon Kind="LanConnect"
+          <icons:MaterialIcon Kind="CodeBraces"
                               Width="32"
                               Height="32"
                               Foreground="{DynamicResource MaterialPrimaryBrush}"/>
-          <TextBlock Text="ET 模式"
+          <TextBlock Text="ET 模式(测试)"
                      FontSize="28"
                      FontWeight="Bold"
                      VerticalAlignment="Center"

@@ -103,6 +103,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         _etService.PlayerListUpdated += OnPlayerListUpdated;
         _etService.StatusChanged += OnStatusChanged;
         _etService.ErrorOccurred += OnErrorOccurred;
+        _etService.NodesFetched += OnNodesFetched;
 
         P2PStateService.StateChanged += OnP2PStateChanged;
 
@@ -245,6 +246,25 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         AddLog($"错误: {error}");
     }
 
+    private async void OnNodesFetched(object? sender, IReadOnlyList<string> nodes)
+    {
+        if (!Views.MainWindow.EnableETNodeList) return;
+        try
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var mainWindow = desktop.MainWindow;
+                if (mainWindow != null)
+                {
+                    var nodeText = string.Join("\n", nodes);
+                    await ExtensionUI.MD3MessageDialog.ShowAsync(mainWindow, $"已获取 {nodes.Count} 个公共节点：\n\n{nodeText}", "公共节点列表", Material.Icons.MaterialIconKind.ServerNetwork);
+                }
+            }
+        }
+        catch { }
+    }
+
     #endregion
 
     #region 命令
@@ -282,6 +302,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         CanStopET = true;
         IsETRunning = true;
         IsETRunningForPanel = true;
+        P2PStateService.SetRunning(true, CoreMode.ET);
 
         var success = await _etService.StartHostAsync(port, playerName);
         if (!success)
@@ -292,6 +313,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             CanStopET = false;
             IsProgressVisible = false;
             ProgressValue = 0;
+            P2PStateService.SetRunning(false);
             AddLog("创建房间失败");
         }
     }
@@ -316,6 +338,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         CanStopET = true;
         IsETRunning = true;
         IsETRunningForPanel = true;
+        P2PStateService.SetRunning(true, CoreMode.ET);
 
         AddLog("=== 开始加入 ET 联机房间 ===");
         AddLog($"提示码: {JoinPromptCode}");
@@ -328,6 +351,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             CanStopET = false;
             IsProgressVisible = false;
             ProgressValue = 0;
+            P2PStateService.SetRunning(false);
             AddLog("加入房间失败");
         }
     }
@@ -476,6 +500,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         _etService.PlayerListUpdated -= OnPlayerListUpdated;
         _etService.StatusChanged -= OnStatusChanged;
         _etService.ErrorOccurred -= OnErrorOccurred;
+        _etService.NodesFetched -= OnNodesFetched;
         P2PStateService.StateChanged -= OnP2PStateChanged;
 
         _etService.Dispose();

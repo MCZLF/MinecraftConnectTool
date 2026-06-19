@@ -36,12 +36,14 @@ public partial class MainWindow : Window
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
 
     // 全局水印配置
-    public static readonly bool EnableWatermark = false;
-    public static readonly string WatermarkText = "这是一个预览版本🤔";
+    public static readonly bool EnableWatermark = true;
+    public static readonly string WatermarkText = "ET模式测试版本🤔";
 
     // 初次启动向导配置
     public static readonly bool EnableFirstLaunchWizard = true;
     
+    // ET是否显示公共节点列表
+    public static readonly bool EnableETNodeList = false;
     
     // 复用的JsonSerializerOptions
     private static readonly JsonSerializerOptions JsonOptions = new()

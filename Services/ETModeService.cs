@@ -24,26 +24,6 @@ namespace MinecraftConnectTool.Services;
 
 // ============ 模型定义 ============
 
-// ============ 公共节点 API 模型 ============
-
-internal record PublicNodeDto
-{
-    [JsonPropertyName("success")] public bool IsSuccess { get; init; }
-    [JsonPropertyName("data")] public PublicNodeDataDto? Data { get; init; }
-}
-
-internal record PublicNodeDataDto
-{
-    [JsonPropertyName("items")] public IReadOnlyList<PublicNodeItemDto>? Items { get; init; }
-}
-
-internal record PublicNodeItemDto
-{
-    [JsonPropertyName("address")] public string Host { get; init; } = "";
-    [JsonPropertyName("allow_relay")] public bool IsAllowRelay { get; init; }
-    [JsonPropertyName("is_active")] public bool IsActive { get; init; }
-}
-
 // ============ ruixuan.online 监控 API 模型 ============
 
 internal record RuixuanStatusDto
@@ -64,7 +44,7 @@ internal record RuixuanMonitorDto
     [JsonPropertyName("type")] public string? Type { get; init; }
 }
 
-public enum ETCoreState { Stopped, Running, Ready }
+public enum ETCoreState { Stopped, Starting, Running, Ready }
 
 public enum ETConnectionType { Local, P2P, Relay, Unknown }
 
@@ -568,6 +548,7 @@ public class ETModeService : IDisposable
     private static bool IsLinux => OperatingSystem.IsLinux();
     private static bool IsMacOS => OperatingSystem.IsMacOS();
     private static bool IsArm64 => RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
+    private static bool IsX86 => RuntimeInformation.ProcessArchitecture == Architecture.X86;
 
     // EasyTier 版本和路径
     private const string ETVersion = "2.6.4";
@@ -581,46 +562,29 @@ public class ETModeService : IDisposable
         get
         {
             string os, arch;
-            if (IsWindows) { os = "windows"; arch = IsArm64 ? "arm64" : "x86_64"; }
-            else if (IsLinux) { os = "linux"; arch = IsArm64 ? "aarch64" : "x86_64"; }
-            else if (IsMacOS) { os = "macos"; arch = IsArm64 ? "aarch64" : "x86_64"; }
+            if (IsWindows) { os = "windows"; arch = IsArm64 ? "arm64" : IsX86 ? "i686" : "x86_64"; }
+            else if (IsLinux) { os = "linux"; arch = IsArm64 ? "aarch64" : IsX86 ? "i686" : "x86_64"; }
+            else if (IsMacOS) { os = "macos"; arch = IsArm64 ? "aarch64" : IsX86 ? "i686" : "x86_64"; }
             else throw new PlatformNotSupportedException();
-            return $"https://v6.gh-proxy.org/https://github.com/EasyTier/EasyTier/releases/download/v{ETVersion}/easytier-{os}-{arch}-v{ETVersion}.zip";
+            return $"https://mczlf.loft.games/API/ET/easytier-{os}-{arch}-v{ETVersion}.zip";
         }
     }
 
     // 公共节点获取
-    private const string PublicNodeApiUrl = "https://uptime.easytier.cn/api/nodes?page=1&per_page=50&is_active=true";
     private const string RuixuanApiUrl = "https://ruixuan.online/uptime/api/status-page/easytier";
-    private static readonly string[] FallbackNodes =
+    private const string FallbackApiUrl = "https://api.mct.mczlf.loft.games/007/ETFullBack";
+    private static readonly string[] HardcodedFallbackNodes =
     [
-        "tcp://et1.fuis.top:11010",
         "tcp://225284.xyz:11010"
     ];
 
     private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
-    private static readonly Regex NodeUrlRegex = new(@"((tcp|udp|wss?)://[^\s（(]+:\d+)", RegexOptions.Compiled);
+    private static readonly Regex NodeUrlRegex = new(@"((tcp|udp|wss?)://[^\s（(]+(?::\d+)?)", RegexOptions.Compiled);
 
-    private static async Task<List<string>> FetchPublicNodesAsync()
+    private async Task<List<string>> FetchPublicNodesAsync()
     {
         var result = new List<string>();
-
-        // 1. 尝试 uptime.easytier.cn API
-        try
-        {
-            var response = await _httpClient.GetStringAsync(PublicNodeApiUrl);
-            var dto = JsonSerializer.Deserialize<PublicNodeDto>(response);
-            if (dto is { IsSuccess: true, Data.Items: not null })
-            {
-                result.AddRange(dto.Data.Items
-                    .Where(it => it is { IsActive: true, IsAllowRelay: true })
-                    .Where(it => !it.Host.Contains('*'))
-                    .Select(it => it.Host));
-            }
-        }
-        catch { }
-
-        // 2. 尝试 ruixuan.online 监控 API（仅国内节点）
+        //尝试 ruixuan.online 监控 API（仅国内节点）
         try
         {
             var response = await _httpClient.GetStringAsync(RuixuanApiUrl);
@@ -655,15 +619,29 @@ public class ETModeService : IDisposable
         }
         catch { }
 
-        // 3. 补充 fallback 节点（仅国内）
-        foreach (var node in FallbackNodes)
+        //补充 fallback 节点
+        var fallbackNodes = new List<string>();
+        // 优先从远程 API 获取
+        try
+        {
+            var response = await _httpClient.GetStringAsync(FallbackApiUrl);
+            var lines = response.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            fallbackNodes.AddRange(lines.Where(l => !string.IsNullOrWhiteSpace(l)));
+            Log("[SUCCESS]获取远程FullBack配置成功");
+        }
+        catch
+        {
+            // API 获取失败，使用硬编码节点
+            Log("[ERROR]获取远程FullBack配置失败");
+            fallbackNodes.AddRange(HardcodedFallbackNodes);
+        }
+
+        foreach (var node in fallbackNodes)
         {
             if (!result.Contains(node))
                 result.Add(node);
         }
-
-        // 过滤掉所有含 * 的节点（以防万一）
-        result = result.Where(n => !n.Contains('*')).ToList();
+        result = result.Where(n => !n.Contains('*')).ToList();//过滤不完整的节点
 
         return result;
     }
@@ -699,6 +677,7 @@ public class ETModeService : IDisposable
     public event EventHandler<IReadOnlyList<ScfPlayerProfile>>? ScfPlayersUpdated;
     public event EventHandler<string>? StatusChanged;
     public event EventHandler<string>? ErrorOccurred;
+    public event EventHandler<IReadOnlyList<string>>? NodesFetched;
 
     /// <summary>
     /// 当前 SCF 玩家列表缓存（用于新面板初始化时获取当前数据）
@@ -713,6 +692,11 @@ public class ETModeService : IDisposable
     private void Log(string msg)
     {
         LogMessage?.Invoke(this, msg);
+        LogToFile(msg);
+    }
+
+    private void LogToFile(string msg)
+    {
         try
         {
             var logDir = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
@@ -841,6 +825,7 @@ public class ETModeService : IDisposable
     {
         if (_state != ETCoreState.Stopped) { Log("ET核心已在运行中"); return false; }
 
+        _state = ETCoreState.Starting;
         _machineId = GenerateMachineId();
         _playerName = playerName;
         _mcPort = mcPort;
@@ -850,6 +835,7 @@ public class ETModeService : IDisposable
         Log("正在启动 ET 联机房间...");
 
         if (!await EnsureEasyTierAsync()) return false;
+        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
 
         // 生成提示码
         _lobbyInfo = ScfLobbyCodeGenerator.Generate();
@@ -865,8 +851,9 @@ public class ETModeService : IDisposable
         Log("正在获取公共节点列表...");
         var publicNodes = await FetchPublicNodesAsync();
         Log($"已获取 {publicNodes.Count} 个公共节点");
+        NodesFetched?.Invoke(this, publicNodes);
         var args = BuildHostArgs(scfPort, publicNodes);
-        Log($"EasyTier 启动参数: {args}");
+        LogToFile($"EasyTier 启动参数: {args}");
 
         if (!StartETProcess(args)) { Log("EasyTier 启动失败"); return false; }
 
@@ -878,6 +865,7 @@ public class ETModeService : IDisposable
         _scfServer.Start();
         Log("Scaffolding 服务端已启动");
 
+        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
         _state = ETCoreState.Running;
         CoreStarted?.Invoke(this, EventArgs.Empty);
         StatusChanged?.Invoke(this, "等待玩家加入...");
@@ -895,6 +883,7 @@ public class ETModeService : IDisposable
     {
         if (_state != ETCoreState.Stopped) { Log("ET核心已在运行中"); return false; }
 
+        _state = ETCoreState.Starting;
         _machineId = GenerateMachineId();
         _playerName = playerName;
         _mcPort = 0;
@@ -912,14 +901,16 @@ public class ETModeService : IDisposable
         Log($"网络名称: {lobby.Identifier.Name}, 网络密钥: {lobby.Identifier.Secret}");
 
         if (!await EnsureEasyTierAsync()) return false;
+        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
 
         _rpcPort = GetAvailablePort();
 
         Log("正在获取公共节点列表...");
         var publicNodes = await FetchPublicNodesAsync();
         Log($"已获取 {publicNodes.Count} 个公共节点");
+        NodesFetched?.Invoke(this, publicNodes);
         var args = BuildJoinArgs(publicNodes);
-        Log($"EasyTier 启动参数: {args}");
+        LogToFile($"EasyTier 启动参数: {args}");
 
         if (!StartETProcess(args)) { Log("EasyTier 启动失败"); return false; }
 
@@ -934,6 +925,7 @@ public class ETModeService : IDisposable
         while (retryCount < 30)
         {
             await Task.Delay(1000);
+            if (_state == ETCoreState.Stopped) { Log("启动已被取消"); return false; }
             var players = GetCliPeerList();
             if (players != null)
             {
@@ -1012,9 +1004,24 @@ public class ETModeService : IDisposable
                 _mcPort = localMcPort;
                 Log($"MC 服务器转发: 127.0.0.1:{localMcPort} -> {hostIp}:{serverPort}");
                 ServerPortDetected?.Invoke(this, localMcPort);
+
+                // 启动局域网多播（如果启用）
+                if (ConfigService.Read("ServerPostEnable", true))
+                {
+                    try
+                    {
+                        global::MinecraftConnectTool.Server_Post.Start_Post(localMcPort);
+                        Log("局域网多播服务已启动");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"多播服务启动异常: {ex.Message}");
+                    }
+                }
             }
         }
 
+        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
         _state = ETCoreState.Running;
         CoreStarted?.Invoke(this, EventArgs.Empty);
         StatusChanged?.Invoke(this, "已连接");
@@ -1032,6 +1039,14 @@ public class ETModeService : IDisposable
 
         Log("正在停止 ET 核心...");
         _state = ETCoreState.Stopped;
+
+        // 停止局域网多播
+        try
+        {
+            global::MinecraftConnectTool.Server_Post.Stop_Post();
+            Log("局域网多播服务已停止");
+        }
+        catch { }
 
         _scfServer?.Dispose();
         _scfServer = null;

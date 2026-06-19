@@ -877,157 +877,174 @@ public class ETModeService : IDisposable
     }
 
     /// <summary>
-    /// 加入联机房间（房客模式，端口由SCF协议自动协商）
+    /// 加入联机房间（房客模式，端口由SCF协议自动协商，失败自动重试最多3次）
     /// </summary>
     public async Task<bool> StartJoinAsync(string promptCode, string playerName)
     {
         if (_state != ETCoreState.Stopped) { Log("ET核心已在运行中"); return false; }
 
-        _state = ETCoreState.Starting;
-        _machineId = GenerateMachineId();
-        _playerName = playerName;
-        _mcPort = 0;
-        _lastScfPlayerCount = -1;
-        _currentScfPlayers = Array.Empty<ScfPlayerProfile>();
-
-        // 解析提示码
-        if (!ScfLobbyCodeGenerator.TryParse(promptCode, out var lobby) || lobby == null)
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            Log("无效的提示码格式");
-            return false;
-        }
-        _lobbyInfo = lobby;
-        Log($"解析提示码: {lobby.FullCode}");
-        Log($"网络名称: {lobby.Identifier.Name}, 网络密钥: {lobby.Identifier.Secret}");
-
-        if (!await EnsureEasyTierAsync()) return false;
-        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
-
-        _rpcPort = GetAvailablePort();
-
-        Log("正在获取公共节点列表...");
-        var publicNodes = await FetchPublicNodesAsync();
-        Log($"已获取 {publicNodes.Count} 个公共节点");
-        NodesFetched?.Invoke(this, publicNodes);
-        var args = BuildJoinArgs(publicNodes);
-        LogToFile($"EasyTier 启动参数: {args}");
-
-        if (!StartETProcess(args)) { Log("EasyTier 启动失败"); return false; }
-
-        StatusChanged?.Invoke(this, "正在查找房主...");
-        Log("正在等待 EasyTier 网络就绪...");
-
-        // 等待网络就绪并获取玩家列表
-        int retryCount = 0;
-        string? hostIp = null;
-        int scfPort = 0;
-
-        while (retryCount < 30)
-        {
-            await Task.Delay(1000);
-            if (_state == ETCoreState.Stopped) { Log("启动已被取消"); return false; }
-            var players = GetCliPeerList();
-            if (players != null)
+            if (attempt > 1)
             {
-                var host = players.FirstOrDefault(p => p.Hostname.StartsWith("scaffolding-mc-server-"));
-                if (host != null)
+                Log($"========== 第 {attempt} 次重试连接 ==========");
+                await Task.Delay(2000);
+            }
+
+            _state = ETCoreState.Starting;
+            _machineId = GenerateMachineId();
+            _playerName = playerName;
+            _mcPort = 0;
+            _lastScfPlayerCount = -1;
+            _currentScfPlayers = Array.Empty<ScfPlayerProfile>();
+
+            // 解析提示码（只需第一次）
+            if (attempt == 1)
+            {
+                if (!ScfLobbyCodeGenerator.TryParse(promptCode, out var lobby) || lobby == null)
                 {
-                    hostIp = host.Ipv4;
-                    var portStr = host.Hostname["scaffolding-mc-server-".Length..];
-                    if (int.TryParse(portStr, out scfPort))
+                    Log("无效的提示码格式");
+                    return false;
+                }
+                _lobbyInfo = lobby;
+                Log($"解析提示码: {lobby.FullCode}");
+                Log($"网络名称: {lobby.Identifier.Name}, 网络密钥: {lobby.Identifier.Secret}");
+            }
+
+            if (!await EnsureEasyTierAsync()) { await StopETAsync(); continue; }
+            if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
+
+            _rpcPort = GetAvailablePort();
+
+            Log("正在获取公共节点列表...");
+            var publicNodes = await FetchPublicNodesAsync();
+            Log($"已获取 {publicNodes.Count} 个公共节点");
+            NodesFetched?.Invoke(this, publicNodes);
+            var args = BuildJoinArgs(publicNodes);
+            LogToFile($"EasyTier 启动参数: {args}");
+
+            if (!StartETProcess(args)) { Log("EasyTier 启动失败"); await StopETAsync(); continue; }
+
+            StatusChanged?.Invoke(this, "正在查找房主...");
+            Log("正在等待 EasyTier 网络就绪...");
+
+            // 等待网络就绪并获取玩家列表
+            int retryCount = 0;
+            string? hostIp = null;
+            int scfPort = 0;
+
+            while (retryCount < 30)
+            {
+                await Task.Delay(1000);
+                if (_state == ETCoreState.Stopped) { Log("启动已被取消"); return false; }
+                var players = GetCliPeerList();
+                if (players != null)
+                {
+                    var host = players.FirstOrDefault(p => p.Hostname.StartsWith("scaffolding-mc-server-"));
+                    if (host != null)
                     {
-                        Log($"找到房主: {host.Hostname} ({hostIp}:{scfPort})");
-                        break;
+                        hostIp = host.Ipv4;
+                        var portStr = host.Hostname["scaffolding-mc-server-".Length..];
+                        if (int.TryParse(portStr, out scfPort))
+                        {
+                            Log($"找到房主: {host.Hostname} ({hostIp}:{scfPort})");
+                            break;
+                        }
                     }
                 }
-            }
-            retryCount++;
-            Log($"等待房主发现... ({retryCount}/30)");
-        }
-
-        if (hostIp == null || scfPort == 0)
-        {
-            Log("未找到房主，联机失败");
-            await StopETAsync();
-            return false;
-        }
-
-        // 建立端口转发
-        var localScfPort = GetAvailablePort();
-        if (!AddPortForward(localScfPort, hostIp, scfPort))
-        {
-            Log("端口转发失败");
-            await StopETAsync();
-            return false;
-        }
-        Log($"端口转发: 127.0.0.1:{localScfPort} -> {hostIp}:{scfPort}");
-
-        // 启动 Scaffolding 客户端
-        _scfClient = new ScfClient("127.0.0.1", localScfPort, playerName, _machineId, $"MCT {Views.MainWindow.version}, Scaffolding");
-        _scfClient.PlayersUpdated += OnScfPlayersUpdated;
-        _scfClient.ServerDisconnected += () =>
-        {
-            Log("与房主的连接断开");
-            ErrorOccurred?.Invoke(this, "与房主的连接断开");
-        };
-
-        try
-        {
-            await _scfClient.ConnectAsync();
-            Log("已连接到房主的 Scaffolding 服务");
-        }
-        catch (Exception ex)
-        {
-            Log($"连接 Scaffolding 服务失败: {ex.Message}");
-            await StopETAsync();
-            return false;
-        }
-
-        // 获取 MC 服务器端口并转发
-        var serverPort = _scfClient.ServerPort;
-        if (serverPort.HasValue && serverPort.Value > 0)
-        {
-            // 确定本地 MC 转发端口：优先使用用户配置，否则随机分配
-            int localMcPort;
-            var customPort = ConfigService.Read<int>("ETCustomPort", 0);
-            if (customPort > 0 && customPort <= 65535)
-            {
-                localMcPort = customPort;
-            }
-            else
-            {
-                localMcPort = GetAvailablePort();
+                retryCount++;
+                Log($"等待房主发现... ({retryCount}/30)");
             }
 
-            if (AddPortForward(localMcPort, hostIp, serverPort.Value))
+            if (hostIp == null || scfPort == 0)
             {
-                _mcPort = localMcPort;
-                Log($"MC 服务器转发: 127.0.0.1:{localMcPort} -> {hostIp}:{serverPort}");
-                ServerPortDetected?.Invoke(this, localMcPort);
+                Log("未找到房主，联机失败");
+                await StopETAsync();
+                if (attempt < maxAttempts) continue;
+                return false;
+            }
 
-                // 启动局域网多播（如果启用）
-                if (ConfigService.Read("ServerPostEnable", true))
+            // 建立端口转发
+            var localScfPort = GetAvailablePort();
+            if (!AddPortForward(localScfPort, hostIp, scfPort))
+            {
+                Log("端口转发失败");
+                await StopETAsync();
+                if (attempt < maxAttempts) continue;
+                return false;
+            }
+            Log($"端口转发: 127.0.0.1:{localScfPort} -> {hostIp}:{scfPort}");
+
+            // 等待端口转发通道就绪
+            Log("等待端口转发通道就绪...");
+            await Task.Delay(3000);
+
+            // 启动 Scaffolding 客户端
+            _scfClient = new ScfClient("127.0.0.1", localScfPort, playerName, _machineId, $"MCT {Views.MainWindow.version}, Scaffolding");
+            _scfClient.PlayersUpdated += OnScfPlayersUpdated;
+            _scfClient.ServerDisconnected += () =>
+            {
+                Log("与房主的连接断开");
+                ErrorOccurred?.Invoke(this, "与房主的连接断开");
+            };
+
+            // Scaffolding 连接，失败重试3次（不重启 ET）
+            bool scfConnected = false;
+            for (int scfTry = 1; scfTry <= 3; scfTry++)
+            {
+                try
                 {
-                    try
-                    {
-                        global::MinecraftConnectTool.Server_Post.Start_Post(localMcPort);
-                        Log("局域网多播服务已启动");
-                    }
-                    catch (Exception ex)
-                    {
-                        Log($"多播服务启动异常: {ex.Message}");
-                    }
+                    if (scfTry > 1) Log($"Scaffolding 重连中... ({scfTry}/3)");
+                    await _scfClient.ConnectAsync();
+                    Log("已连接到房主的 Scaffolding 服务");
+                    scfConnected = true;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Log($"连接 Scaffolding 服务失败: {ex.Message}");
+                    if (scfTry < 3) await Task.Delay(2000);
                 }
             }
+            if (!scfConnected)
+            {
+                await StopETAsync();
+                if (attempt < maxAttempts) continue;
+                return false;
+            }
+
+            // 获取 MC 服务器端口并转发
+            var serverPort = _scfClient.ServerPort;
+            if (serverPort.HasValue && serverPort.Value > 0)
+            {
+                int localMcPort;
+                var customPort = ConfigService.Read<int>("ETCustomPort", 0);
+                if (customPort > 0 && customPort <= 65535)
+                    localMcPort = customPort;
+                else
+                    localMcPort = GetAvailablePort();
+
+                if (AddPortForward(localMcPort, hostIp, serverPort.Value))
+                {
+                    _mcPort = localMcPort;
+                    Log($"MC 服务器转发: 127.0.0.1:{localMcPort} -> {hostIp}:{serverPort}");
+                    ServerPortDetected?.Invoke(this, localMcPort);
+                }
+            }
+
+            if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
+            _state = ETCoreState.Running;
+            CoreStarted?.Invoke(this, EventArgs.Empty);
+            StatusChanged?.Invoke(this, "已连接");
+
+            _ = PollPlayerListAsync();
+            return true;
         }
 
-        if (_state != ETCoreState.Starting) { Log("启动已被取消"); return false; }
-        _state = ETCoreState.Running;
-        CoreStarted?.Invoke(this, EventArgs.Empty);
-        StatusChanged?.Invoke(this, "已连接");
-
-        _ = PollPlayerListAsync();
-        return true;
+        // 三次都失败
+        Log("多次重试后仍无法加入房间");
+        return false;
     }
 
     /// <summary>

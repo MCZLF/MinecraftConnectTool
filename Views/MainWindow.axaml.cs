@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.042";
+    public static readonly string version = "0.0.7.050(TEST)";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -884,7 +884,7 @@ public partial class MainWindow : Window
         var line2 = this.FindControl<TextBlock>("WatermarkLine2");
         
         if (line1 != null) line1.Text = WatermarkText;
-        if (line2 != null) line2.Text = "若遇到问题请及时反馈ISSUE或Q群内";
+        if (line2 != null) line2.Text = "若遇到问题请及时反馈Issue或Q群内";
 
         // 双击水印区域打开链接
         watermarkBorder.DoubleTapped += (s, e) =>

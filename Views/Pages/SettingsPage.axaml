@@ -526,17 +526,15 @@
 
           <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
 
-          <!-- 启用Relay中转 (禁用) -->
+          <!-- 启用Relay中转 -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">
               <TextBlock Text="Relay中转"
                          FontSize="16"
                          FontWeight="Medium"
-                         Opacity="0.5"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="启用Relay服务器中转功能 (当前不可用)"
+              <TextBlock Text="启用Relay服务器中转功能 (该功能由联机核心自主判断,暂不支持手动修改)"
                          FontSize="14"
-                         Opacity="0.5"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1"
@@ -588,7 +586,7 @@
                          FontSize="16"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="使用TCP协议进行连接"
+              <TextBlock Text="使用TCP协议进行连接(当该选项被关闭时,则为UDP协议进行连接)"
                          FontSize="14"
                          Opacity="0.7"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
@@ -912,7 +910,7 @@
                          FontSize="16"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="下载并运行360DNS优化工具"
+              <TextBlock Text="下载并运行360DNS优化工具(单文件提取版本啦,不会下崽的)"
                          FontSize="14"
                          Opacity="0.7"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>

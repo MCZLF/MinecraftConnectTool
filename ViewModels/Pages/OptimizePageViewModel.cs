@@ -23,7 +23,7 @@ public enum NatType
     Blocked
 }
 
-public partial class OptimizePageViewModel : ViewModelBase
+public partial class OptimizePageViewModel : ViewModelBase, IDisposable
 {
     // 主要STUN服务器
     private readonly string[] _primaryStunServers = new[]
@@ -633,5 +633,11 @@ public partial class OptimizePageViewModel : ViewModelBase
         public NatType Type { get; set; }
         public string? PublicIp { get; set; }
         public int PublicPort { get; set; }
+    }
+
+    public void Dispose()
+    {
+        // OptimizePageViewModel 无长生命周期的非托管资源，UdpClient 均为局部 using。
+        // 实现 IDisposable 以便 PageCacheService 淘汰页面时可统一调用。
     }
 }

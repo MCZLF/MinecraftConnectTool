@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace MinecraftConnectTool.ViewModels.Pages;
 
-public partial class UpdatePageViewModel : ViewModelBase
+public partial class UpdatePageViewModel : ViewModelBase, IDisposable
 {
     #region 跨平台更新API配置
 
@@ -1418,6 +1418,11 @@ del /f /q ""%~nx0""";
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+    }
 }
 
 /// <summary>

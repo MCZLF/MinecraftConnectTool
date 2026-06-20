@@ -2,17 +2,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:MinecraftConnectTool.Controls"
              mc:Ignorable="d" d:DesignWidth="60" d:DesignHeight="40"
              x:Class="MinecraftConnectTool.Controls.ColorPickerButton"
+             x:DataType="controls:ColorPickerButton"
              x:Name="Root">
 
   <Button x:Name="ColorButton"
-          Width="{Binding Width, RelativeSource={RelativeSource AncestorType=UserControl}}"
-          Height="{Binding Height, RelativeSource={RelativeSource AncestorType=UserControl}}"
+          Width="{Binding Width, RelativeSource={RelativeSource AncestorType=controls:ColorPickerButton}}"
+          Height="{Binding Height, RelativeSource={RelativeSource AncestorType=controls:ColorPickerButton}}"
           CornerRadius="12"
           BorderThickness="2"
           BorderBrush="{DynamicResource MaterialOutlineBrush}"
-          Background="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource ColorToBrushConverter}}"
+          Background="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=controls:ColorPickerButton}, Converter={StaticResource ColorToBrushConverter}}"
           HorizontalContentAlignment="Center"
           VerticalContentAlignment="Center"
           Click="OnButtonClick">

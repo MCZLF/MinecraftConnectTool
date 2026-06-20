@@ -59,6 +59,22 @@ public partial class MainWindow : Window
     private bool _isPerformanceModeEnabled;
     private string _aiServerUrl = string.Empty;
     private int _aiTimeoutSeconds = 120;
+    private Bitmap? _backgroundBitmap;
+    private string? _currentBackgroundPath;
+
+    // 缓存 InitializePhotoBackground / ApplyTextOpacity 用到的控件引用，避免重复遍历视觉树
+    private Image? _cachedBackgroundImage;
+    private Avalonia.Controls.Shapes.Rectangle? _cachedBackgroundOverlay;
+    private Border? _cachedLeftNavBackground;
+    private Border? _cachedLeftNavBorder;
+    private Border? _cachedRightContentBackground;
+    private Border? _cachedRightContentBorder;
+    private TextBlock? _cachedHomeText;
+    private TextBlock? _cachedP2PText;
+    private TextBlock? _cachedLinkText;
+    private TextBlock? _cachedPlayText;
+    private TextBlock? _cachedUpdateText;
+    private TextBlock? _cachedSettingsText;
 
     public MainWindow()
     {
@@ -235,12 +251,20 @@ public partial class MainWindow : Window
     /// </summary>
     private void InitializePhotoBackground()
     {
-        var backgroundImage = this.FindControl<Image>("BackgroundImage");
-        var backgroundOverlay = this.FindControl<Avalonia.Controls.Shapes.Rectangle>("BackgroundOverlay");
-        var leftNavBackground = this.FindControl<Border>("LeftNavBackground");
-        var leftNavBorder = this.FindControl<Border>("LeftNavBorder");
-        var rightContentBackground = this.FindControl<Border>("RightContentBackground");
-        var rightContentBorder = this.FindControl<Border>("RightContentBorder");
+        // 仅首次查找控件，后续使用缓存引用
+        _cachedBackgroundImage ??= this.FindControl<Image>("BackgroundImage");
+        _cachedBackgroundOverlay ??= this.FindControl<Avalonia.Controls.Shapes.Rectangle>("BackgroundOverlay");
+        _cachedLeftNavBackground ??= this.FindControl<Border>("LeftNavBackground");
+        _cachedLeftNavBorder ??= this.FindControl<Border>("LeftNavBorder");
+        _cachedRightContentBackground ??= this.FindControl<Border>("RightContentBackground");
+        _cachedRightContentBorder ??= this.FindControl<Border>("RightContentBorder");
+
+        var backgroundImage = _cachedBackgroundImage;
+        var backgroundOverlay = _cachedBackgroundOverlay;
+        var leftNavBackground = _cachedLeftNavBackground;
+        var leftNavBorder = _cachedLeftNavBorder;
+        var rightContentBackground = _cachedRightContentBackground;
+        var rightContentBorder = _cachedRightContentBorder;
 
         if (backgroundImage == null || backgroundOverlay == null) return;
 
@@ -276,11 +300,32 @@ public partial class MainWindow : Window
 
         if (enablePhotoBackground && !string.IsNullOrEmpty(photoPath) && File.Exists(photoPath))
         {
+            // 路径未变化时复用已有 Bitmap，避免重复解码
+            if (!string.Equals(_currentBackgroundPath, photoPath, StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    // 释放旧的 Bitmap 实例（非托管 GDI 资源）
+                    _backgroundBitmap?.Dispose();
+                    _backgroundBitmap = null;
+
+                    // 加载图片
+                    _backgroundBitmap = new Bitmap(photoPath);
+                    _currentBackgroundPath = photoPath;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"加载背景图片失败: {ex.Message}");
+                    _currentBackgroundPath = null;
+                    _backgroundBitmap = null;
+                    ResetToOpaqueBackground(backgroundImage, backgroundOverlay, leftNavBackground, leftNavBorder, rightContentBackground, rightContentBorder);
+                    return;
+                }
+            }
+
             try
             {
-                // 加载图片
-                var bitmap = new Bitmap(photoPath);
-                backgroundImage.Source = bitmap;
+                backgroundImage.Source = _backgroundBitmap;
                 backgroundImage.IsVisible = true;
                 backgroundImage.Opacity = 1;
                 
@@ -311,7 +356,10 @@ public partial class MainWindow : Window
         }
         else
         {
-            // 未启用照片背景，保持不透明
+            // 未启用照片背景，释放已加载的 Bitmap 并保持不透明
+            _backgroundBitmap?.Dispose();
+            _backgroundBitmap = null;
+            _currentBackgroundPath = null;
             ResetToOpaqueBackground(backgroundImage, backgroundOverlay, leftNavBackground, leftNavBorder, rightContentBackground, rightContentBorder);
         }
     }
@@ -321,20 +369,20 @@ public partial class MainWindow : Window
     /// </summary>
     private void ApplyTextOpacity(double navTextOpacity, double contentTextOpacity)
     {
-        // 左侧导航文字
-        var homeText = this.FindControl<TextBlock>("HomeText");
-        var p2pText = this.FindControl<TextBlock>("P2PText");
-        var linkText = this.FindControl<TextBlock>("LinkText");
-        var playText = this.FindControl<TextBlock>("PlayText");
-        var updateText = this.FindControl<TextBlock>("UpdateText");
-        var settingsText = this.FindControl<TextBlock>("SettingsText");
-        
-        if (homeText != null) homeText.Opacity = navTextOpacity;
-        if (p2pText != null) p2pText.Opacity = navTextOpacity;
-        if (linkText != null) linkText.Opacity = navTextOpacity;
-        if (playText != null) playText.Opacity = navTextOpacity;
-        if (updateText != null) updateText.Opacity = navTextOpacity;
-        if (settingsText != null) settingsText.Opacity = navTextOpacity;
+        // 左侧导航文字（使用缓存引用）
+        _cachedHomeText ??= this.FindControl<TextBlock>("HomeText");
+        _cachedP2PText ??= this.FindControl<TextBlock>("P2PText");
+        _cachedLinkText ??= this.FindControl<TextBlock>("LinkText");
+        _cachedPlayText ??= this.FindControl<TextBlock>("PlayText");
+        _cachedUpdateText ??= this.FindControl<TextBlock>("UpdateText");
+        _cachedSettingsText ??= this.FindControl<TextBlock>("SettingsText");
+
+        if (_cachedHomeText != null) _cachedHomeText.Opacity = navTextOpacity;
+        if (_cachedP2PText != null) _cachedP2PText.Opacity = navTextOpacity;
+        if (_cachedLinkText != null) _cachedLinkText.Opacity = navTextOpacity;
+        if (_cachedPlayText != null) _cachedPlayText.Opacity = navTextOpacity;
+        if (_cachedUpdateText != null) _cachedUpdateText.Opacity = navTextOpacity;
+        if (_cachedSettingsText != null) _cachedSettingsText.Opacity = navTextOpacity;
     }
 
     /// <summary>
@@ -810,6 +858,10 @@ public partial class MainWindow : Window
 
         // 释放内存监控服务
         _memoryMonitorService?.Dispose();
+
+        // 释放背景 Bitmap 资源
+        _backgroundBitmap?.Dispose();
+        _backgroundBitmap = null;
     }
     
     /// <summary>

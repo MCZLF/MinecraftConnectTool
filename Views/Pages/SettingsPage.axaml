@@ -527,22 +527,15 @@
           <Separator Background="{DynamicResource MaterialDividerBrush}" Margin="0,4"/>
 
           <!-- 启用Relay中转 -->
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Grid.Column="0" Spacing="4">
-              <TextBlock Text="Relay中转"
-                         FontSize="16"
-                         FontWeight="Medium"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="启用Relay服务器中转功能 (该功能由联机核心自主判断,暂不支持手动修改)"
-                         FontSize="14"
-                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding EnableRelay, Mode=TwoWay}"
-                          IsEnabled="False"
-                          Opacity="0.5"
-                          VerticalAlignment="Center"/>
-          </Grid>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Relay中转"
+                       FontSize="16"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="启用Relay服务器中转功能 (该功能由联机核心自主判断,暂不支持手动修改)"
+                       FontSize="14"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
 
           <!-- 启用服务器Post -->
           <Grid ColumnDefinitions="*,Auto">

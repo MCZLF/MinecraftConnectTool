@@ -16,6 +16,14 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _logText = "";
 
+    // 日志最大字符数限制（防止长时间运行导致 OOM）
+    private const int MaxLogLength = 32_000_000;
+    private void TrimLogIfNeeded()
+    {
+        if (LogText.Length > MaxLogLength)
+            LogText = LogText[^MaxLogLength..];
+    }
+
     [ObservableProperty]
     private string _promptCode = "";
 
@@ -475,9 +483,35 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     private void AddLog(string message)
     {
+        // 过滤日志：只显示重要信息（ERROR/WARN/SUCCESS 或不带 [ET] 前缀的业务日志）
+        if (ShouldFilterLog(message))
+            return;
+
         var timestamp = DateTime.Now.ToString("HH:mm:ss");
         LogText += $"[{timestamp}] {message}\n";
+        TrimLogIfNeeded();
         LogTextChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private bool ShouldFilterLog(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return true;
+
+        var upper = message.ToUpperInvariant();
+        
+        // 保留所有 ERROR/WARN/FAIL/SUCCESS 级别的日志
+        if (upper.Contains("ERROR") || upper.Contains("WARN") || 
+            upper.Contains("FAIL") || upper.Contains("SUCCESS") ||
+            upper.Contains("错误") || upper.Contains("警告") || upper.Contains("失败"))
+            return false;
+
+        // 保留关键业务日志（不带 [ET] 前缀的）
+        if (!message.TrimStart().StartsWith("[ET]"))
+            return false;
+
+        // 过滤掉 EasyTier 原始输出的 INFO/DEBUG 日志
+        return true;
     }
 
     #endregion

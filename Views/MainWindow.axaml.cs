@@ -1187,7 +1187,20 @@ public partial class MainWindow : Window
                 return;
             }
 
-            string logContent = File.ReadAllText(logPath, Encoding.UTF8);
+            // 读取 APPLog.ini（限制最大 32MB）
+            string logContent;
+            var logFileInfo = new FileInfo(logPath);
+            if (logFileInfo.Length > 32_000_000)
+            {
+                using var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                fs.Seek(-32_000_000, SeekOrigin.End);
+                using var reader = new StreamReader(fs, Encoding.UTF8);
+                logContent = reader.ReadToEnd();
+            }
+            else
+            {
+                logContent = File.ReadAllText(logPath, Encoding.UTF8);
+            }
             string logAppConfig = File.ReadAllText(AppconfigPath, Encoding.UTF8);
             string logConfig = File.ReadAllText(configPath, Encoding.UTF8);
             var j = JsonNode.Parse(logConfig);
@@ -1402,11 +1415,22 @@ public partial class MainWindow : Window
         }
         else
         {
-            // 其他页面：读取全局 APPLog.ini
+            // 其他页面：读取全局 APPLog.ini（只读取最后32MB，避免OOM）
             string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
             if (File.Exists(logFilePath))
             {
-                logContent = File.ReadAllText(logFilePath);
+                var fi = new FileInfo(logFilePath);
+                if (fi.Length > 32_000_000)
+                {
+                    using var fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fs.Seek(-32_000_000, SeekOrigin.End);
+                    using var reader = new StreamReader(fs, Encoding.UTF8);
+                    logContent = reader.ReadToEnd();
+                }
+                else
+                {
+                    logContent = File.ReadAllText(logFilePath);
+                }
             }
             pageName = "全局日志";
         }
@@ -1414,6 +1438,19 @@ public partial class MainWindow : Window
         if (string.IsNullOrWhiteSpace(logContent))
         {
             logContent = "暂无日志内容";
+        }
+
+        // 截断过长日志，防止序列化时 OOM（保留最后32MB）
+        const int maxAILogLength = 32_000_000;
+        if (logContent.Length > maxAILogLength)
+        {
+            int keepLength = maxAILogLength - 100;
+            var sb = new StringBuilder(maxAILogLength);
+            sb.Append("...(前面 ");
+            sb.Append(logContent.Length - keepLength);
+            sb.Append(" 字符已省略)...\n");
+            sb.Append(logContent, logContent.Length - keepLength, keepLength);
+            logContent = sb.ToString();
         }
 
         var panel = new RightPage.PanelAiAnalyze(logContent, _aiServerUrl, pageName, _aiTimeoutSeconds);

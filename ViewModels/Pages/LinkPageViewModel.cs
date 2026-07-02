@@ -47,6 +47,14 @@ public partial class LinkPageViewModel : ViewModelBase
     [ObservableProperty]
     private string _logText = "";
 
+    // 日志最大字符数限制（防止长时间运行导致 OOM）
+    private const int MaxLogLength = 32_000_000;
+    private void TrimLogIfNeeded()
+    {
+        if (LogText.Length > MaxLogLength)
+            LogText = LogText[^MaxLogLength..];
+    }
+
     [ObservableProperty]
     private string _promptCode = "";
 
@@ -353,6 +361,7 @@ public partial class LinkPageViewModel : ViewModelBase
 
         // 追加到日志文本
         LogText += displayMessage + Environment.NewLine;
+        TrimLogIfNeeded();
     }
 
     private string ExtractPromptCode(string fullText)
@@ -979,6 +988,7 @@ public partial class LinkPageViewModel : ViewModelBase
         
         // 直接添加到UI，不经过ProcessLogMessage处理
         LogText += message + Environment.NewLine;
+        TrimLogIfNeeded();
     }
 
     // ========== 显示错误提示窗 ==========

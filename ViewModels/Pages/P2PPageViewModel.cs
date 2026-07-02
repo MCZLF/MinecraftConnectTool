@@ -20,6 +20,14 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _logText = "";
 
+    // 日志最大字符数限制（防止长时间运行导致 OOM）
+    private const int MaxLogLength = 32_000_000;
+    private void TrimLogIfNeeded()
+    {
+        if (LogText.Length > MaxLogLength)
+            LogText = LogText[^MaxLogLength..];
+    }
+
     [ObservableProperty]
     private string _alertText = "提示码";
 
@@ -701,6 +709,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     {
         var timestamp = DateTime.Now.ToString("HH:mm:ss");
         LogText += $"[{timestamp}] {message}\n";
+        TrimLogIfNeeded();
         // 触发日志变化事件
         LogTextChanged?.Invoke(this, EventArgs.Empty);
     }

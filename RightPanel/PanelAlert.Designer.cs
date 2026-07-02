@@ -1,4 +1,4 @@
-﻿namespace MinecraftConnectTool
+namespace MinecraftConnectTool
 {
     partial class PanelAlert
     {
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.materialFlatButton1 = new MaterialSkin.Controls.MaterialFlatButton();
-            this.label1 = new AntdUI.Label();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label2 = new AntdUI.Label();
             this.SuspendLayout();
             // 
@@ -49,16 +49,17 @@
             this.materialFlatButton1.UseVisualStyleBackColor = true;
             this.materialFlatButton1.Click += new System.EventHandler(this.materialFlatButton1_Click);
             // 
-            // label1
+            // richTextBox1
             // 
-            this.label1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(0, 45);
-            this.label1.Name = "label1";
-            this.label1.PrefixColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(119)))), ((int)(((byte)(255)))));
-            this.label1.Size = new System.Drawing.Size(302, 412);
-            this.label1.TabIndex = 60;
-            this.label1.Text = "云公告";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.richTextBox1.Location = new System.Drawing.Point(0, 45);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Font = new System.Drawing.Font("微软雅黑", 11F);
+            this.richTextBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.richTextBox1.Size = new System.Drawing.Size(307, 412);
+            this.richTextBox1.TabIndex = 60;
+            this.richTextBox1.Text = "云公告";
             // 
             // label2
             // 
@@ -75,7 +76,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.materialFlatButton1);
             this.Name = "PanelAlert";
             this.Size = new System.Drawing.Size(307, 455);
@@ -88,7 +89,7 @@
         #endregion
 
         private MaterialSkin.Controls.MaterialFlatButton materialFlatButton1;
-        private AntdUI.Label label1;
+        internal System.Windows.Forms.RichTextBox richTextBox1;
         private AntdUI.Label label2;
     }
 }

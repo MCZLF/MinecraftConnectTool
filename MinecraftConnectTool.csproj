@@ -110,6 +110,13 @@
     <Compile Include="RightPanel\PanelAlert.Designer.cs">
       <DependentUpon>PanelAlert.cs</DependentUpon>
     </Compile>
+    <Compile Include="Plugins\AiRemoteConfig.cs" />
+    <Compile Include="Plugins\PanelAiAnalyze.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plugins\PanelAiAnalyze.Designer.cs">
+      <DependentUpon>PanelAiAnalyze.cs</DependentUpon>
+    </Compile>
     <Compile Include="Plugins\Probe.cs" />
     <Compile Include="RightPanel\InviteinfoEdit.cs">
       <SubType>UserControl</SubType>

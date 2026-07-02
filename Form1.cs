@@ -37,6 +37,10 @@ namespace MinecraftConnectTool
         private readonly List<object> _floatButtons = new List<object>(); //启动时监测进程的字典
         //各项子功能控制放开头的传统也不能变
         public static Font formfont { get; } = new Font("Microsoft YaHei UI", 9f);        //form1中的全局字体 714后的新字体统一使用Program中的public
+
+        // AI 日志分析相关
+        private string _aiServerUrl = "http://127.0.0.1:11451";
+        private int _aiTimeoutSeconds = 120;
         private async void Form1_Shown(object sender, EventArgs e)
         {
             Probe.EnablePopup = false;
@@ -50,9 +54,7 @@ namespace MinecraftConnectTool
             if (nonotifywhenstart) { }
             else
             {
-                AntdUI.Notification.info((Form)this, "info", "欢迎使用Minecraft Connect Tool~", align: AntdUI.TAlignFrom.BR, font: formfont);
-                //AntdUI.Notification.success((Form)this, "info", "成功的加载了ToastNotification3", align: AntdUI.TAlignFrom.BR, font: formfont);
-            }
+                AntdUI.Notification.info((Form)this, "info", "欢迎使用Minecraft Connect Tool~", align: AntdUI.TAlignFrom.BR, font: formfont);            }
             if (version.Contains("测试版本"))
             {
                 AntdUI.Modal.open(new AntdUI.Modal.Config(Program.MainForm, $"Info\n这是一个测试版本 版本号为{version}\n该提醒不可关闭,每次启动时强制提醒", "出现bug欢迎反馈,可在群里反馈690625244\n或是向admin@mczlf.xyz发送邮件,标题备注[BUG反馈]", AntdUI.TType.Info)
@@ -120,6 +122,7 @@ namespace MinecraftConnectTool
                 AntdUI.Config.IsDark = true; }
             await CheckAndShowAnnouncementAsync();
             await CheckThirdPartyEnableAsync();
+            _ = CheckAiConfigAsync();
         }
 
         private void Menu1_SelectChanged(object sender, MenuSelectEventArgs e)
@@ -762,6 +765,131 @@ SysVersion:{SystemEvVersion}
             {
                 Program.alerterror($"获取第三方功能可用性时失败：\n请检查是否已连接到互联网\n{ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// 检查AI远程配置，控制标题栏AI按钮显示/隐藏
+        /// </summary>
+        private async Task CheckAiConfigAsync()
+        {
+            try
+            {
+                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
+                {
+                    var json = await client.GetStringAsync("https://api.mct.mczlf.loft.games/007/analyze.json");
+                    var config = Newtonsoft.Json.JsonConvert.DeserializeObject<AiRemoteConfig>(json);
+
+                    if (config == null || !config.Enable)
+                    {
+                        return;
+                    }
+
+                    _aiServerUrl = string.IsNullOrWhiteSpace(config.ServerIP)
+                        ? "http://127.0.0.1:11451"
+                        : config.ServerIP.TrimEnd('/');
+                    _aiTimeoutSeconds = config.TimeoutSeconds > 0 ? config.TimeoutSeconds : 120;
+
+                    buttonAI.Visible = true;
+                }
+            }
+            catch
+            {
+                // 请求失败时默认隐藏AI按钮
+            }
+        }
+
+        /// <summary>
+        /// 标题栏AI按钮点击 - 获取当前日志内容并打开右侧AI分析面板
+        /// </summary>
+        private void buttonAI_Click(object sender, EventArgs e)
+        {
+            string logContent = string.Empty;
+            string pageName = string.Empty;
+
+            // 根据当前面板获取对应日志内容
+            if (panel.Controls.Count > 0)
+            {
+                var current = panel.Controls[0];
+                if (current is P2PMode p2pMode)
+                {
+                    // P2PMode 有 richTextBoxLog
+                    var field = typeof(P2PMode).GetField("richTextBoxLog",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (field != null)
+                    {
+                        var rtb = field.GetValue(p2pMode) as RichTextBox;
+                        if (rtb != null) logContent = rtb.Text;
+                    }
+                    pageName = "P2P模式";
+                }
+                else if (current is P2PLog p2pLog)
+                {
+                    // P2PLog 有 richTextBox1
+                    var field = typeof(P2PLog).GetField("richTextBox1",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (field != null)
+                    {
+                        var rtb = field.GetValue(p2pLog) as RichTextBox;
+                        if (rtb != null) logContent = rtb.Text;
+                    }
+                    pageName = "运行日志";
+                }
+                else if (current is LinkMode)
+                {
+                    pageName = "Link模式";
+                }
+            }
+
+            // 兜底：读取 APPLog.ini
+            if (string.IsNullOrWhiteSpace(logContent))
+            {
+                string logFilePath = Path.Combine(
+                    Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
+                    "MCZLFAPP", "Temp", "APPLog.ini");
+                if (File.Exists(logFilePath))
+                {
+                    var fi = new FileInfo(logFilePath);
+                    if (fi.Length > 32_000_000)
+                    {
+                        using (var fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            fs.Seek(-32_000_000, SeekOrigin.End);
+                            using (var reader = new StreamReader(fs, Encoding.UTF8))
+                            {
+                                logContent = reader.ReadToEnd();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        logContent = File.ReadAllText(logFilePath);
+                    }
+                }
+                if (string.IsNullOrEmpty(pageName)) pageName = "全局日志";
+            }
+
+            if (string.IsNullOrWhiteSpace(logContent))
+            {
+                logContent = "暂无日志内容";
+            }
+
+            // 截断过长日志，防止OOM
+            const int maxAILogLength = 32_000_000;
+            if (logContent.Length > maxAILogLength)
+            {
+                logContent = "...\n" + logContent.Substring(logContent.Length - maxAILogLength + 10);
+            }
+
+            var aiPanel = new PanelAiAnalyze(logContent, _aiServerUrl, pageName, _aiTimeoutSeconds);
+            aiPanel.Size = new Size(420, 600);
+
+            AntdUI.Drawer.open(new AntdUI.Drawer.Config(Program.MainForm, aiPanel)
+            {
+                Align = TAlignMini.Right,
+                Mask = true,
+                MaskClosable = true,
+                DisplayDelay = 0
+            });
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,7 +26,7 @@ namespace MinecraftConnectTool
 
         private void PanelAlert_Load(object sender, EventArgs e)
         {
-            label1.Text = "正在加载公告...";
+            richTextBox1.Text = "正在加载公告...";
             LoadAnnouncementAsync();
         }
 
@@ -85,17 +85,12 @@ namespace MinecraftConnectTool
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action(() => label1.Text = text));
+                this.Invoke(new Action(() => richTextBox1.Text = text));
             }
             else
             {
-                label1.Text = text;
+                richTextBox1.Text = text;
             }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

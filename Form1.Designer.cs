@@ -1,4 +1,4 @@
-﻿namespace MinecraftConnectTool
+namespace MinecraftConnectTool
 {
     partial class Form1
     {
@@ -43,6 +43,7 @@
             this.panelbar = new AntdUI.Panel();
             this.PageHeader = new AntdUI.PageHeader();
             this.button2 = new AntdUI.Button();
+            this.buttonAI = new AntdUI.Button();
             this.button_mclogs = new AntdUI.Button();
             this.button1 = new AntdUI.Button();
             this.button_color = new AntdUI.Button();
@@ -126,6 +127,7 @@
             // PageHeader
             // 
             this.PageHeader.Controls.Add(this.button2);
+            this.PageHeader.Controls.Add(this.buttonAI);
             this.PageHeader.Controls.Add(this.button_mclogs);
             this.PageHeader.Controls.Add(this.button1);
             this.PageHeader.Controls.Add(this.button_color);
@@ -158,7 +160,22 @@
             this.button2.Visible = false;
             this.button2.WaveSize = 0;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
+            //
+            // buttonAI
+            //
+            this.buttonAI.Dock = System.Windows.Forms.DockStyle.Right;
+            this.buttonAI.Ghost = true;
+            this.buttonAI.IconRatio = 0.65F;
+            this.buttonAI.IconSvg = "ThunderboltOutlined";
+            this.buttonAI.Location = new System.Drawing.Point(505, 0);
+            this.buttonAI.Name = "buttonAI";
+            this.buttonAI.Radius = 0;
+            this.buttonAI.Size = new System.Drawing.Size(50, 40);
+            this.buttonAI.TabIndex = 9;
+            this.buttonAI.Visible = false;
+            this.buttonAI.WaveSize = 0;
+            this.buttonAI.Click += new System.EventHandler(this.buttonAI_Click);
+            //
             // button_mclogs
             // 
             this.button_mclogs.Dock = System.Windows.Forms.DockStyle.Right;
@@ -247,6 +264,7 @@
         private AntdUI.Button button1;
         private AntdUI.Button button_mclogs;
         private AntdUI.Button button2;
+        private AntdUI.Button buttonAI;
     }
 }
 

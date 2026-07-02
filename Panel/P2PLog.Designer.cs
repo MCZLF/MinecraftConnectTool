@@ -1,4 +1,4 @@
-﻿namespace MinecraftConnectTool
+namespace MinecraftConnectTool
 {
     partial class P2PLog
     {
@@ -80,7 +80,7 @@
             this.button3.TabIndex = 25;
             this.button3.Text = "Pack";
             this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
+            //
             // P2PLog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);

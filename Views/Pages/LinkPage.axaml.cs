@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using MinecraftConnectTool.ExtensionUI;
+using MinecraftConnectTool.Services;
 using MinecraftConnectTool.ViewModels.Pages;
 using MinecraftConnectTool.Views;
 
@@ -18,6 +19,7 @@ public partial class LinkPage : UserControl
     public LinkPage()
     {
         InitializeComponent();
+        TextBoxContextMenuService.ApplyChineseContextMenu(this);
         _viewModel = new LinkPageViewModel();
         DataContext = _viewModel;
 

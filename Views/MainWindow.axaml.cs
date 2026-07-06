@@ -30,13 +30,13 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.050(TEST)";
+    public static readonly string version = "0.0.7.050";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
 
     // 全局水印配置
-    public static readonly bool EnableWatermark = true;
+    public static readonly bool EnableWatermark = false;
     public static readonly string WatermarkText = "ET模式测试版本🤔";
 
     // 初次启动向导配置
@@ -305,7 +305,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    // 释放旧的 Bitmap 实例（非托管 GDI 资源）
+                    backgroundImage.Source = null;
                     _backgroundBitmap?.Dispose();
                     _backgroundBitmap = null;
 
@@ -356,7 +356,8 @@ public partial class MainWindow : Window
         }
         else
         {
-            // 未启用照片背景，释放已加载的 Bitmap 并保持不透明
+            backgroundImage.Source = null;
+            backgroundImage.IsVisible = false;
             _backgroundBitmap?.Dispose();
             _backgroundBitmap = null;
             _currentBackgroundPath = null;
@@ -390,6 +391,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void ResetToOpaqueBackground(Image backgroundImage, Avalonia.Controls.Shapes.Rectangle backgroundOverlay, Border? leftNavBackground, Border? leftNavBorder, Border? rightContentBackground, Border? rightContentBorder)
     {
+        backgroundImage.Source = null;
         backgroundImage.IsVisible = false;
         backgroundOverlay.Opacity = 1;
         if (leftNavBackground != null) leftNavBackground.Opacity = 1;
@@ -860,6 +862,11 @@ public partial class MainWindow : Window
         _memoryMonitorService?.Dispose();
 
         // 释放背景 Bitmap 资源
+        _cachedBackgroundImage ??= this.FindControl<Image>("BackgroundImage");
+        if (_cachedBackgroundImage != null)
+        {
+            _cachedBackgroundImage.Source = null;
+        }
         _backgroundBitmap?.Dispose();
         _backgroundBitmap = null;
     }
@@ -1593,7 +1600,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// 显示云公告PanelAlert
     /// </summary>
-    private async void ShowPanelAlert()
+    public async void ShowPanelAlert()
     {
         var panelAlert = new RightPage.PanelAlert();
         var drawerWindow = await ShowRightDrawerAsync(panelAlert, 350);

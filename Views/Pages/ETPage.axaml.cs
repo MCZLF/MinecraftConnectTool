@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using MinecraftConnectTool.ExtensionUI;
+using MinecraftConnectTool.Services;
 using MinecraftConnectTool.ViewModels.Pages;
 
 namespace MinecraftConnectTool.Views.Pages;
@@ -14,6 +15,7 @@ public partial class ETPage : UserControl
     public ETPage()
     {
         InitializeComponent();
+        TextBoxContextMenuService.ApplyChineseContextMenu(this);
         _viewModel = new ETPageViewModel();
         DataContext = _viewModel;
 

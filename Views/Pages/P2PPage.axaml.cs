@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using MinecraftConnectTool.Services;
 using MinecraftConnectTool.ViewModels.Pages;
 
 namespace MinecraftConnectTool.Views.Pages;
@@ -13,6 +14,7 @@ public partial class P2PPage : UserControl
     public P2PPage()
     {
         InitializeComponent();
+        TextBoxContextMenuService.ApplyChineseContextMenu(this);
         _viewModel = new P2PPageViewModel();
         DataContext = _viewModel;
         

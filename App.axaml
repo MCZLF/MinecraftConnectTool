@@ -15,6 +15,36 @@
     <FluentTheme />
     <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Teal" />
     <icons:MaterialIconStyles />
+
+    <Style Selector="ContextMenu">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style Selector="MenuItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+    </Style>
+    <Style Selector="MenuItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+    </Style>
+    <Style Selector="MenuItem:pressed">
+      <Setter Property="Background" Value="{DynamicResource MaterialSecondaryContainerBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+    </Style>
+    <Style Selector="ComboBoxItem">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+    </Style>
+    <Style Selector="ComboBoxItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+    </Style>
+    <Style Selector="ComboBoxItem:selected">
+      <Setter Property="Background" Value="{DynamicResource MaterialSecondaryContainerBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MaterialOnSecondaryContainerBrush}"/>
+    </Style>
   </Application.Styles>
 
   <Application.Resources>

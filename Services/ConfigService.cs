@@ -53,7 +53,9 @@ public static class ConfigService
                 ["EnableATDDark"] = false,
                 ["AnimationSpeed"] = "Medium",
                 ["CustomAnimationDuration"] = 200,
-                ["RenderingMode"] = "SystemDefault"
+                ["RenderingMode"] = "SystemDefault",
+                ["DefaultStartupPage"] = "Home",
+                ["SimulateFluentDesign"] = true
             };
 
             SaveConfig(defaultConfig);

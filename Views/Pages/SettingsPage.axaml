@@ -272,21 +272,38 @@
                           VerticalAlignment="Center"/>
           </Grid>
 
-          <!-- 启动时检查更新 -->
+          <!-- 启动后默认显示页面 -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">
-              <TextBlock Text="自动检查更新"
+              <TextBlock Text="启动后默认显示页面"
                          FontSize="16"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="启动时自动检查新版本"
+              <TextBlock Text="选择应用每次启动后优先展示的页面"
                          FontSize="14"
                          Opacity="0.7"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
             </StackPanel>
-            <ToggleSwitch Grid.Column="1"
-                          IsChecked="{Binding GoUpdateWhenStart, Mode=TwoWay}"
-                          VerticalAlignment="Center"/>
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding StartupPageOptions}"
+                      SelectedItem="{Binding DefaultStartupPage, Mode=TwoWay}"
+                      VerticalAlignment="Center"
+                      Width="160"
+                      Height="40"
+                      Padding="12,8"
+                      Background="Transparent"
+                      BorderThickness="0,0,0,1"
+                      BorderBrush="{DynamicResource MaterialOutlineBrush}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding DisplayName}"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Width="120"
+                             Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
           </Grid>
 
           <!-- 启动时检查版本 -->
@@ -537,7 +554,7 @@
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
           </StackPanel>
 
-          <!-- 启用服务器Post -->
+          <!-- 服务器Post -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">
               <TextBlock Text="服务器Post"
@@ -553,6 +570,7 @@
                           IsChecked="{Binding ServerPostEnable, Mode=TwoWay}"
                           VerticalAlignment="Center"/>
           </Grid>
+
         </StackPanel>
       </Border>
 

@@ -45,7 +45,8 @@
               BorderThickness="1"
               CornerRadius="12"
               Padding="12,9"
-              IsVisible="False">
+              IsVisible="False"
+              PointerPressed="OnCloudAlertPointerPressed">
         <Grid ColumnDefinitions="Auto,Auto,*">
           <icons:MaterialIcon Grid.Column="0"
                               Kind="InformationCircle"
@@ -73,10 +74,12 @@
       <UniformGrid Columns="2" Rows="2" Margin="0,9">
         <!-- P2P卡片 -->
         <Border Classes="card"
+                Tag="P2P"
                 Background="{DynamicResource MaterialSurfaceBrush}"
                 CornerRadius="16"
                 Margin="6"
-                Padding="17">
+                Padding="17"
+                PointerPressed="OnCardPointerPressed">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>
@@ -115,10 +118,12 @@
 
         <!-- Link卡片 -->
         <Border Classes="card"
+                Tag="Link"
                 Background="{DynamicResource MaterialSurfaceBrush}"
                 CornerRadius="16"
                 Margin="6"
-                Padding="17">
+                Padding="17"
+                PointerPressed="OnCardPointerPressed">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>
@@ -157,10 +162,12 @@
 
         <!-- 更新卡片 -->
         <Border Classes="card"
+                Tag="Update"
                 Background="{DynamicResource MaterialSurfaceBrush}"
                 CornerRadius="16"
                 Margin="6"
-                Padding="17">
+                Padding="17"
+                PointerPressed="OnCardPointerPressed">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>
@@ -199,10 +206,12 @@
 
         <!-- 设置卡片 -->
         <Border Classes="card"
+                Tag="Settings"
                 Background="{DynamicResource MaterialSurfaceBrush}"
                 CornerRadius="16"
                 Margin="6"
-                Padding="17">
+                Padding="17"
+                PointerPressed="OnCardPointerPressed">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>

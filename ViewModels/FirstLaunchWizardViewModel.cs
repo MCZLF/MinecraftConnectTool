@@ -104,6 +104,14 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     }
 
     [ObservableProperty]
+    private bool _simulateFluentDesign = true;
+
+    partial void OnSimulateFluentDesignChanged(bool value)
+    {
+        ApplyThemeSettings();
+    }
+
+    [ObservableProperty]
     private Color _accentColor = Color.Parse("#6750A4");
 
     partial void OnAccentColorChanged(Color value)
@@ -688,6 +696,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         var themeService = ThemeService.Instance;
         IsDarkMode = themeService.IsDarkMode;
         EnableColorMode = themeService.EnableColorMode;
+        SimulateFluentDesign = themeService.SimulateFluentDesign;
         AccentColor = themeService.AccentColor;
         MixIntensity = themeService.MixIntensity;
         EnablePhotoBackground = themeService.EnablePhotoBackground;
@@ -701,6 +710,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         var themeService = ThemeService.Instance;
         themeService.IsDarkMode = IsDarkMode;
         themeService.EnableColorMode = EnableColorMode;
+        themeService.SimulateFluentDesign = SimulateFluentDesign;
         themeService.AccentColor = AccentColor;
         themeService.MixIntensity = MixIntensity;
         themeService.EnablePhotoBackground = EnablePhotoBackground;

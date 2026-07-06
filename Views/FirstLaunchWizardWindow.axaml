@@ -461,6 +461,23 @@
                                 VerticalAlignment="Center"/>
                 </Grid>
 
+                <!-- 模拟 Fluent Design -->
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="模拟 Fluent Design"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <TextBlock Text="将界面风格调整为 Win11 风格（色调、圆角、透明度）"
+                               FontSize="12"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                  </StackPanel>
+                  <ToggleSwitch Grid.Column="1"
+                                IsChecked="{Binding SimulateFluentDesign, Mode=TwoWay}"
+                                VerticalAlignment="Center"/>
+                </Grid>
+
                 <!-- 彩色主题 -->
                 <Grid ColumnDefinitions="*,Auto">
                   <StackPanel Grid.Column="0" Spacing="4">

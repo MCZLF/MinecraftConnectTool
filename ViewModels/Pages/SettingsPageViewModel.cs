@@ -118,6 +118,12 @@ public partial class SettingsPageViewModel : ViewModelBase
     private bool _autoCheckP2PIFOpen = true;
 
     /// <summary>
+    /// 启动后默认显示页面
+    /// </summary>
+    [ObservableProperty]
+    private StartupPageOption? _defaultStartupPage;
+
+    /// <summary>
     /// 动画速度
     /// </summary>
     [ObservableProperty]
@@ -241,8 +247,19 @@ public partial class SettingsPageViewModel : ViewModelBase
     private bool _isMirrorTypeSelectorVisible;
 
     /// <summary>
-    /// 可用的镜像源类型列表
+    /// 可用的默认启动页面列表
     /// </summary>
+    public List<StartupPageOption> StartupPageOptions { get; } = new()
+    {
+        new StartupPageOption("Home", "首页(默认)"),
+        new StartupPageOption("P2P", "P2P模式"),
+        new StartupPageOption("Link", "Link模式"),
+        new StartupPageOption("ET", "ET"),
+        new StartupPageOption("Optimize", "优化"),
+        new StartupPageOption("Update", "检查更新"),
+        new StartupPageOption("Settings", "设置")
+    };
+
     public List<string> GitHubMirrorTypes { get; } = new() { "cloudflare", "hk", "fastly" };
 
     /// <summary>
@@ -442,6 +459,14 @@ public partial class SettingsPageViewModel : ViewModelBase
         GoUpdateWhenStart = ConfigService.Read<bool>("goupdatewhenstart", false);
         EnableVersionCheck = ConfigService.Read<bool>("EnableVersionCheck", true);
         AutoCheckP2PIFOpen = ConfigService.Read<bool>("AutoCheckP2PIFOpen", true);
+        var defaultStartupPageKey = ConfigService.Read<string>("DefaultStartupPage", "Home");
+        var defaultStartupPage = StartupPageOptions.FirstOrDefault(option => option.PageKey == defaultStartupPageKey);
+        if (defaultStartupPage == null)
+        {
+            ConfigService.Delete("DefaultStartupPage");
+            defaultStartupPage = StartupPageOptions[0];
+        }
+        DefaultStartupPage = defaultStartupPage;
 
         // 动画速度设置
         AnimationSpeed = ThemeService.Instance.AnimationSpeed;
@@ -622,6 +647,14 @@ public partial class SettingsPageViewModel : ViewModelBase
         {
             // 显示提示，告知用户需要重启才能生效
             ShowToast(value ? "性能模式已开启，重启应用后生效" : "性能模式已关闭，重启应用后生效");
+        }
+    }
+
+    partial void OnDefaultStartupPageChanged(StartupPageOption? value)
+    {
+        if (value != null)
+        {
+            ConfigService.Write("DefaultStartupPage", value.PageKey);
         }
     }
 
@@ -1383,6 +1416,20 @@ public class AnimationSpeedOption
         Value = value;
         DisplayName = displayName;
         DurationText = durationText;
+    }
+
+    public override string ToString() => DisplayName;
+}
+
+public class StartupPageOption
+{
+    public string PageKey { get; }
+    public string DisplayName { get; }
+
+    public StartupPageOption(string pageKey, string displayName)
+    {
+        PageKey = pageKey;
+        DisplayName = displayName;
     }
 
     public override string ToString() => DisplayName;

@@ -1,5 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -78,16 +81,38 @@ public partial class MainWindowViewModel : ViewModelBase
 
         InitializeNavigationItems();
         
-        // 根据设置决定启动页面
-        bool goUpdateWhenStart = ConfigService.Read("goupdatewhenstart", false);
-        if (goUpdateWhenStart)
+        NavigateTo(GetDefaultStartupPageKey());
+    }
+
+    private string GetDefaultStartupPageKey()
+    {
+        try
         {
-            NavigateTo("Update");
+            var configPath = ConfigService.GetConfigFilePath();
+            if (!File.Exists(configPath))
+            {
+                return "Home";
+            }
+
+            var json = File.ReadAllText(configPath);
+            var config = JsonNode.Parse(json)?.AsObject();
+            if (config?.TryGetPropertyValue("DefaultStartupPage", out var value) != true || value == null)
+            {
+                return "Home";
+            }
+
+            var defaultStartupPage = value.GetValue<string>();
+            if (NavigationItems.Any(item => item.Key == defaultStartupPage))
+            {
+                return defaultStartupPage;
+            }
         }
-        else
+        catch
         {
-            NavigateTo("Home");
         }
+
+        ConfigService.Delete("DefaultStartupPage");
+        return "Home";
     }
 
     private void OnP2PStateChanged(object? sender, bool isRunning)

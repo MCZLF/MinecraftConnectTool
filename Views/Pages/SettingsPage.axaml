@@ -40,7 +40,7 @@
       </StackPanel>
 
       <!-- 外观设置卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="20">
@@ -240,7 +240,7 @@
       </Border>
 
       <!-- 启动设置卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="20">
@@ -528,7 +528,7 @@
       </Border>
 
       <!-- 功能设置卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="20">
@@ -575,7 +575,7 @@
       </Border>
 
       <!-- P2P高级设置卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="20">
@@ -743,7 +743,7 @@
       </Border>
 
       <!-- 高级设置卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="20">
@@ -932,7 +932,7 @@
                            Margin="0,8,0,0"
                            Height="4"
                            Foreground="{DynamicResource MaterialPrimaryBrush}"
-                           Background="{DynamicResource MaterialSurfaceVariantBrush}"/>
+                           Background="{DynamicResource MaterialCardVariantBrush}"/>
               <TextBlock IsVisible="{Binding IsNetworkOptimizing}"
                          Text="{Binding NetworkOptimizationProgress, StringFormat='{}{0}%'}"
                          FontSize="12"
@@ -955,7 +955,7 @@
       </Border>
 
       <!-- 关于卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="24">
         <StackPanel Spacing="16">
@@ -1054,7 +1054,7 @@
             Margin="0,0,0,60"
             Padding="20,12"
             CornerRadius="28"
-            Background="{DynamicResource MaterialSurfaceVariantBrush}"
+            Background="{DynamicResource MaterialCardVariantBrush}"
             MaxWidth="360"
             Opacity="{Binding ToastOpacity, FallbackValue=0}"
             IsVisible="{Binding IsToastVisible, FallbackValue=False}"

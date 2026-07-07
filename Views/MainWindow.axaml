@@ -157,7 +157,7 @@
             VerticalAlignment="Stretch">
         <Border HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBrush}"
                 BoxShadow="0 16 48 0 #60000000"
                 CornerRadius="8"
                 Padding="0"
@@ -249,8 +249,9 @@
       </Grid.ColumnDefinitions>
       
       <!-- 标题栏背景 - 允许拖动 -->
-      <Border Grid.Column="0" Grid.ColumnSpan="3" 
-              Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border x:Name="TitleBarBackground"
+              Grid.Column="0" Grid.ColumnSpan="3" 
+              Background="{DynamicResource MaterialCardBrush}"
               Opacity="0.8"
               PointerPressed="OnTitleBarPointerPressed"/>
       
@@ -402,16 +403,14 @@
       <Grid Grid.Column="0">
         <!-- 左侧导航背景层 -->
         <Border x:Name="LeftNavBackground"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBackgroundBrush}"
                 Opacity="1"
                 BorderBrush="{DynamicResource MaterialDividerBrush}"
                 BorderThickness="0,0,1,0"/>
-        <!-- 左侧导航控件层 -->
-        <Border x:Name="LeftNavBorder"
-                Background="{DynamicResource MaterialSurfaceBrush}"
-                Opacity="1"
+        <Border x:Name="LeftNavControlGlass"
+                Background="Transparent"
                 BorderBrush="{DynamicResource MaterialDividerBrush}"
-                BorderThickness="0,0,1,0">
+                BorderThickness="0,0,1,0"/>
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -671,7 +670,6 @@
             </Button>
           </Border>
           </Grid>
-        </Border>
       </Grid>
 
       <!-- 右侧内容区域 -->
@@ -682,14 +680,13 @@
         
         <!-- 背景层 - 用于显示照片背景 -->
         <Border x:Name="RightContentBackground" 
-                Background="{DynamicResource MaterialBackgroundBrush}" 
+                Background="{DynamicResource MaterialCardBackgroundBrush}" 
                 Opacity="1"/>
+        <Border x:Name="RightContentControlGlass"
+                Background="Transparent"/>
         
         <!-- 内容层 - 实际显示控件 -->
-        <Border x:Name="RightContentBorder" 
-                Background="{DynamicResource MaterialBackgroundBrush}" 
-                Opacity="1">
-          <Grid>
+        <Grid>
           <!-- 页面内容 -->
           <TransitioningContentControl x:Name="ContentControl"
                                        Content="{Binding CurrentPage}"
@@ -707,7 +704,7 @@
                   Margin="0,0,24,88"
                   Padding="16,12"
                   CornerRadius="8"
-                  Background="{DynamicResource MaterialSurfaceBrush}"
+                  Background="{DynamicResource MaterialCardBrush}"
                   Opacity="0.7">
             <StackPanel Spacing="4">
               <TextBlock x:Name="WatermarkLine1"
@@ -749,7 +746,7 @@
                     Canvas.Bottom="24"
                     Padding="12,8"
                     CornerRadius="8"
-                    Background="{DynamicResource MaterialSurfaceBrush}"
+                    Background="{DynamicResource MaterialCardBrush}"
                     Opacity="0.9"
                     Cursor="Hand"
                     IsVisible="True">
@@ -776,7 +773,6 @@
                                        ToolTipText="{Binding StopButtonToolTip}"
                                        Command="{Binding StopCoreCommand}"/>
           </Grid>
-        </Border>
       </Grid>
     </Grid>
   </Grid>

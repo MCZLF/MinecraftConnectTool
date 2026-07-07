@@ -21,7 +21,7 @@
       <Grid ColumnDefinitions="*,*" Margin="0,16,0,0">
         <!-- 图文教程 -->
         <Border Grid.Column="0"
-                Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                Background="{DynamicResource MaterialCardVariantBrush}"
                 CornerRadius="12"
                 Padding="16"
                 Margin="0,0,8,0"
@@ -41,7 +41,7 @@
 
         <!-- 视频教程 -->
         <Border Grid.Column="1"
-                Background="{DynamicResource MaterialSurfaceVariantBrush}"
+                Background="{DynamicResource MaterialCardVariantBrush}"
                 CornerRadius="12"
                 Padding="16"
                 Margin="8,0,0,0"
@@ -61,7 +61,7 @@
       </Grid>
 
       <!-- 提示信息 -->
-      <Border Background="{DynamicResource MaterialSurfaceVariantBrush}"
+      <Border Background="{DynamicResource MaterialCardVariantBrush}"
               CornerRadius="8"
               Padding="16">
         <TextBlock Text="点击上方链接即可直接打开~                              欢迎加入QQ群一起讨论|690625244"

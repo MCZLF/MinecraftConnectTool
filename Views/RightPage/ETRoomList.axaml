@@ -106,7 +106,7 @@
 
       <!-- 玩家列表 -->
       <Border Grid.Row="1"
-              Background="{DynamicResource MaterialSurfaceVariantBrush}"
+              Background="{DynamicResource MaterialCardVariantBrush}"
               CornerRadius="8"
               Padding="0">
         <Grid>
@@ -133,7 +133,7 @@
             <ItemsControl ItemsSource="{Binding Players}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Border Background="{DynamicResource MaterialSurfaceBrush}"
+                  <Border Background="{DynamicResource MaterialCardBrush}"
                           CornerRadius="8"
                           Padding="12"
                           Margin="8,4,8,4">

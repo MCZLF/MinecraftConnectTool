@@ -250,7 +250,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset1()
     {
-        // 预设1：鸣潮_守岸人 - 深色模式，紫色偏深主题，背景模糊10%，控件不模糊50%
+        // 预设1：鸣潮_守岸人 - 深色模式，紫色偏深主题，背景模糊10%，控件不模糊5%，混色浓度1.0
         IsPreset1Selected = true;
         IsPreset2Selected = false;
         IsPreset3Selected = false;
@@ -260,12 +260,12 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         IsDarkMode = true;
         EnableColorMode = true;
         AccentColor = Color.Parse("#7B1FA2"); // 紫色偏深
-        MixIntensity = 0.12;
+        MixIntensity = 1.00;
         EnablePhotoBackground = true;
         // 下载并应用完整图片
         PhotoBackgroundPath = await DownloadFullImageAsync(Preset1OriginalUrl, "shouanren_full.png");
         BackgroundOpacity = 0.10;
-        ControlOpacity = 0.50;
+        ControlOpacity = 0.05;
 
         ApplyThemeSettings();
     }
@@ -273,7 +273,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset2()
     {
-        // 预设2：战双帕弥什_祝你幸福露西亚 - 亮色模式，橙色主题，照片背景lucia.jpg，透明度10%，控件不透明度40%，混色浓度0.1
+        // 预设2：战双帕弥什_祝你幸福露西亚 - 亮色模式，橙色主题，照片背景lucia.jpg，透明度10%，控件不透明度20%，混色浓度1.0
         IsPreset1Selected = false;
         IsPreset2Selected = true;
         IsPreset3Selected = false;
@@ -283,12 +283,12 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         IsDarkMode = false;
         EnableColorMode = true;
         AccentColor = Color.Parse("#FF9800"); // 橙色
-        MixIntensity = 0.10;
+        MixIntensity = 1.00;
         EnablePhotoBackground = true;
         // 下载并应用完整图片
         PhotoBackgroundPath = await DownloadFullImageAsync(Preset2OriginalUrl, "lucia_full.jpg");
         BackgroundOpacity = 0.10;
-        ControlOpacity = 0.40;
+        ControlOpacity = 0.20;
 
         ApplyThemeSettings();
     }
@@ -296,7 +296,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset3()
     {
-        // 预设3：Minecraft_清晨 - 深色模式，绿色主题，照片背景mcback.jpg，透明度14%，控件不透明度45%，混色浓度0.12
+        // 预设3：Minecraft_清晨 - 深色模式，绿色主题，照片背景mcback.jpg，透明度10%，控件不透明度15%，混色浓度1.0
         IsPreset1Selected = false;
         IsPreset2Selected = false;
         IsPreset3Selected = true;
@@ -306,12 +306,12 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         IsDarkMode = true;
         EnableColorMode = true;
         AccentColor = Color.Parse("#8BC34A"); // 绿色
-        MixIntensity = 0.12;
+        MixIntensity = 1.00;
         EnablePhotoBackground = true;
         // 下载并应用完整图片
         PhotoBackgroundPath = await DownloadFullImageAsync(Preset3OriginalUrl, "mcback_full.jpg");
-        BackgroundOpacity = 0.14;
-        ControlOpacity = 0.45;
+        BackgroundOpacity = 0.10;
+        ControlOpacity = 0.15;
 
         ApplyThemeSettings();
     }
@@ -319,7 +319,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task ApplyPreset4()
     {
-        // 预设4：有兽焉_合照 - 深色模式，黄绿主题，照片背景YouShouBack.jpg，透明度15%，控件不透明度45%，混色浓度0.12
+        // 预设4：有兽焉_合照 - 深色模式，黄绿主题，照片背景YouShouBack.jpg，透明度10%，控件不透明度10%，混色浓度1.0
         IsPreset1Selected = false;
         IsPreset2Selected = false;
         IsPreset3Selected = false;
@@ -333,8 +333,8 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         EnablePhotoBackground = true;
         // 下载并应用完整图片
         PhotoBackgroundPath = await DownloadFullImageAsync(Preset4OriginalUrl, "YouShouBack_full.jpg");
-        BackgroundOpacity = 0.15;
-        ControlOpacity = 0.45;
+        BackgroundOpacity = 0.10;
+        ControlOpacity = 0.10;
 
         ApplyThemeSettings();
     }

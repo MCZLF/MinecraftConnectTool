@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.050";
+    public static readonly string version = "0.0.7.051";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -62,19 +62,14 @@ public partial class MainWindow : Window
     private Bitmap? _backgroundBitmap;
     private string? _currentBackgroundPath;
 
-    // 缓存 InitializePhotoBackground / ApplyTextOpacity 用到的控件引用，避免重复遍历视觉树
+    // 缓存 InitializePhotoBackground 用到的控件引用，避免重复遍历视觉树
     private Image? _cachedBackgroundImage;
     private Avalonia.Controls.Shapes.Rectangle? _cachedBackgroundOverlay;
+    private Border? _cachedTitleBarBackground;
     private Border? _cachedLeftNavBackground;
-    private Border? _cachedLeftNavBorder;
+    private Border? _cachedLeftNavControlGlass;
     private Border? _cachedRightContentBackground;
-    private Border? _cachedRightContentBorder;
-    private TextBlock? _cachedHomeText;
-    private TextBlock? _cachedP2PText;
-    private TextBlock? _cachedLinkText;
-    private TextBlock? _cachedPlayText;
-    private TextBlock? _cachedUpdateText;
-    private TextBlock? _cachedSettingsText;
+    private Border? _cachedRightContentControlGlass;
 
     public MainWindow()
     {
@@ -254,17 +249,19 @@ public partial class MainWindow : Window
         // 仅首次查找控件，后续使用缓存引用
         _cachedBackgroundImage ??= this.FindControl<Image>("BackgroundImage");
         _cachedBackgroundOverlay ??= this.FindControl<Avalonia.Controls.Shapes.Rectangle>("BackgroundOverlay");
+        _cachedTitleBarBackground ??= this.FindControl<Border>("TitleBarBackground");
         _cachedLeftNavBackground ??= this.FindControl<Border>("LeftNavBackground");
-        _cachedLeftNavBorder ??= this.FindControl<Border>("LeftNavBorder");
+        _cachedLeftNavControlGlass ??= this.FindControl<Border>("LeftNavControlGlass");
         _cachedRightContentBackground ??= this.FindControl<Border>("RightContentBackground");
-        _cachedRightContentBorder ??= this.FindControl<Border>("RightContentBorder");
+        _cachedRightContentControlGlass ??= this.FindControl<Border>("RightContentControlGlass");
 
         var backgroundImage = _cachedBackgroundImage;
         var backgroundOverlay = _cachedBackgroundOverlay;
+        var titleBarBackground = _cachedTitleBarBackground;
         var leftNavBackground = _cachedLeftNavBackground;
-        var leftNavBorder = _cachedLeftNavBorder;
+        var leftNavControlGlass = _cachedLeftNavControlGlass;
         var rightContentBackground = _cachedRightContentBackground;
-        var rightContentBorder = _cachedRightContentBorder;
+        var rightContentControlGlass = _cachedRightContentControlGlass;
 
         if (backgroundImage == null || backgroundOverlay == null) return;
 
@@ -274,29 +271,14 @@ public partial class MainWindow : Window
         double opacity = ThemeService.Instance.BackgroundOpacity;
         double controlOpacity = ThemeService.Instance.ControlOpacity;
 
-        // 根据当前主题调整透明度（亮色模式需要更不透明以保证可读性）
         bool isDarkMode = ThemeService.Instance.IsDarkMode;
-        
-        // 文字额外固定+10%不透明度
-        double textExtraOpacity = 0.10;
-        
-        // 左侧导航背景透明度（让照片显示出来）
-        double navBgOpacity = isDarkMode ? opacity : Math.Min(opacity + 0.15, 0.95);
-        // 左侧导航控件层不透明度（让按钮等控件更清晰）
-        double navControlOpacity = isDarkMode 
-            ? Math.Min(opacity + controlOpacity, 1.0) 
-            : Math.Min(opacity + controlOpacity + 0.15, 1.0);
-        // 左侧导航文字额外不透明度
-        double navTextOpacity = Math.Min(navControlOpacity + textExtraOpacity, 1.0);
-        
-        // 右侧内容区域背景透明度（让照片显示出来）
-        double contentBgOpacity = isDarkMode ? opacity : Math.Min(opacity + 0.10, 0.95);
-        // 右侧内容区域控件层不透明度（让控件更清晰）
-        double contentControlOpacity = isDarkMode 
-            ? Math.Min(opacity + controlOpacity, 1.0) 
-            : Math.Min(opacity + controlOpacity + 0.15, 1.0);
-        // 右侧内容区域文字额外不透明度
-        double contentTextOpacity = Math.Min(contentControlOpacity + textExtraOpacity, 1.0);
+        double surfaceOpacity = GetEffectiveSurfaceOpacity(controlOpacity);
+        double backgroundSurfaceOpacity = GetEffectiveBackgroundOpacity(opacity);
+        double titleBarBackgroundOpacity = Math.Clamp(surfaceOpacity + (isDarkMode ? 0.06 : 0.10), 0.45, 0.96);
+        double navBgOpacity = backgroundSurfaceOpacity;
+        double navControlOpacity = surfaceOpacity;
+        double contentBgOpacity = backgroundSurfaceOpacity;
+        double contentControlOpacity = surfaceOpacity;
 
         if (enablePhotoBackground && !string.IsNullOrEmpty(photoPath) && File.Exists(photoPath))
         {
@@ -318,7 +300,7 @@ public partial class MainWindow : Window
                     Console.WriteLine($"加载背景图片失败: {ex.Message}");
                     _currentBackgroundPath = null;
                     _backgroundBitmap = null;
-                    ResetToOpaqueBackground(backgroundImage, backgroundOverlay, leftNavBackground, leftNavBorder, rightContentBackground, rightContentBorder);
+                    ResetToOpaqueBackground(backgroundImage, backgroundOverlay, titleBarBackground, leftNavBackground, leftNavControlGlass, rightContentBackground, rightContentControlGlass);
                     return;
                 }
             }
@@ -336,22 +318,16 @@ public partial class MainWindow : Window
 
                 // 应用透明度设置
                 backgroundOverlay.Opacity = opacity;
-                
-                // 左侧导航栏：背景层显示照片，控件层让按钮更清晰，文字额外+10%
-                if (leftNavBackground != null) leftNavBackground.Opacity = navBgOpacity;
-                if (leftNavBorder != null) leftNavBorder.Opacity = navControlOpacity;
-                
-                // 右侧内容区域：背景层显示照片，内容层让控件更清晰，文字额外+10%
-                if (rightContentBackground != null) rightContentBackground.Opacity = contentBgOpacity;
-                if (rightContentBorder != null) rightContentBorder.Opacity = contentControlOpacity;
-                
-                // 应用文字额外不透明度
-                ApplyTextOpacity(navTextOpacity, contentTextOpacity);
+                SetPanelBackground(titleBarBackground, "MaterialCardBrush", titleBarBackgroundOpacity);
+                SetPanelBackground(leftNavBackground, "MaterialCardBackgroundBrush", navBgOpacity);
+                SetPanelBackground(leftNavControlGlass, "MaterialCardBrush", navControlOpacity);
+                SetPanelBackground(rightContentBackground, "MaterialCardBackgroundBrush", contentBgOpacity);
+                SetPanelBackground(rightContentControlGlass, "MaterialCardBrush", contentControlOpacity);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"加载背景图片失败: {ex.Message}");
-                ResetToOpaqueBackground(backgroundImage, backgroundOverlay, leftNavBackground, leftNavBorder, rightContentBackground, rightContentBorder);
+                ResetToOpaqueBackground(backgroundImage, backgroundOverlay, titleBarBackground, leftNavBackground, leftNavControlGlass, rightContentBackground, rightContentControlGlass);
             }
         }
         else
@@ -361,46 +337,71 @@ public partial class MainWindow : Window
             _backgroundBitmap?.Dispose();
             _backgroundBitmap = null;
             _currentBackgroundPath = null;
-            ResetToOpaqueBackground(backgroundImage, backgroundOverlay, leftNavBackground, leftNavBorder, rightContentBackground, rightContentBorder);
+            ResetToOpaqueBackground(backgroundImage, backgroundOverlay, titleBarBackground, leftNavBackground, leftNavControlGlass, rightContentBackground, rightContentControlGlass);
         }
-    }
-
-    /// <summary>
-    /// 应用文字额外不透明度
-    /// </summary>
-    private void ApplyTextOpacity(double navTextOpacity, double contentTextOpacity)
-    {
-        // 左侧导航文字（使用缓存引用）
-        _cachedHomeText ??= this.FindControl<TextBlock>("HomeText");
-        _cachedP2PText ??= this.FindControl<TextBlock>("P2PText");
-        _cachedLinkText ??= this.FindControl<TextBlock>("LinkText");
-        _cachedPlayText ??= this.FindControl<TextBlock>("PlayText");
-        _cachedUpdateText ??= this.FindControl<TextBlock>("UpdateText");
-        _cachedSettingsText ??= this.FindControl<TextBlock>("SettingsText");
-
-        if (_cachedHomeText != null) _cachedHomeText.Opacity = navTextOpacity;
-        if (_cachedP2PText != null) _cachedP2PText.Opacity = navTextOpacity;
-        if (_cachedLinkText != null) _cachedLinkText.Opacity = navTextOpacity;
-        if (_cachedPlayText != null) _cachedPlayText.Opacity = navTextOpacity;
-        if (_cachedUpdateText != null) _cachedUpdateText.Opacity = navTextOpacity;
-        if (_cachedSettingsText != null) _cachedSettingsText.Opacity = navTextOpacity;
     }
 
     /// <summary>
     /// 重置为不透明背景
     /// </summary>
-    private void ResetToOpaqueBackground(Image backgroundImage, Avalonia.Controls.Shapes.Rectangle backgroundOverlay, Border? leftNavBackground, Border? leftNavBorder, Border? rightContentBackground, Border? rightContentBorder)
+    private void ResetToOpaqueBackground(Image backgroundImage, Avalonia.Controls.Shapes.Rectangle backgroundOverlay, Border? titleBarBackground, Border? leftNavBackground, Border? leftNavControlGlass, Border? rightContentBackground, Border? rightContentControlGlass)
     {
         backgroundImage.Source = null;
         backgroundImage.IsVisible = false;
         backgroundOverlay.Opacity = 1;
-        if (leftNavBackground != null) leftNavBackground.Opacity = 1;
-        if (leftNavBorder != null) leftNavBorder.Opacity = 1;
-        if (rightContentBackground != null) rightContentBackground.Opacity = 1;
-        if (rightContentBorder != null) rightContentBorder.Opacity = 1;
-        
-        // 重置文字不透明度为默认值
-        ApplyTextOpacity(1.0, 1.0);
+        ResetPanelBackground(titleBarBackground, "MaterialCardBrush", 0.8);
+        ResetPanelBackground(leftNavBackground, "MaterialCardBackgroundBrush");
+        ResetPanelBackground(leftNavControlGlass, "MaterialCardBrush", 0);
+        ResetPanelBackground(rightContentBackground, "MaterialCardBackgroundBrush");
+        ResetPanelBackground(rightContentControlGlass, "MaterialCardBrush", 0);
+    }
+
+    private void SetPanelBackground(Border? panel, string resourceKey, double opacity)
+    {
+        if (panel == null) return;
+
+        panel.Opacity = 1;
+        panel.Background = CreateBrushWithOpacity(resourceKey, opacity);
+    }
+
+    private void ResetPanelBackground(Border? panel, string resourceKey, double? fallbackOpacity = null)
+    {
+        if (panel == null) return;
+
+        panel.Opacity = fallbackOpacity ?? 1;
+        panel.Background = this.FindResource(resourceKey) as IBrush;
+    }
+
+    private IBrush? CreateBrushWithOpacity(string resourceKey, double opacity)
+    {
+        if (this.FindResource(resourceKey) is not SolidColorBrush sourceBrush)
+        {
+            if (resourceKey == "MaterialCardBrush" && this.FindResource("MaterialSurfaceBrush") is SolidColorBrush surfaceBrush)
+            {
+                sourceBrush = surfaceBrush;
+            }
+            else if (resourceKey == "MaterialCardBackgroundBrush" && this.FindResource("MaterialBackgroundBrush") is SolidColorBrush backgroundBrush)
+            {
+                sourceBrush = backgroundBrush;
+            }
+            else
+            {
+                return this.FindResource(resourceKey) as IBrush;
+            }
+        }
+
+        var color = sourceBrush.Color;
+        return new SolidColorBrush(Color.FromArgb((byte)Math.Round(Math.Clamp(opacity, 0, 1) * 255), color.R, color.G, color.B));
+    }
+
+    private static double GetEffectiveSurfaceOpacity(double controlOpacity)
+    {
+        return Math.Clamp(0.38 + controlOpacity * 0.70, 0.38, 0.94);
+    }
+
+    private static double GetEffectiveBackgroundOpacity(double backgroundOpacity)
+    {
+        return Math.Clamp(0.22 + backgroundOpacity * 0.75, 0.25, 0.92);
     }
 
     /// <summary>

@@ -182,7 +182,7 @@
       <!-- 左侧操作面板 -->
       <StackPanel Grid.Column="0" Spacing="16">
         <!-- 开启联机房间 -->
-        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+        <Border Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Padding="20">
           <StackPanel Spacing="16">
@@ -216,7 +216,7 @@
         </Border>
 
         <!-- 加入联机房间 -->
-        <Border Background="{DynamicResource MaterialSurfaceBrush}"
+        <Border Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Padding="20">
           <StackPanel Spacing="16">
@@ -269,7 +269,7 @@
 
       <!-- 右侧日志区域 -->
       <Border Grid.Column="1"
-              Background="{DynamicResource MaterialSurfaceBrush}"
+              Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               Padding="20"
               Margin="20,0,0,5">
@@ -309,7 +309,7 @@
           </Grid>
 
           <Border Grid.Row="1"
-                  Background="{DynamicResource MaterialBackgroundBrush}"
+                  Background="{DynamicResource MaterialCardBackgroundBrush}"
                   CornerRadius="12"
                   Padding="16">
             <ScrollViewer x:Name="LogScrollViewer"

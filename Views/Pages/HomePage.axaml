@@ -40,7 +40,7 @@
 
       <!-- 普通云公告 -->
       <Border x:Name="CloudAlertBorder"
-              Background="{DynamicResource MaterialSurfaceBrush}"
+              Background="{DynamicResource MaterialCardBrush}"
               BorderBrush="{DynamicResource MaterialPrimaryBrush}"
               BorderThickness="1"
               CornerRadius="12"
@@ -75,7 +75,7 @@
         <!-- P2P卡片 -->
         <Border Classes="card"
                 Tag="P2P"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Margin="6"
                 Padding="17"
@@ -119,7 +119,7 @@
         <!-- Link卡片 -->
         <Border Classes="card"
                 Tag="Link"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Margin="6"
                 Padding="17"
@@ -163,7 +163,7 @@
         <!-- 更新卡片 -->
         <Border Classes="card"
                 Tag="Update"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Margin="6"
                 Padding="17"
@@ -207,7 +207,7 @@
         <!-- 设置卡片 -->
         <Border Classes="card"
                 Tag="Settings"
-                Background="{DynamicResource MaterialSurfaceBrush}"
+                Background="{DynamicResource MaterialCardBrush}"
                 CornerRadius="16"
                 Margin="6"
                 Padding="17"

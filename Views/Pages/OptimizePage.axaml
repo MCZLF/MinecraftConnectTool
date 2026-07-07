@@ -47,7 +47,7 @@
       </Grid>
 
       <!-- NAT类型检测卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               BoxShadow="0 2 8 0 #1A000000"
               BorderThickness="1"
@@ -162,7 +162,7 @@
       </Border>
 
       <!-- 详细日志卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               BoxShadow="0 2 8 0 #1A000000"
               BorderThickness="1"
@@ -192,7 +192,7 @@
           </Grid>
 
           <!-- 日志内容 -->
-          <Border Background="{DynamicResource MaterialBackgroundBrush}"
+          <Border Background="{DynamicResource MaterialCardBackgroundBrush}"
                   CornerRadius="8"
                   Padding="16">
             <ScrollViewer MaxHeight="300"
@@ -209,7 +209,7 @@
       </Border>
 
       <!-- 优化建议卡片 -->
-      <Border Background="{DynamicResource MaterialSurfaceBrush}"
+      <Border Background="{DynamicResource MaterialCardBrush}"
               CornerRadius="16"
               BoxShadow="0 2 8 0 #1A000000"
               BorderThickness="1"

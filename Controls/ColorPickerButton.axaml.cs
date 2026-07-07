@@ -277,6 +277,17 @@ public partial class ColorPickerButton : UserControl
         };
 
         intensityPanel.Children.Add(intensitySliderPanel);
+
+        // 提示文字 - 版本说明
+        intensityPanel.Children.Add(new TextBlock
+        {
+            Text = "这个浓度滑块在0.0.7.052后被大削了，移除了全局滤镜\n可以随便拉，没太大影响了，建议直接100%",
+            FontSize = 11,
+            Opacity = 0.55,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            Foreground = this.FindResource("MaterialOnSurfaceBrush") as IBrush
+        });
+
         mainPanel.Children.Add(intensityPanel);
 
         // 按钮区域（确定 + 重置）

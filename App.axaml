@@ -65,11 +65,14 @@
     <SolidColorBrush x:Key="MaterialOnTertiaryContainerBrush" Color="#FFD8E4"/>
 
     <SolidColorBrush x:Key="MaterialSurfaceBrush" Color="#1C1B1F"/>
+    <SolidColorBrush x:Key="MaterialCardBrush" Color="#1C1B1F"/>
+    <SolidColorBrush x:Key="MaterialCardVariantBrush" Color="#1C1B1F"/>
     <SolidColorBrush x:Key="MaterialOnSurfaceBrush" Color="#E6E1E5"/>
     <SolidColorBrush x:Key="MaterialOnSurfaceVariantBrush" Color="#49454F"/>
     <SolidColorBrush x:Key="MaterialSurfaceVariantBrush" Color="#49454F"/>
 
     <SolidColorBrush x:Key="MaterialBackgroundBrush" Color="#1C1B1F"/>
+    <SolidColorBrush x:Key="MaterialCardBackgroundBrush" Color="#1C1B1F"/>
     <SolidColorBrush x:Key="MaterialOnBackgroundBrush" Color="#E6E1E5"/>
 
     <SolidColorBrush x:Key="MaterialErrorBrush" Color="#F2B8B5"/>

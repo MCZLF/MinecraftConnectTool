@@ -199,6 +199,7 @@ public class ThemeService
                 // 保存到配置
                 ConfigService.Write("IsDarkMode", value);
                 ApplyTheme();
+                NotifyPhotoBackgroundChangedIfEnabled();
             }
         }
     }
@@ -214,6 +215,7 @@ public class ThemeService
                 // 保存到配置
                 ConfigService.Write("SimulateFluentDesign", value);
                 ApplyTheme();
+                NotifyPhotoBackgroundChangedIfEnabled();
             }
         }
     }
@@ -232,6 +234,7 @@ public class ThemeService
                 // 保存到配置
                 ConfigService.Write("EnableColorMode", value);
                 ApplyTheme();
+                NotifyPhotoBackgroundChangedIfEnabled();
             }
         }
     }
@@ -250,6 +253,7 @@ public class ThemeService
                 // 保存到配置
                 ConfigService.Write("AccentColor", value.ToString());
                 ApplyTheme();
+                NotifyPhotoBackgroundChangedIfEnabled();
             }
         }
     }
@@ -268,6 +272,7 @@ public class ThemeService
                 // 保存到配置
                 ConfigService.Write("MixIntensity", _mixIntensity);
                 ApplyTheme();
+                NotifyPhotoBackgroundChangedIfEnabled();
             }
         }
     }
@@ -325,7 +330,7 @@ public class ThemeService
                 _backgroundOpacity = Math.Clamp(value, 0.1, 0.9);
                 // 保存到配置
                 ConfigService.Write("BackgroundOpacity", _backgroundOpacity);
-                ApplyTheme();
+                UpdatePhotoBackgroundResources();
                 // 触发照片背景变更事件
                 PhotoBackgroundChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -345,10 +350,69 @@ public class ThemeService
                 _controlOpacity = Math.Clamp(value, 0.0, 0.8);
                 // 保存到配置
                 ConfigService.Write("ControlOpacity", _controlOpacity);
+                UpdatePhotoBackgroundResources();
                 // 触发照片背景变更事件
                 PhotoBackgroundChanged?.Invoke(this, EventArgs.Empty);
             }
         }
+    }
+
+    private void NotifyPhotoBackgroundChangedIfEnabled()
+    {
+        if (_enablePhotoBackground)
+        {
+            PhotoBackgroundChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void UpdatePhotoBackgroundResources()
+    {
+        var app = Application.Current;
+        if (app == null) return;
+
+        ApplyPhotoBackgroundSurfaceTransparency(app.Resources);
+    }
+
+    private void ApplyPhotoBackgroundSurfaceTransparency(Avalonia.Controls.IResourceDictionary resources)
+    {
+        resources["PhotoBackgroundOpacity"] = _backgroundOpacity;
+        resources["ControlBackgroundOpacity"] = _controlOpacity;
+
+        var surfaceBrush = resources.TryGetResource("MaterialSurfaceBrush", null, out var surfaceValue) && surfaceValue is SolidColorBrush surface
+            ? surface
+            : new SolidColorBrush(_isDarkMode ? Color.Parse("#1C1B1F") : Color.Parse("#FFFBFE"));
+        var backgroundBrush = resources.TryGetResource("MaterialBackgroundBrush", null, out var backgroundValue) && backgroundValue is SolidColorBrush background
+            ? background
+            : surfaceBrush;
+
+        if (!_enablePhotoBackground)
+        {
+            resources["MaterialCardBrush"] = new SolidColorBrush(surfaceBrush.Color);
+            resources["MaterialCardVariantBrush"] = new SolidColorBrush(surfaceBrush.Color);
+            resources["MaterialCardBackgroundBrush"] = new SolidColorBrush(backgroundBrush.Color);
+            return;
+        }
+
+        var cardOpacity = GetEffectiveSurfaceOpacity(_controlOpacity);
+        resources["MaterialCardBrush"] = CreateBrushWithOpacity(surfaceBrush, cardOpacity);
+        resources["MaterialCardVariantBrush"] = CreateBrushWithOpacity(surfaceBrush, Math.Clamp(cardOpacity + 0.08, 0.45, 0.96));
+        resources["MaterialCardBackgroundBrush"] = CreateBrushWithOpacity(backgroundBrush, GetEffectiveBackgroundOpacity(_backgroundOpacity));
+    }
+
+    private static double GetEffectiveSurfaceOpacity(double controlOpacity)
+    {
+        return Math.Clamp(0.38 + controlOpacity * 0.70, 0.38, 0.94);
+    }
+
+    private static double GetEffectiveBackgroundOpacity(double backgroundOpacity)
+    {
+        return Math.Clamp(0.22 + backgroundOpacity * 0.75, 0.25, 0.92);
+    }
+
+    private static IBrush CreateBrushWithOpacity(SolidColorBrush brush, double opacity)
+    {
+        var color = brush.Color;
+        return new SolidColorBrush(Color.FromArgb((byte)Math.Round(opacity * 255), color.R, color.G, color.B));
     }
 
     /// <summary>
@@ -492,7 +556,6 @@ public class ThemeService
 
         if (_enableColorMode)
         {
-            // 应用彩色模式主题色
             ApplyAccentColors(resources);
         }
         else if (_simulateFluentDesign)
@@ -503,6 +566,8 @@ public class ThemeService
         {
             ApplyMaterialDesignColors(resources);
         }
+
+        UpdatePhotoBackgroundResources();
     }
 
     /// <summary>
@@ -511,38 +576,43 @@ public class ThemeService
     private void ApplyAccentColors(Avalonia.Controls.IResourceDictionary resources)
     {
         var primary = _accentColor;
-        var primaryLight = LightenColor(primary, 0.2);
-        var primaryDark = DarkenColor(primary, 0.2);
+        var primaryLight = LightenColor(primary, 0.18);
+        var primaryDark = DarkenColor(primary, 0.22);
         var onPrimary = GetContrastColor(primary);
+        var mix = Math.Clamp(_mixIntensity, 0.01, 1.0);
 
         if (_isDarkMode)
         {
-            // 彩色模式 - 深色主题
+            var background = MixColor(Color.Parse("#1C1B1F"), primary, mix * 0.035);
+            var surface = MixColor(Color.Parse("#211F26"), primary, mix * 0.055);
+            var surfaceVariant = MixColor(Color.Parse("#49454F"), primary, mix * 0.08);
+            var primaryContainer = MixColor(Color.Parse("#2B2135"), primary, 0.38 + mix * 0.10);
+            var secondary = MixColor(Color.Parse("#CCC2DC"), primary, 0.16 + mix * 0.08);
+            var secondaryContainer = MixColor(Color.Parse("#332D41"), primary, 0.14 + mix * 0.08);
+            var tertiary = MixColor(Color.Parse("#EFB8C8"), primary, 0.14 + mix * 0.06);
+            var tertiaryContainer = MixColor(Color.Parse("#492532"), primary, 0.12 + mix * 0.08);
+
             resources["MaterialPrimaryBrush"] = new SolidColorBrush(primary);
             resources["MaterialOnPrimaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialPrimaryContainerBrush"] = new SolidColorBrush(primaryDark);
-            resources["MaterialOnPrimaryContainerBrush"] = new SolidColorBrush(primary);
+            resources["MaterialPrimaryContainerBrush"] = new SolidColorBrush(primaryContainer);
+            resources["MaterialOnPrimaryContainerBrush"] = new SolidColorBrush(GetContrastColor(primaryContainer));
 
-            resources["MaterialSecondaryBrush"] = new SolidColorBrush(primaryLight);
-            resources["MaterialOnSecondaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialSecondaryContainerBrush"] = new SolidColorBrush(DarkenColor(primary, 0.3));
-            resources["MaterialOnSecondaryContainerBrush"] = new SolidColorBrush(primaryLight);
+            resources["MaterialSecondaryBrush"] = new SolidColorBrush(secondary);
+            resources["MaterialOnSecondaryBrush"] = new SolidColorBrush(GetContrastColor(secondary));
+            resources["MaterialSecondaryContainerBrush"] = new SolidColorBrush(secondaryContainer);
+            resources["MaterialOnSecondaryContainerBrush"] = new SolidColorBrush(GetContrastColor(secondaryContainer));
 
-            resources["MaterialTertiaryBrush"] = new SolidColorBrush(primaryLight);
-            resources["MaterialOnTertiaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialTertiaryContainerBrush"] = new SolidColorBrush(DarkenColor(primary, 0.4));
-            resources["MaterialOnTertiaryContainerBrush"] = new SolidColorBrush(primaryLight);
+            resources["MaterialTertiaryBrush"] = new SolidColorBrush(tertiary);
+            resources["MaterialOnTertiaryBrush"] = new SolidColorBrush(GetContrastColor(tertiary));
+            resources["MaterialTertiaryContainerBrush"] = new SolidColorBrush(tertiaryContainer);
+            resources["MaterialOnTertiaryContainerBrush"] = new SolidColorBrush(GetContrastColor(tertiaryContainer));
 
-            // 背景使用主题色的暗色调（使用动态混色浓度）
-            var bgColor = MixColor(Color.Parse("#1C1B1F"), primary, _mixIntensity);
-            var surfaceColor = MixColor(Color.Parse("#2D2D3D"), primary, Math.Min(_mixIntensity * 1.3, 1.0));
-
-            resources["MaterialSurfaceBrush"] = new SolidColorBrush(surfaceColor);
+            resources["MaterialSurfaceBrush"] = new SolidColorBrush(surface);
             resources["MaterialOnSurfaceBrush"] = new SolidColorBrush(Color.Parse("#E6E1E5"));
-            resources["MaterialOnSurfaceVariantBrush"] = new SolidColorBrush(Color.Parse("#49454F"));
-            resources["MaterialSurfaceVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#49454F"), primary, Math.Min(_mixIntensity * 1.5, 1.0)));
+            resources["MaterialOnSurfaceVariantBrush"] = new SolidColorBrush(Color.Parse("#CAC4D0"));
+            resources["MaterialSurfaceVariantBrush"] = new SolidColorBrush(surfaceVariant);
 
-            resources["MaterialBackgroundBrush"] = new SolidColorBrush(bgColor);
+            resources["MaterialBackgroundBrush"] = new SolidColorBrush(background);
             resources["MaterialOnBackgroundBrush"] = new SolidColorBrush(Color.Parse("#E6E1E5"));
 
             resources["MaterialErrorBrush"] = new SolidColorBrush(Color.Parse("#F2B8B5"));
@@ -550,20 +620,18 @@ public class ThemeService
             resources["MaterialErrorContainerBrush"] = new SolidColorBrush(Color.Parse("#8C1D18"));
             resources["MaterialOnErrorContainerBrush"] = new SolidColorBrush(Color.Parse("#F9DEDC"));
 
-            resources["MaterialOutlineBrush"] = new SolidColorBrush(MixColor(Color.Parse("#938F99"), primary, Math.Min(_mixIntensity * 2.0, 1.0)));
-            resources["MaterialOutlineVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#49454F"), primary, Math.Min(_mixIntensity * 1.8, 1.0)));
-            resources["MaterialDividerBrush"] = new SolidColorBrush(MixColor(Color.Parse("#49454F"), primary, Math.Min(_mixIntensity * 1.5, 1.0)));
+            resources["MaterialOutlineBrush"] = new SolidColorBrush(MixColor(Color.Parse("#938F99"), primary, mix * 0.10));
+            resources["MaterialOutlineVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#49454F"), primary, mix * 0.08));
+            resources["MaterialDividerBrush"] = new SolidColorBrush(MixColor(Color.Parse("#49454F"), primary, mix * 0.06));
 
-            resources["MaterialPaperBrush"] = new SolidColorBrush(MixColor(Color.Parse("#141218"), primary, _mixIntensity * 0.8));
+            resources["MaterialPaperBrush"] = new SolidColorBrush(MixColor(Color.Parse("#141218"), primary, mix * 0.025));
 
-            // 彩色模式特有的强调色资源
             resources["AccentBrush"] = new SolidColorBrush(primary);
             resources["AccentLightBrush"] = new SolidColorBrush(primaryLight);
             resources["AccentDarkBrush"] = new SolidColorBrush(primaryDark);
-            resources["AccentContainerBrush"] = new SolidColorBrush(DarkenColor(primary, 0.3));
+            resources["AccentContainerBrush"] = new SolidColorBrush(primaryContainer);
             resources["OnAccentBrush"] = new SolidColorBrush(onPrimary);
 
-            // 圆角保持 Material Design 风格
             resources["CardCornerRadius"] = new CornerRadius(16);
             resources["ButtonCornerRadius"] = new CornerRadius(20);
             resources["InputCornerRadius"] = new CornerRadius(4);
@@ -571,32 +639,36 @@ public class ThemeService
         }
         else
         {
-            // 彩色模式 - 浅色主题
+            var background = MixColor(Color.Parse("#FFFBFE"), primary, mix * 0.025);
+            var surface = MixColor(Color.Parse("#FFFFFF"), primary, mix * 0.035);
+            var surfaceVariant = MixColor(Color.Parse("#E7E0EC"), primary, mix * 0.055);
+            var primaryContainer = MixColor(Color.Parse("#EADDFF"), primary, 0.36 + mix * 0.10);
+            var secondary = MixColor(Color.Parse("#625B71"), primary, 0.14 + mix * 0.08);
+            var secondaryContainer = MixColor(Color.Parse("#E8DEF8"), primary, 0.14 + mix * 0.08);
+            var tertiary = MixColor(Color.Parse("#7D5260"), primary, 0.10 + mix * 0.06);
+            var tertiaryContainer = MixColor(Color.Parse("#FFD8E4"), primary, 0.10 + mix * 0.08);
+
             resources["MaterialPrimaryBrush"] = new SolidColorBrush(primary);
             resources["MaterialOnPrimaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialPrimaryContainerBrush"] = new SolidColorBrush(LightenColor(primary, 0.3));
-            resources["MaterialOnPrimaryContainerBrush"] = new SolidColorBrush(primaryDark);
+            resources["MaterialPrimaryContainerBrush"] = new SolidColorBrush(primaryContainer);
+            resources["MaterialOnPrimaryContainerBrush"] = new SolidColorBrush(GetContrastColor(primaryContainer));
 
-            resources["MaterialSecondaryBrush"] = new SolidColorBrush(primaryDark);
-            resources["MaterialOnSecondaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialSecondaryContainerBrush"] = new SolidColorBrush(LightenColor(primary, 0.4));
-            resources["MaterialOnSecondaryContainerBrush"] = new SolidColorBrush(primaryDark);
+            resources["MaterialSecondaryBrush"] = new SolidColorBrush(secondary);
+            resources["MaterialOnSecondaryBrush"] = new SolidColorBrush(GetContrastColor(secondary));
+            resources["MaterialSecondaryContainerBrush"] = new SolidColorBrush(secondaryContainer);
+            resources["MaterialOnSecondaryContainerBrush"] = new SolidColorBrush(GetContrastColor(secondaryContainer));
 
-            resources["MaterialTertiaryBrush"] = new SolidColorBrush(primaryDark);
-            resources["MaterialOnTertiaryBrush"] = new SolidColorBrush(onPrimary);
-            resources["MaterialTertiaryContainerBrush"] = new SolidColorBrush(LightenColor(primary, 0.5));
-            resources["MaterialOnTertiaryContainerBrush"] = new SolidColorBrush(primaryDark);
+            resources["MaterialTertiaryBrush"] = new SolidColorBrush(tertiary);
+            resources["MaterialOnTertiaryBrush"] = new SolidColorBrush(GetContrastColor(tertiary));
+            resources["MaterialTertiaryContainerBrush"] = new SolidColorBrush(tertiaryContainer);
+            resources["MaterialOnTertiaryContainerBrush"] = new SolidColorBrush(GetContrastColor(tertiaryContainer));
 
-            // 背景使用主题色的浅色调（使用动态混色浓度）
-            var bgColor = MixColor(Color.Parse("#FFFBFE"), primary, _mixIntensity);
-            var surfaceColor = MixColor(Color.Parse("#FFFFFF"), primary, Math.Min(_mixIntensity * 1.3, 1.0));
-
-            resources["MaterialSurfaceBrush"] = new SolidColorBrush(surfaceColor);
+            resources["MaterialSurfaceBrush"] = new SolidColorBrush(surface);
             resources["MaterialOnSurfaceBrush"] = new SolidColorBrush(Color.Parse("#1C1B1F"));
             resources["MaterialOnSurfaceVariantBrush"] = new SolidColorBrush(Color.Parse("#49454F"));
-            resources["MaterialSurfaceVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#E7E0EC"), primary, Math.Min(_mixIntensity * 1.5, 1.0)));
+            resources["MaterialSurfaceVariantBrush"] = new SolidColorBrush(surfaceVariant);
 
-            resources["MaterialBackgroundBrush"] = new SolidColorBrush(bgColor);
+            resources["MaterialBackgroundBrush"] = new SolidColorBrush(background);
             resources["MaterialOnBackgroundBrush"] = new SolidColorBrush(Color.Parse("#1C1B1F"));
 
             resources["MaterialErrorBrush"] = new SolidColorBrush(Color.Parse("#B3261E"));
@@ -604,27 +676,24 @@ public class ThemeService
             resources["MaterialErrorContainerBrush"] = new SolidColorBrush(Color.Parse("#F9DEDC"));
             resources["MaterialOnErrorContainerBrush"] = new SolidColorBrush(Color.Parse("#410E0B"));
 
-            resources["MaterialOutlineBrush"] = new SolidColorBrush(MixColor(Color.Parse("#79747E"), primary, Math.Min(_mixIntensity * 2.0, 1.0)));
-            resources["MaterialOutlineVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#C4C7C5"), primary, Math.Min(_mixIntensity * 1.8, 1.0)));
-            resources["MaterialDividerBrush"] = new SolidColorBrush(MixColor(Color.Parse("#C4C7C5"), primary, Math.Min(_mixIntensity * 1.5, 1.0)));
+            resources["MaterialOutlineBrush"] = new SolidColorBrush(MixColor(Color.Parse("#79747E"), primary, mix * 0.08));
+            resources["MaterialOutlineVariantBrush"] = new SolidColorBrush(MixColor(Color.Parse("#C4C7C5"), primary, mix * 0.05));
+            resources["MaterialDividerBrush"] = new SolidColorBrush(MixColor(Color.Parse("#C4C7C5"), primary, mix * 0.04));
 
-            resources["MaterialPaperBrush"] = new SolidColorBrush(MixColor(Color.Parse("#F3EDF7"), primary, _mixIntensity * 0.8));
+            resources["MaterialPaperBrush"] = new SolidColorBrush(MixColor(Color.Parse("#F3EDF7"), primary, mix * 0.02));
 
-            // 彩色模式特有的强调色资源
             resources["AccentBrush"] = new SolidColorBrush(primary);
             resources["AccentLightBrush"] = new SolidColorBrush(primaryLight);
             resources["AccentDarkBrush"] = new SolidColorBrush(primaryDark);
-            resources["AccentContainerBrush"] = new SolidColorBrush(LightenColor(primary, 0.3));
+            resources["AccentContainerBrush"] = new SolidColorBrush(primaryContainer);
             resources["OnAccentBrush"] = new SolidColorBrush(onPrimary);
 
-            // 圆角保持 Material Design 风格
             resources["CardCornerRadius"] = new CornerRadius(16);
             resources["ButtonCornerRadius"] = new CornerRadius(20);
             resources["InputCornerRadius"] = new CornerRadius(4);
             resources["OverlayOpacity"] = 0.08;
         }
 
-        // 清除 Fluent Design 标志
         resources["IsFluentDesignEnabled"] = false;
     }
 

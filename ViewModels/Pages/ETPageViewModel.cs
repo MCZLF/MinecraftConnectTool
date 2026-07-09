@@ -18,10 +18,19 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     // 日志最大字符数限制（防止长时间运行导致 OOM）
     private const int MaxLogLength = 32_000_000;
+    private const int MaxRecentErrorMessages = 128;
+    private readonly Queue<string> _recentErrorMessages = new();
+    private readonly HashSet<string> _recentErrorMessageSet = new(StringComparer.OrdinalIgnoreCase);
     private void TrimLogIfNeeded()
     {
         if (LogText.Length > MaxLogLength)
             LogText = LogText[^MaxLogLength..];
+    }
+
+    private void ResetErrorDeduplication()
+    {
+        _recentErrorMessages.Clear();
+        _recentErrorMessageSet.Clear();
     }
 
     [ObservableProperty]
@@ -81,6 +90,87 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         Error,
         Info,
         Waiting
+    }
+
+    private bool ShouldBlockDuplicateError(string message)
+    {
+        if (!IsErrorLog(message))
+            return false;
+
+        var normalizedMessage = NormalizeErrorMessage(message);
+        if (string.IsNullOrWhiteSpace(normalizedMessage))
+            return false;
+
+        if (_recentErrorMessageSet.Contains(normalizedMessage))
+            return true;
+
+        _recentErrorMessages.Enqueue(normalizedMessage);
+        _recentErrorMessageSet.Add(normalizedMessage);
+
+        while (_recentErrorMessages.Count > MaxRecentErrorMessages)
+        {
+            var oldestMessage = _recentErrorMessages.Dequeue();
+            _recentErrorMessageSet.Remove(oldestMessage);
+        }
+
+        return false;
+    }
+
+    private static bool IsErrorLog(string message)
+    {
+        var upper = message.ToUpperInvariant();
+        return upper.Contains("ERROR") || upper.Contains("FAIL") ||
+               upper.Contains("错误") || upper.Contains("失败") ||
+               IsRepeatedEtConnectError(message);
+    }
+
+    private static bool IsRepeatedEtConnectError(string message)
+    {
+        return message.Contains("[ET]", StringComparison.OrdinalIgnoreCase) &&
+               message.Contains("connect to peer error", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string NormalizeErrorMessage(string message)
+    {
+        var normalized = message.Trim();
+        if (normalized.StartsWith("错误:", StringComparison.OrdinalIgnoreCase))
+            normalized = normalized[3..].Trim();
+        if (normalized.StartsWith("[ET]", StringComparison.OrdinalIgnoreCase))
+            normalized = normalized[4..].Trim();
+
+        var connectErrorIndex = normalized.IndexOf("connect to peer error", StringComparison.OrdinalIgnoreCase);
+        if (connectErrorIndex >= 0)
+            return NormalizeEtConnectError(normalized[connectErrorIndex..]);
+
+        return normalized;
+    }
+
+    private static string NormalizeEtConnectError(string message)
+    {
+        var normalized = RemoveField(message.Trim(), " ip_version=");
+        var errorIndex = normalized.IndexOf(" error=", StringComparison.OrdinalIgnoreCase);
+        if (errorIndex >= 0)
+        {
+            var errorValueIndex = errorIndex + " error=".Length;
+            var bracketIndex = normalized.IndexOf('(', errorValueIndex);
+            if (bracketIndex >= 0)
+                normalized = normalized[..bracketIndex].Trim();
+        }
+        return normalized;
+    }
+
+    private static string RemoveField(string message, string fieldName)
+    {
+        var fieldIndex = message.IndexOf(fieldName, StringComparison.OrdinalIgnoreCase);
+        if (fieldIndex < 0)
+            return message;
+
+        var valueStartIndex = fieldIndex + fieldName.Length;
+        var nextFieldIndex = message.IndexOf(' ', valueStartIndex);
+        if (nextFieldIndex < 0)
+            return message[..fieldIndex].TrimEnd();
+
+        return (message[..fieldIndex] + message[nextFieldIndex..]).Trim();
     }
 
     #endregion
@@ -303,6 +393,8 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             }
         }
 
+        ResetErrorDeduplication();
+
         AddLog("=== 开始创建 ET 联机房间 ===");
 
         // 立即显示关闭按钮
@@ -350,6 +442,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
         AddLog("=== 开始加入 ET 联机房间 ===");
         AddLog($"提示码: {JoinPromptCode}");
+        ResetErrorDeduplication();
         var success = await _etService.StartJoinAsync(JoinPromptCode, playerName);
         if (!success)
         {
@@ -487,6 +580,9 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         if (ShouldFilterLog(message))
             return;
 
+        if (ShouldBlockDuplicateError(message))
+            return;
+
         var timestamp = DateTime.Now.ToString("HH:mm:ss");
         LogText += $"[{timestamp}] {message}\n";
         TrimLogIfNeeded();
@@ -500,6 +596,9 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
         var upper = message.ToUpperInvariant();
         
+        if (IsRepeatedEtConnectError(message))
+            return false;
+
         // 保留所有 ERROR/WARN/FAIL/SUCCESS 级别的日志
         if (upper.Contains("ERROR") || upper.Contains("WARN") || 
             upper.Contains("FAIL") || upper.Contains("SUCCESS") ||

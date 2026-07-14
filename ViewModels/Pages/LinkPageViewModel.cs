@@ -48,11 +48,17 @@ public partial class LinkPageViewModel : ViewModelBase
     private string _logText = "";
 
     // 日志最大字符数限制（防止长时间运行导致 OOM）
-    private const int MaxLogLength = 32_000_000;
-    private void TrimLogIfNeeded()
+    private const int MaxLogLength = 300_000;
+    private const int LogTrimTargetLength = 240_000;
+    private void AppendUiLog(string message)
     {
-        if (LogText.Length > MaxLogLength)
-            LogText = LogText[^MaxLogLength..];
+        var newText = message + Environment.NewLine;
+        if (LogText.Length + newText.Length > MaxLogLength)
+        {
+            var keepLength = Math.Min(LogTrimTargetLength, LogText.Length);
+            LogText = $"...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...{Environment.NewLine}{LogText[^keepLength..]}";
+        }
+        LogText += newText;
     }
 
     [ObservableProperty]
@@ -250,6 +256,7 @@ public partial class LinkPageViewModel : ViewModelBase
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);
+        TempRunLogService.Append("Link模式", message);
 
         // 处理消息并添加到日志
         ProcessLogMessage(message);
@@ -360,8 +367,7 @@ public partial class LinkPageViewModel : ViewModelBase
         }
 
         // 追加到日志文本
-        LogText += displayMessage + Environment.NewLine;
-        TrimLogIfNeeded();
+        AppendUiLog(displayMessage);
     }
 
     private string ExtractPromptCode(string fullText)
@@ -985,10 +991,10 @@ public partial class LinkPageViewModel : ViewModelBase
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);
+        TempRunLogService.Append("Link模式", message);
         
         // 直接添加到UI，不经过ProcessLogMessage处理
-        LogText += message + Environment.NewLine;
-        TrimLogIfNeeded();
+        AppendUiLog(message);
     }
 
     // ========== 显示错误提示窗 ==========

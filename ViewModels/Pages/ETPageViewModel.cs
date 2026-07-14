@@ -17,14 +17,20 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     private string _logText = "";
 
     // 日志最大字符数限制（防止长时间运行导致 OOM）
-    private const int MaxLogLength = 32_000_000;
+    private const int MaxLogLength = 300_000;
+    private const int LogTrimTargetLength = 240_000;
     private const int MaxRecentErrorMessages = 128;
     private readonly Queue<string> _recentErrorMessages = new();
     private readonly HashSet<string> _recentErrorMessageSet = new(StringComparer.OrdinalIgnoreCase);
-    private void TrimLogIfNeeded()
+    private void AppendUiLog(string message)
     {
-        if (LogText.Length > MaxLogLength)
-            LogText = LogText[^MaxLogLength..];
+        var newText = $"[{DateTime.Now:HH:mm:ss}] {message}\n";
+        if (LogText.Length + newText.Length > MaxLogLength)
+        {
+            var keepLength = Math.Min(LogTrimTargetLength, LogText.Length);
+            LogText = $"...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...\n{LogText[^keepLength..]}";
+        }
+        LogText += newText;
     }
 
     private void ResetErrorDeduplication()
@@ -240,7 +246,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     private void OnLogMessage(object? sender, string message)
     {
-        AddLog(message);
+        AddServiceLog(message);
     }
 
     private void OnProgressChanged(object? sender, double progress)
@@ -576,6 +582,16 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     private void AddLog(string message)
     {
+        AddLogCore(message, true);
+    }
+
+    private void AddServiceLog(string message)
+    {
+        AddLogCore(message, false);
+    }
+
+    private void AddLogCore(string message, bool writeAppLog)
+    {
         // 过滤日志：只显示重要信息（ERROR/WARN/SUCCESS 或不带 [ET] 前缀的业务日志）
         if (ShouldFilterLog(message))
             return;
@@ -583,9 +599,12 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         if (ShouldBlockDuplicateError(message))
             return;
 
-        var timestamp = DateTime.Now.ToString("HH:mm:ss");
-        LogText += $"[{timestamp}] {message}\n";
-        TrimLogIfNeeded();
+        if (writeAppLog)
+            TempRunLogService.AppendPageAndApp("ET模式", message);
+        else
+            TempRunLogService.Append("ET模式", message);
+
+        AppendUiLog(message);
         LogTextChanged?.Invoke(this, EventArgs.Empty);
     }
 

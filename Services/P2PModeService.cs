@@ -115,6 +115,7 @@ public class P2PModeService : IDisposable
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);
+        TempRunLogService.Append("P2P模式", message);
 
         // 3. 状态指示器处理
         ProcessLogIndicators(message);

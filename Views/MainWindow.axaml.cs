@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.051";
+    public static readonly string version = "0.0.7.052";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -76,6 +76,7 @@ public partial class MainWindow : Window
         paintLogo();
         _platformService = new PlatformService();
         _p2pService = new P2PModeService();
+        TempRunLogService.Initialize();
 
         // 检查性能模式是否开启
         _isPerformanceModeEnabled = ConfigService.Read<bool>("EnablePerformanceMode", false);
@@ -870,6 +871,8 @@ public partial class MainWindow : Window
         }
         _backgroundBitmap?.Dispose();
         _backgroundBitmap = null;
+
+        TempRunLogService.Cleanup();
     }
     
     /// <summary>
@@ -1408,18 +1411,18 @@ public partial class MainWindow : Window
         // 根据当前页面获取对应日志
         if (_viewModel?.CurrentPage is Pages.LinkPage linkPage && linkPage.DataContext is ViewModels.Pages.LinkPageViewModel linkVm)
         {
-            logContent = linkVm.LogText ?? string.Empty;
             pageName = "Link模式";
+            logContent = ReadAiLogSafely(pageName, linkVm.LogText ?? string.Empty);
         }
         else if (_viewModel?.CurrentPage is Pages.P2PPage p2pPage && p2pPage.DataContext is ViewModels.Pages.P2PPageViewModel p2pVm)
         {
-            logContent = p2pVm.LogText ?? string.Empty;
             pageName = "P2P模式";
+            logContent = ReadAiLogSafely(pageName, p2pVm.LogText ?? string.Empty);
         }
         else if (_viewModel?.CurrentPage is Pages.ETPage etPage && etPage.DataContext is ViewModels.Pages.ETPageViewModel etVm)
         {
-            logContent = etVm.LogText ?? string.Empty;
             pageName = "ET模式";
+            logContent = ReadAiLogSafely(pageName, etVm.LogText ?? string.Empty);
         }
         else
         {
@@ -1448,19 +1451,6 @@ public partial class MainWindow : Window
             logContent = "暂无日志内容";
         }
 
-        // 截断过长日志，防止序列化时 OOM（保留最后32MB）
-        const int maxAILogLength = 32_000_000;
-        if (logContent.Length > maxAILogLength)
-        {
-            int keepLength = maxAILogLength - 100;
-            var sb = new StringBuilder(maxAILogLength);
-            sb.Append("...(前面 ");
-            sb.Append(logContent.Length - keepLength);
-            sb.Append(" 字符已省略)...\n");
-            sb.Append(logContent, logContent.Length - keepLength, keepLength);
-            logContent = sb.ToString();
-        }
-
         var panel = new RightPage.PanelAiAnalyze(logContent, _aiServerUrl, pageName, _aiTimeoutSeconds);
         var drawer = await ShowRightDrawerAsync(panel, 420);
 
@@ -1481,6 +1471,19 @@ public partial class MainWindow : Window
                 }
             };
         }
+    }
+
+    private string ReadAiLogSafely(string pageName, string fallbackLog)
+    {
+        try
+        {
+            var runLog = TempRunLogService.Read(pageName);
+            if (!string.IsNullOrWhiteSpace(runLog))
+                return runLog;
+        }
+        catch { }
+
+        return fallbackLog;
     }
 
     private void button2_Click(object? sender, RoutedEventArgs e)

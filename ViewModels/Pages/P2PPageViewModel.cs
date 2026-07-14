@@ -21,11 +21,17 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     private string _logText = "";
 
     // 日志最大字符数限制（防止长时间运行导致 OOM）
-    private const int MaxLogLength = 32_000_000;
-    private void TrimLogIfNeeded()
+    private const int MaxLogLength = 300_000;
+    private const int LogTrimTargetLength = 240_000;
+    private void AppendUiLog(string message)
     {
-        if (LogText.Length > MaxLogLength)
-            LogText = LogText[^MaxLogLength..];
+        var newText = $"[{DateTime.Now:HH:mm:ss}] {message}\n";
+        if (LogText.Length + newText.Length > MaxLogLength)
+        {
+            var keepLength = Math.Min(LogTrimTargetLength, LogText.Length);
+            LogText = $"...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...\n{LogText[^keepLength..]}";
+        }
+        LogText += newText;
     }
 
     [ObservableProperty]
@@ -326,7 +332,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
     private void OnLogMessage(object? sender, string message)
     {
-        AddLog(message);
+        AppendUiLog(message);
+        LogTextChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnProgressChanged(object? sender, double progress)
@@ -707,9 +714,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
     private void AddLog(string message)
     {
-        var timestamp = DateTime.Now.ToString("HH:mm:ss");
-        LogText += $"[{timestamp}] {message}\n";
-        TrimLogIfNeeded();
+        TempRunLogService.AppendPageAndApp("P2P模式", message);
+        AppendUiLog(message);
         // 触发日志变化事件
         LogTextChanged?.Invoke(this, EventArgs.Empty);
     }

@@ -68,7 +68,7 @@ public class PlayerListService
     }
 
     private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "http://193.112.56.140:30148";
+    private readonly string _baseUrl = "http://room.mct.mczlf.loft.games:30148";
     private System.Timers.Timer? _heartbeatTimer;
     
     // 容错机制相关字段

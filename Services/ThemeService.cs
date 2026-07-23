@@ -75,11 +75,28 @@ public class ThemeService
             if (_instance == null)
             {
                 _instance = new ThemeService();
-                // 初始化主题
                 _instance.InitializeTheme();
             }
             return _instance;
         }
+    }
+
+    public static void ApplyFirstLaunchPreviewTheme()
+    {
+        var service = new ThemeService
+        {
+            _isDarkMode = true,
+            _simulateFluentDesign = true,
+            _enableColorMode = false,
+            _accentColor = Color.Parse("#6750A4"),
+            _mixIntensity = 0.12,
+            _enablePhotoBackground = false,
+            _backgroundOpacity = 0.10,
+            _controlOpacity = 0.40,
+            _animationSpeed = AnimationSpeed.Medium
+        };
+
+        service.ApplyTheme();
     }
 
     private ThemeService() { }

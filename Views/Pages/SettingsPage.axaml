@@ -306,6 +306,58 @@
             </ComboBox>
           </Grid>
 
+          <!-- 存储目录 -->
+          <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
+            <StackPanel Grid.Row="0" Spacing="4">
+              <TextBlock Text="核心数据存放目录"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="配置文件、核心文件与日志默认保存到当前目录 MCTConfig，也可切换到系统 Temp 或自定义目录"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding CurrentStoragePath}"
+                         FontSize="12"
+                         Opacity="0.6"
+                         TextTrimming="CharacterEllipsis"
+                         Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            </StackPanel>
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <ComboBox Grid.Column="0"
+                        ItemsSource="{Binding StorageOptions}"
+                        SelectedItem="{Binding SelectedStorageOption, Mode=TwoWay}"
+                        MinHeight="48"
+                        Padding="12,4"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource MaterialOutlineBrush}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Spacing="2" MinWidth="150" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 FontSize="13"
+                                 TextTrimming="CharacterEllipsis"
+                                 Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <Button Grid.Column="1"
+                      Classes="outlined"
+                      Command="{Binding SelectStorageDirectoryCommand}"
+                      IsVisible="{Binding IsCustomStorageSelected}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <icons:MaterialIcon Kind="FolderCog" Width="18" Height="18"/>
+                  <TextBlock Text="选择"/>
+                </StackPanel>
+              </Button>
+            </Grid>
+          </Grid>
+
           <!-- 启动时检查版本 -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">

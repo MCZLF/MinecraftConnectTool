@@ -7,7 +7,7 @@ namespace MinecraftConnectTool.Services;
 public static class TempRunLogService
 {
     private static readonly object SyncRoot = new();
-    private static readonly string BaseDirectory = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "TempRunLog");
+    private static string BaseDirectory => Path.Combine(LocalStorageService.TempDirectory, "TempRunLog");
 
     public static void Initialize()
     {
@@ -46,7 +46,7 @@ public static class TempRunLogService
 
         try
         {
-            var logPath = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+            var logPath = LocalStorageService.AppLogPath;
             Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
             File.AppendAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}", Encoding.UTF8);
         }

@@ -53,9 +53,11 @@ public class P2PModeService : IDisposable
     public bool TCP => ConfigService.Read("TCP", true);
     
     // 核心文件路径
-    private string CoreDirectory => Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
+    private string CoreDirectory => LocalStorageService.P2PCoreDirectory;
     private string CoreFileName => IsWindows ? "main.exe" : "main"; // Linux/Mac 没有 .exe 后缀
     private string CoreFilePath => Path.Combine(CoreDirectory, CoreFileName);
+    private string RuntimeConfigPath => Path.Combine(CoreDirectory, "config.json");
+    private string RuntimeBackupConfigPath => Path.Combine(CoreDirectory, "config.json0");
     
     // 基础URL
     private string BaseUrl => "https://api.mct.mczlf.loft.games/Core";
@@ -109,9 +111,7 @@ public class P2PModeService : IDisposable
         }
 
         // 2. 写入日志文件
-        string logFilePath = Path.Combine(
-            Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
-            "MCZLFAPP", "Temp", "APPLog.ini");
+        string logFilePath = LocalStorageService.AppLogPath;
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);
@@ -235,11 +235,10 @@ public class P2PModeService : IDisposable
         
         // 确保目录存在
         Directory.CreateDirectory(CoreDirectory);
-        Directory.SetCurrentDirectory(CoreDirectory);
         
         // 清理运行垃圾
-        if (File.Exists("config.json")) File.Delete("config.json");
-        if (File.Exists("config.json0")) File.Delete("config.json0");
+        if (File.Exists(RuntimeConfigPath)) File.Delete(RuntimeConfigPath);
+        if (File.Exists(RuntimeBackupConfigPath)) File.Delete(RuntimeBackupConfigPath);
         
         // 增强提醒 - 生成提示码
         int codeupate = ConfigService.Read("codeupdate", 1);
@@ -567,11 +566,10 @@ public class P2PModeService : IDisposable
         
         // 设置目录
         Directory.CreateDirectory(CoreDirectory);
-        Directory.SetCurrentDirectory(CoreDirectory);
         
         // 清理运行垃圾
-        if (File.Exists("config.json")) File.Delete("config.json");
-        if (File.Exists("config.json0")) File.Delete("config.json0");
+        if (File.Exists(RuntimeConfigPath)) File.Delete(RuntimeConfigPath);
+        if (File.Exists(RuntimeBackupConfigPath)) File.Delete(RuntimeBackupConfigPath);
         
         // 显示增强提醒
         string joinAddress = $"127.0.0.1:{randomPort}";
@@ -924,6 +922,7 @@ public class P2PModeService : IDisposable
                 {
                     FileName = CoreFilePath,
                     Arguments = arguments,
+                    WorkingDirectory = CoreDirectory,
                     UseShellExecute = true
                 };
                 
@@ -931,7 +930,7 @@ public class P2PModeService : IDisposable
                 if (IsLinux || IsMacOS)
                 {
                     startInfo.FileName = "/bin/bash";
-                    startInfo.Arguments = $"-c \"{CoreFilePath} {arguments}\"";
+                    startInfo.Arguments = $"-c \"'{CoreFilePath}' {arguments}\"";
                 }
                 
                 Process.Start(startInfo);
@@ -942,6 +941,7 @@ public class P2PModeService : IDisposable
                 _currentProcess = new Process();
                 _currentProcess.StartInfo.FileName = CoreFilePath;
                 _currentProcess.StartInfo.Arguments = arguments;
+                _currentProcess.StartInfo.WorkingDirectory = CoreDirectory;
                 _currentProcess.StartInfo.UseShellExecute = false;
                 _currentProcess.StartInfo.RedirectStandardOutput = true;
                 _currentProcess.StartInfo.RedirectStandardError = true;
@@ -953,7 +953,7 @@ public class P2PModeService : IDisposable
                 if (IsLinux || IsMacOS)
                 {
                     _currentProcess.StartInfo.FileName = "/bin/bash";
-                    _currentProcess.StartInfo.Arguments = $"-c \"{CoreFilePath} {arguments}\"";
+                    _currentProcess.StartInfo.Arguments = $"-c \"'{CoreFilePath}' {arguments}\"";
                 }
                 
                 _currentProcess.OutputDataReceived += (sender, e) =>
@@ -1065,7 +1065,7 @@ public class P2PModeService : IDisposable
     {
         try
         {
-            string configPath = Path.Combine(CoreDirectory, "config.json");
+            string configPath = RuntimeConfigPath;
             if (!File.Exists(configPath))
             {
                 return;
@@ -1103,7 +1103,8 @@ public class P2PModeService : IDisposable
         {
             try 
             { 
-                File.AppendAllText(Path.Combine(CoreDirectory, "APPLog.ini"), $"ReadPeerConfig 异常：{ex}"); 
+                Directory.CreateDirectory(Path.GetDirectoryName(LocalStorageService.AppLogPath)!);
+                File.AppendAllText(LocalStorageService.AppLogPath, $"ReadPeerConfig 异常：{ex}"); 
             } 
             catch { }
         }
@@ -1115,7 +1116,7 @@ public class P2PModeService : IDisposable
     public async Task<string?> CloudAlertAsync()
     {
         string url = "https://api.mct.mczlf.loft.games/cloudalert";
-        string cacheFileName = Path.Combine(CoreDirectory, "MCZLFAPP_Temp_CloudAlertCache.flag");
+        string cacheFileName = Path.Combine(CoreDirectory, "CloudAlertCache.flag");
         
         try
         {

@@ -548,11 +548,18 @@ public class ETModeService : IDisposable
     private static bool IsLinux => OperatingSystem.IsLinux();
     private static bool IsMacOS => OperatingSystem.IsMacOS();
     private static bool IsArm64 => RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
+    private static bool IsX64 => RuntimeInformation.ProcessArchitecture == Architecture.X64;
     private static bool IsX86 => RuntimeInformation.ProcessArchitecture == Architecture.X86;
+    private static bool ShouldValidateWindowsX64Md5 => IsWindows && IsX64;
 
     // EasyTier 版本和路径
     private const string ETVersion = "2.6.4";
-    private string ETDirectory => Path.Combine(Path.GetTempPath(), "MCZLFAPP", "ET", ETVersion);
+    private const string EasyTierCoreMd5 = "de67f60c15ef96ca8408ad5026bba640";
+    private const string EasyTierCliMd5 = "9f0345fc4ee83bc57d652d3cd5c9d433";
+    private const string PacketDllMd5 = "d011404f592e8b43973ea13c037edd23";
+    private const string WinDivert64SysMd5 = "89ed5be7ea83c01d0de33d3519944aa5";
+    private const string WinTunDllMd5 = "e861eb5789c50997d9476a6172d1c269";
+    private string ETDirectory => LocalStorageService.GetETDirectory(ETVersion);
     private string ETCorePath => Path.Combine(ETDirectory, IsWindows ? "easytier-core.exe" : "easytier-core");
     private string ETCliPath => Path.Combine(ETDirectory, IsWindows ? "easytier-cli.exe" : "easytier-cli");
 
@@ -699,9 +706,8 @@ public class ETModeService : IDisposable
     {
         try
         {
-            var logDir = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
-            Directory.CreateDirectory(logDir);
-            File.AppendAllText(Path.Combine(logDir, "APPLog.ini"), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ET] {msg}{Environment.NewLine}");
+            Directory.CreateDirectory(Path.GetDirectoryName(LocalStorageService.AppLogPath)!);
+            File.AppendAllText(LocalStorageService.AppLogPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ET] {msg}{Environment.NewLine}");
         }
         catch { }
     }
@@ -711,10 +717,22 @@ public class ETModeService : IDisposable
     /// </summary>
     public async Task<bool> EnsureEasyTierAsync()
     {
-        if (File.Exists(ETCorePath) && File.Exists(ETCliPath))
+        if (ShouldValidateWindowsX64Md5 && await ValidateWindowsX64EasyTierFilesAsync())
+        {
+            Log("EasyTier 核心已存在且安全校验通过");
+            return true;
+        }
+
+        if (!ShouldValidateWindowsX64Md5 && File.Exists(ETCorePath) && File.Exists(ETCliPath))
         {
             Log("EasyTier 核心已存在");
             return true;
+        }
+
+        if (ShouldValidateWindowsX64Md5 && Directory.Exists(ETDirectory))
+        {
+            Log("EasyTier 核心文件缺失或安全校验失败，重新下载");
+            TryDeleteEasyTierFiles();
         }
 
         Log("开始下载 EasyTier 核心...");
@@ -789,6 +807,14 @@ public class ETModeService : IDisposable
                 catch { }
             }
 
+            if (ShouldValidateWindowsX64Md5 && !await ValidateWindowsX64EasyTierFilesAsync())
+            {
+                Log("EasyTier 核心安全校验失败");
+                TryDeleteEasyTierFiles();
+                ProgressChanged?.Invoke(this, 0);
+                return false;
+            }
+
             ProgressChanged?.Invoke(this, 100);
             Log("EasyTier 核心安装完成");
             return true;
@@ -798,6 +824,83 @@ public class ETModeService : IDisposable
             Log($"下载 EasyTier 失败: {ex.Message}");
             ProgressChanged?.Invoke(this, 0);
             return false;
+        }
+    }
+
+    private async Task<bool> ValidateWindowsX64EasyTierFilesAsync()
+    {
+        if (!ShouldValidateWindowsX64Md5)
+            return true;
+
+        var expectedFiles = new Dictionary<string, string>
+        {
+            [ETCorePath] = EasyTierCoreMd5,
+            [ETCliPath] = EasyTierCliMd5,
+            [Path.Combine(ETDirectory, "Packet.dll")] = PacketDllMd5,
+            [Path.Combine(ETDirectory, "WinDivert64.sys")] = WinDivert64SysMd5,
+            [Path.Combine(ETDirectory, "wintun.dll")] = WinTunDllMd5
+        };
+
+        foreach (var (path, expectedMd5) in expectedFiles)
+        {
+            if (!File.Exists(path))
+            {
+                Log($"EasyTier 文件缺失: {Path.GetFileName(path)}");
+                return false;
+            }
+
+            var actualMd5 = await GetFileMD5HashAsync(path);
+            if (!string.Equals(actualMd5, expectedMd5, StringComparison.OrdinalIgnoreCase))
+            {
+                Log($"EasyTier 文件校验失败: {Path.GetFileName(path)}");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static async Task<string?> GetFileMD5HashAsync(string filePath)
+    {
+        try
+        {
+            await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1024 * 1024, true);
+            using var md5 = MD5.Create();
+            var hashValue = await md5.ComputeHashAsync(stream);
+            var hex = new StringBuilder(hashValue.Length * 2);
+            foreach (var b in hashValue)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void TryDeleteEasyTierFiles()
+    {
+        if (!Directory.Exists(ETDirectory))
+            return;
+
+        foreach (var file in new[]
+        {
+            ETCorePath,
+            ETCliPath,
+            Path.Combine(ETDirectory, "Packet.dll"),
+            Path.Combine(ETDirectory, "WinDivert64.sys"),
+            Path.Combine(ETDirectory, "wintun.dll")
+        })
+        {
+            try
+            {
+                if (!File.Exists(file))
+                    continue;
+
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+            catch { }
         }
     }
 

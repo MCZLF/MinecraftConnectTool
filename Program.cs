@@ -116,18 +116,9 @@ sealed class Program
     {
         try
         {
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configPath = Path.Combine(tempPath, "MCZLFAPP", "Temp", "APPconfig.json");
-
-            if (!File.Exists(configPath))
-                return false;
-
-            var json = File.ReadAllText(configPath);
-            var config = JsonNode.Parse(json)?.AsObject();
-
-            if (config?.TryGetPropertyValue("EnablePerformanceMode", out var value) == true)
+            if (LocalStorageService.TryReadBootstrapConfigValue("EnablePerformanceMode", false, out var enabled))
             {
-                return value?.GetValue<bool>() ?? false;
+                return enabled;
             }
         }
         catch
@@ -144,22 +135,10 @@ sealed class Program
     {
         try
         {
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configPath = Path.Combine(tempPath, "MCZLFAPP", "Temp", "APPconfig.json");
-
-            if (!File.Exists(configPath))
-                return RenderingMode.SystemDefault;
-
-            var json = File.ReadAllText(configPath);
-            var config = JsonNode.Parse(json)?.AsObject();
-
-            if (config?.TryGetPropertyValue("RenderingMode", out var value) == true)
+            if (LocalStorageService.TryReadBootstrapConfigValue("RenderingMode", "SystemDefault", out var modeStr) &&
+                Enum.TryParse<RenderingMode>(modeStr, out var mode))
             {
-                var modeStr = value?.GetValue<string>() ?? "SystemDefault";
-                if (Enum.TryParse<RenderingMode>(modeStr, out var mode))
-                {
-                    return mode;
-                }
+                return mode;
             }
         }
         catch

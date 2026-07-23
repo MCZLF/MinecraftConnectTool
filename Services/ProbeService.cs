@@ -28,7 +28,7 @@ public static class ProbeService
     public static string Version { get; set; } = "Unknown";
 
     //================ Probe 标记文件路径 ================
-    private static string ProbeMarkerPath => Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "Probe");
+    private static string ProbeMarkerPath => LocalStorageService.GetTempFilePath("Probe");
 
     /// <summary>
     /// 检查是否需要发送 Probe（通过标记文件）
@@ -79,17 +79,16 @@ Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
                 byte[] data = Encoding.UTF8.GetBytes(body);
                 using (TcpClient client = new TcpClient())
                 {
-                    var connectTask = client.ConnectAsync(HOST, PORT);
-                    bool ok = await Task.WhenAny(connectTask, Task.Delay(TIMEOUT)) == connectTask && connectTask.IsCompleted;
-                    if (!ok) return;
+                    using var timeoutCts = new System.Threading.CancellationTokenSource(TIMEOUT);
+                    await client.ConnectAsync(HOST, PORT, timeoutCts.Token);
 
                     var stream = client.GetStream();
                     stream.WriteTimeout = TIMEOUT;
                     stream.ReadTimeout = TIMEOUT;
 
-                    await stream.WriteAsync(data, 0, data.Length);
+                    await stream.WriteAsync(data, timeoutCts.Token);
                     byte[] buffer = new byte[256];
-                    int n = await stream.ReadAsync(buffer, 0, buffer.Length);
+                    int n = await stream.ReadAsync(buffer, timeoutCts.Token);
                     string response = Encoding.UTF8.GetString(buffer, 0, n).Trim();
 
                     // 无论返回什么结果，都正常处理

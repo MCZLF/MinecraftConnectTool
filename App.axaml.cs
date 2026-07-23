@@ -26,6 +26,7 @@ public partial class App : Application, IDisposable
 {
     private Timer? _gcTimer;
     private bool _isPerformanceModeEnabled;
+    private bool _isThemeServiceInitialized;
     private Styles? _globalBoldStyles;
 
     public override void Initialize()
@@ -50,14 +51,7 @@ public partial class App : Application, IDisposable
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // 初始化主题服务
-        ThemeService.Instance.Initialize();
-
-        // 订阅全局文字加粗设置变更事件
-        ThemeService.Instance.GlobalBoldTextChanged += OnGlobalBoldTextChanged;
-
-        // 应用初始全局文字加粗样式
-        ApplyGlobalBoldTextStyle();
+        bool migratedLegacyStorage = LocalStorageService.TryAutoConfigureLegacySystemTempStorageIfNeeded();
 
         // 检查是否是首次启动（同时检查全局开关EnableFirstLaunchWizard）
         bool alreadyFirstGuild = ConfigService.Read<bool>("AlreadyFirstGuild", false);
@@ -69,14 +63,27 @@ public partial class App : Application, IDisposable
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 DisableAvaloniaDataAnnotationValidation();
+                ThemeService.ApplyFirstLaunchPreviewTheme();
                 var wizardWindow = new FirstLaunchWizardWindow();
                 desktop.MainWindow = wizardWindow;
                 wizardWindow.Show();
                 desktop.Exit += OnApplicationExit;
+                if (migratedLegacyStorage)
+                    ShowLegacyStorageMigratedDialog(wizardWindow);
             }
         }
         else
         {
+            // 初始化主题服务
+            ThemeService.Instance.Initialize();
+            _isThemeServiceInitialized = true;
+
+            // 订阅全局文字加粗设置变更事件
+            ThemeService.Instance.GlobalBoldTextChanged += OnGlobalBoldTextChanged;
+
+            // 应用初始全局文字加粗样式
+            ApplyGlobalBoldTextStyle();
+
             // 非首次启动，正常启动主窗口
             // 检查性能模式是否开启
             _isPerformanceModeEnabled = ConfigService.Read<bool>("EnablePerformanceMode", false);
@@ -99,10 +106,28 @@ public partial class App : Application, IDisposable
 
                 // 应用退出时清理资源
                 desktop.Exit += OnApplicationExit;
+                if (migratedLegacyStorage)
+                    ShowLegacyStorageMigratedDialog(desktop.MainWindow);
             }
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static void ShowLegacyStorageMigratedDialog(Window parent)
+    {
+        Dispatcher.UIThread.Post(async () =>
+        {
+            try
+            {
+                await ExtensionUI.MD3MessageDialog.ShowAsync(
+                    parent,
+                    "已自动迁移旧版MCT存储配置\n您可以在[设置>核心数据存放目录]中进行修改",
+                    "自动迁移成功",
+                    Material.Icons.MaterialIconKind.InformationCircle);
+            }
+            catch { }
+        }, DispatcherPriority.Background);
     }
 
     /// <summary>
@@ -178,7 +203,8 @@ public partial class App : Application, IDisposable
     private void OnApplicationExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
         // 取消订阅事件
-        ThemeService.Instance.GlobalBoldTextChanged -= OnGlobalBoldTextChanged;
+        if (_isThemeServiceInitialized)
+            ThemeService.Instance.GlobalBoldTextChanged -= OnGlobalBoldTextChanged;
         Dispose();
     }
 

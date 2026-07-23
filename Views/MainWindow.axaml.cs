@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.053";
+    public static readonly string version = "0.0.7.054";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -827,7 +827,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            string logPath = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+            string logPath = LocalStorageService.AppLogPath;
+            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
             File.AppendAllText(logPath, status + Environment.NewLine);
         }
         catch { }
@@ -1177,15 +1178,9 @@ public partial class MainWindow : Window
         const string api = "https://api.mclo.gs/1/log";
         try
         {
-            string logPath = Path.Combine(
-                Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
-                "MCZLFAPP", "Temp", "APPLog.ini");
-            string configPath = Path.Combine(
-                Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
-                "MCZLFAPP", "Temp", "config.json");
-            string AppconfigPath = Path.Combine(
-                Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
-                "MCZLFAPP", "Temp", "APPconfig.json");
+            string logPath = LocalStorageService.AppLogPath;
+            string configPath = LocalStorageService.GetTempFilePath("config.json");
+            string AppconfigPath = LocalStorageService.ConfigFilePath;
 
             // GetNetVersion
             string Netversion = Environment.Version.ToString();
@@ -1427,7 +1422,7 @@ public partial class MainWindow : Window
         else
         {
             // 其他页面：读取全局 APPLog.ini（只读取最后32MB，避免OOM）
-            string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+            string logFilePath = LocalStorageService.AppLogPath;
             if (File.Exists(logFilePath))
             {
                 var fi = new FileInfo(logFilePath);

@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -163,6 +161,29 @@ public partial class SettingsPageViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private RenderingMode _renderingMode = RenderingMode.SystemDefault;
+
+    [ObservableProperty]
+    private LocalStorageOption? _selectedStorageOption;
+
+    partial void OnSelectedStorageOptionChanged(LocalStorageOption? value)
+    {
+        IsCustomStorageSelected = value?.Mode == LocalStorageMode.Custom;
+        if (!_isLoadingSettings && value != null && value.Mode != LocalStorageMode.Custom)
+        {
+            ApplyStorageSettings();
+        }
+    }
+
+    [ObservableProperty]
+    private string _customStorageDirectory = "";
+
+    [ObservableProperty]
+    private bool _isCustomStorageSelected;
+
+    [ObservableProperty]
+    private string _currentStoragePath = "";
+
+    public IReadOnlyList<LocalStorageOption> StorageOptions => LocalStorageService.PresetOptions;
 
     /// <summary>
     /// 启用全局文字加粗
@@ -477,6 +498,11 @@ public partial class SettingsPageViewModel : ViewModelBase
         // 渲染方式
         RenderingMode = ThemeService.Instance.RenderingMode;
 
+        SelectedStorageOption = StorageOptions.FirstOrDefault(option => option.Mode == LocalStorageService.StorageMode) ?? StorageOptions[0];
+        CustomStorageDirectory = LocalStorageService.CustomDirectory;
+        IsCustomStorageSelected = SelectedStorageOption.Mode == LocalStorageMode.Custom;
+        CurrentStoragePath = LocalStorageService.AppRootDirectory;
+
         // 全局文字加粗
         EnableGlobalBoldText = ThemeService.Instance.EnableGlobalBoldText;
 
@@ -764,6 +790,77 @@ public partial class SettingsPageViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private async Task SelectStorageDirectoryAsync()
+    {
+        try
+        {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+            {
+                var result = await desktop.MainWindow.StorageProvider.OpenFolderPickerAsync(new Avalonia.Platform.Storage.FolderPickerOpenOptions
+                {
+                    Title = "选择配置文件存放目录",
+                    AllowMultiple = false
+                });
+
+                if (result.Count > 0)
+                {
+                    CustomStorageDirectory = result[0].Path.LocalPath;
+                    SelectedStorageOption = StorageOptions.First(option => option.Mode == LocalStorageMode.Custom);
+                    ApplyStorageSettings();
+                }
+                else
+                {
+                    ShowToast("未选择目录，存储位置未变更");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"选择目录失败: {ex.Message}");
+        }
+    }
+
+    private void ApplyStorageSettings()
+    {
+        var option = SelectedStorageOption ?? StorageOptions[0];
+        var previousStoragePath = LocalStorageService.AppRootDirectory;
+        var previousPhotoBackgroundPath = ConfigService.Read<string?>("PhotoBackgroundPath", null);
+        var customDirectory = option.Mode == LocalStorageMode.Custom ? CustomStorageDirectory : null;
+        LocalStorageService.Configure(option.Mode, customDirectory, true);
+        ConfigService.ReloadFromStorage();
+        CurrentStoragePath = LocalStorageService.AppRootDirectory;
+        UpdateMigratedPhotoBackgroundPath(previousStoragePath, CurrentStoragePath, previousPhotoBackgroundPath);
+        ShowToast(string.Equals(previousStoragePath, CurrentStoragePath, StringComparison.OrdinalIgnoreCase)
+            ? "存储目录已更新，重启应用后完全生效"
+            : "存储目录已更新并迁移现有数据，重启应用后完全生效", true);
+    }
+
+    private void UpdateMigratedPhotoBackgroundPath(string previousStoragePath, string currentStoragePath, string? previousPhotoBackgroundPath)
+    {
+        if (string.IsNullOrWhiteSpace(previousPhotoBackgroundPath))
+            return;
+
+        try
+        {
+            if (string.Equals(previousStoragePath, currentStoragePath, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var fullPhotoPath = Path.GetFullPath(previousPhotoBackgroundPath);
+            var fullPreviousRoot = Path.GetFullPath(previousStoragePath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            if (!fullPhotoPath.StartsWith(fullPreviousRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) &&
+                !fullPhotoPath.StartsWith(fullPreviousRoot + Path.AltDirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var relativePath = Path.GetRelativePath(previousStoragePath, fullPhotoPath);
+            var newPhotoPath = Path.Combine(currentStoragePath, relativePath);
+            ConfigService.Write("PhotoBackgroundPath", newPhotoPath);
+            PhotoBackgroundPath = newPhotoPath;
+            ThemeService.Instance.PhotoBackgroundPath = newPhotoPath;
+        }
+        catch { }
+    }
+
     /// <summary>
     /// 清除照片背景
     /// </summary>
@@ -798,50 +895,16 @@ public partial class SettingsPageViewModel : ViewModelBase
     {
         try
         {
-            string tempPath = Path.GetTempPath();
-            string targetFolder = Path.Combine(tempPath, "MCZLFAPP");
+            LocalStorageService.ClearAppRoot();
+            ConfigService.ReloadFromStorage();
 
-            if (Directory.Exists(targetFolder))
+            ShowToast("清除成功，正在重启应用~", true);
+
+            _ = Task.Run(async () =>
             {
-                foreach (string file in Directory.GetFiles(targetFolder, "*.*", SearchOption.AllDirectories))
-                {
-                    try
-                    {
-                        File.SetAttributes(file, FileAttributes.Normal);
-                        File.Delete(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"删除文件失败 {file}: {ex.Message}");
-                    }
-                }
-
-                foreach (string folder in Directory.GetDirectories(targetFolder, "*.*", SearchOption.AllDirectories).OrderByDescending(d => d.Length))
-                {
-                    try
-                    {
-                        Directory.Delete(folder, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"删除目录失败 {folder}: {ex.Message}");
-                    }
-                }
-
-                // 显示成功 Toast
-                ShowToast("清除成功~", true);
-
-                // 延迟后重启
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(1500);
-                    RestartApplication();
-                });
-            }
-            else
-            {
-                ShowToast("缓存为空，无需清理");
-            }
+                await Task.Delay(1500);
+                RestartApplication();
+            });
         }
         catch (Exception ex)
         {
@@ -857,37 +920,7 @@ public partial class SettingsPageViewModel : ViewModelBase
     {
         try
         {
-            string tempPath = Path.GetTempPath();
-            
-            // 使用 ConfigService 获取配置文件路径，确保路径一致性
-            string configFilePath = ConfigService.GetConfigFilePath();
-            if (File.Exists(configFilePath))
-            {
-                try
-                {
-                    File.SetAttributes(configFilePath, FileAttributes.Normal);
-                    File.Delete(configFilePath);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"删除配置文件失败 {configFilePath}: {ex.Message}");
-                }
-            }
-            
-            // 删除theme.json
-            string targetThemePath = Path.Combine(tempPath, "MCZLFAPP", "theme.json");
-            if (File.Exists(targetThemePath))
-            {
-                try
-                {
-                    File.SetAttributes(targetThemePath, FileAttributes.Normal);
-                    File.Delete(targetThemePath);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"删除主题文件失败 {targetThemePath}: {ex.Message}");
-                }
-            }
+            LocalStorageService.DeleteConfigFiles();
             
             // 显示成功 Toast
             ShowToast("重置成功~", true);
@@ -920,8 +953,7 @@ public partial class SettingsPageViewModel : ViewModelBase
                 return;
             }
 
-            string tempPath = Path.GetTempPath();
-            string folderPath = Path.Combine(tempPath, "MCZLFAPP");
+            string folderPath = LocalStorageService.AppRootDirectory;
             string command = $"Add-MpPreference -ExclusionPath \"{folderPath}\"";
 
             var psi = new System.Diagnostics.ProcessStartInfo
@@ -956,7 +988,7 @@ public partial class SettingsPageViewModel : ViewModelBase
         try
         {
             string url = "https://api.mct.mczlf.loft.games/360DNS.exe";
-            string tempDir = Path.Combine(Path.GetTempPath(), "MCZLFAPP", "Temp");
+            string tempDir = LocalStorageService.TempDirectory;
             string destinationPath = Path.Combine(tempDir, "360DNS.exe");
             string expectedMd5 = "a0c67c45b118e9706cadb771b3014528";
             bool needsDownload = false;

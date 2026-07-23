@@ -9,6 +9,7 @@ using Material.Icons;
 using MinecraftConnectTool.Services;
 using MinecraftConnectTool.Views;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -27,7 +28,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     private int _currentPage = 1;
 
     [ObservableProperty]
-    private int _totalPages = 3;
+    private int _totalPages = 4;
 
     [ObservableProperty]
     private string _nextButtonText = "Next→";
@@ -82,6 +83,25 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _memoryInfoText = "💡 若低于4G运行内存推荐开启性能模式";
+
+    [ObservableProperty]
+    private LocalStorageOption? _selectedStorageOption;
+
+    partial void OnSelectedStorageOptionChanged(LocalStorageOption? value)
+    {
+        OnPropertyChanged(nameof(IsCustomStorageSelected));
+    }
+
+    [ObservableProperty]
+    private string _customStorageDirectory = "";
+
+    partial void OnCustomStorageDirectoryChanged(string value)
+    {
+    }
+
+    public IReadOnlyList<LocalStorageOption> StorageOptions => LocalStorageService.PresetOptions;
+
+    public bool IsCustomStorageSelected => SelectedStorageOption?.Mode == LocalStorageMode.Custom;
 
     #endregion
 
@@ -389,9 +409,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private void SkipThemeSetup()
     {
-        // 跳过主题设置，使用默认主题
-        ApplyDefaultSettings();
-        // 直接进入下一页（完成）
+        ApplyThemeSettings();
         CompleteWizard();
     }
 
@@ -436,6 +454,32 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         catch (Exception ex)
         {
             Console.WriteLine($"打开哔哩哔哩失败: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SelectCustomStorageDirectoryAsync()
+    {
+        try
+        {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+            {
+                var result = await desktop.MainWindow.StorageProvider.OpenFolderPickerAsync(new Avalonia.Platform.Storage.FolderPickerOpenOptions
+                {
+                    Title = "选择配置文件存放目录",
+                    AllowMultiple = false
+                });
+
+                if (result.Count > 0)
+                {
+                    SelectedStorageOption = StorageOptions.First(option => option.Mode == LocalStorageMode.Custom);
+                    CustomStorageDirectory = result[0].Path.LocalPath;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"选择配置存放目录失败: {ex.Message}");
         }
     }
 
@@ -531,7 +575,10 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     /// </summary>
     private void ApplyDefaultSettings()
     {
-        // 使用系统默认主题设置
+        SelectedStorageOption = StorageOptions.First(option => option.Mode == LocalStorageMode.AppDirectory);
+        CustomStorageDirectory = string.Empty;
+        ApplyStorageAndDefaultConfigSettings();
+
         IsDarkMode = true;
         EnableColorMode = false;
         EnablePhotoBackground = false;
@@ -560,17 +607,11 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
     public FirstLaunchWizardViewModel()
     {
-        // 先设置默认图片路径
-        var configDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp");
-        Preset1ImagePath = Path.Combine(configDir, "shouanren.png");
-        Preset2ImagePath = Path.Combine(configDir, "lucia.jpg");
-        Preset3ImagePath = Path.Combine(configDir, "mcback.jpg");
-        Preset4ImagePath = Path.Combine(configDir, "YouShouBack.jpg");
+        WelcomeTitle = File.Exists(LocalStorageService.BootstrapFilePath) ? "Hi，再次见面" : "Hi，初次见面";
+        SelectedStorageOption = StorageOptions.FirstOrDefault(option => option.Mode == LocalStorageService.StorageMode) ?? StorageOptions[0];
+        CustomStorageDirectory = LocalStorageService.CustomDirectory;
 
-        // 初始化时加载当前主题设置
-        LoadCurrentThemeSettings();
-        // 下载预设图片（如果本地不存在）
-        _ = DownloadPresetImagesAsync();
+        RefreshPresetImagePaths();
     }
 
     /// <summary>
@@ -578,8 +619,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     /// </summary>
     private async Task DownloadPresetImagesAsync()
     {
-        var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-        var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+        var configDir = LocalStorageService.TempDirectory;
         Directory.CreateDirectory(configDir);
 
         // 每个预设独立try-catch，防止单个失败阻断后续下载
@@ -660,8 +700,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     {
         try
         {
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+            var configDir = LocalStorageService.TempDirectory;
             Directory.CreateDirectory(configDir);
 
             var fullImagePath = Path.Combine(configDir, fileName);
@@ -685,8 +724,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         {
             Console.WriteLine($"下载完整图片失败: {ex.Message}");
             // 失败时返回缩略图路径作为备用
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+            var configDir = LocalStorageService.TempDirectory;
             return Path.Combine(configDir, fileName.Replace("_full", ""));
         }
     }
@@ -741,22 +779,52 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
         }
     }
 
+    private void ApplyStorageSettings()
+    {
+        var option = SelectedStorageOption ?? StorageOptions[0];
+        var customDirectory = option.Mode == LocalStorageMode.Custom ? CustomStorageDirectory : null;
+        LocalStorageService.Configure(option.Mode, customDirectory);
+        ConfigService.ReloadFromStorage();
+        RefreshPresetImagePaths();
+    }
+
+    private void ApplyStorageAndDefaultConfigSettings()
+    {
+        ApplyStorageSettings();
+        ConfigService.Write("IsDarkMode", IsDarkMode);
+        ConfigService.Write("MixIntensity", MixIntensity);
+        ConfigService.Write("BackgroundOpacity", BackgroundOpacity);
+        ConfigService.Write("ControlOpacity", ControlOpacity);
+        ConfigService.Write("EnablePerformanceMode", EnablePerformanceMode);
+    }
+
+    private void RefreshPresetImagePaths()
+    {
+        var configDir = LocalStorageService.TempDirectory;
+        Preset1ImagePath = Path.Combine(configDir, "shouanren.png");
+        Preset2ImagePath = Path.Combine(configDir, "lucia.jpg");
+        Preset3ImagePath = Path.Combine(configDir, "mcback.jpg");
+        Preset4ImagePath = Path.Combine(configDir, "YouShouBack.jpg");
+    }
+
     private void SaveCurrentPageData()
     {
         switch (CurrentPage)
         {
             case 2:
-                // 保存用户名
+                ApplyStorageAndDefaultConfigSettings();
+                _ = DownloadPresetImagesAsync();
+                break;
+
+            case 3:
                 if (!string.IsNullOrWhiteSpace(Username))
                 {
                     ConfigService.Write("Username", Username.Trim());
                 }
-                // 保存性能模式设置
                 ConfigService.Write("EnablePerformanceMode", EnablePerformanceMode);
                 break;
 
-            case 3:
-                // 保存主题设置
+            case 4:
                 ApplyThemeSettings();
                 break;
         }
@@ -795,8 +863,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     {
         try
         {
-            var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
+            var configDir = LocalStorageService.TempDirectory;
 
             // 获取当前选中的图片文件名
             var selectedImageFile = Path.GetFileName(PhotoBackgroundPath ?? "");

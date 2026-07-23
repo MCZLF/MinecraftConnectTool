@@ -10,16 +10,14 @@ namespace MinecraftConnectTool.Services;
 /// </summary>
 public static class ConfigService
 {
-    private static readonly string ConfigFilePath;
+    private static string ConfigFilePath;
     private static readonly object LockObj = new();
     private static JsonObject? _configCache;
     private static readonly JsonSerializerOptions JsonOptions;
 
     static ConfigService()
     {
-        var tempPath = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-        var configDir = Path.Combine(tempPath, "MCZLFAPP", "Temp");
-        ConfigFilePath = Path.Combine(configDir, "APPconfig.json");
+        ConfigFilePath = LocalStorageService.ConfigFilePath;
 
         // 初始化 JSON 序列化选项
         JsonOptions = new JsonSerializerOptions
@@ -27,15 +25,6 @@ public static class ConfigService
             WriteIndented = true,
             PropertyNamingPolicy = null
         };
-
-        // 确保目录存在
-        if (!Directory.Exists(configDir))
-        {
-            Directory.CreateDirectory(configDir);
-        }
-
-        // 初始化默认配置
-        InitializeDefaultConfig();
     }
 
     private static void InitializeDefaultConfig()
@@ -102,6 +91,7 @@ public static class ConfigService
                     dict[prop.Key] = prop.Value?.GetValue<object?>();
                 }
                 var json = JsonSerializer.Serialize(dict, JsonOptions);
+                Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
                 File.WriteAllText(ConfigFilePath, json);
                 _configCache = config;
             }
@@ -219,4 +209,15 @@ public static class ConfigService
     /// 获取配置文件路径（用于调试）
     /// </summary>
     public static string GetConfigFilePath() => ConfigFilePath;
+
+    public static void ReloadFromStorage()
+    {
+        lock (LockObj)
+        {
+            _configCache = null;
+            ConfigFilePath = LocalStorageService.ConfigFilePath;
+            Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
+            InitializeDefaultConfig();
+        }
+    }
 }

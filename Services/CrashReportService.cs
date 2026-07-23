@@ -19,8 +19,7 @@ public static class CrashReportService
 
     static CrashReportService()
     {
-        // 崩溃报告保存到程序同目录下
-        CrashReportsDirectory = AppContext.BaseDirectory;
+        CrashReportsDirectory = GetExecutableDirectory();
     }
 
     /// <summary>
@@ -59,7 +58,7 @@ public static class CrashReportService
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         // 忽略 Linux DBus 相关异常（如 AppMenu.Registrar 服务不存在）
-        if (IsDBusException(e.Exception))
+        if (IsDBusException(e.Exception) || IsBenignNetworkCancellationException(e.Exception))
         {
             e.SetObserved();
             return;
@@ -85,6 +84,44 @@ public static class CrashReportService
             }
         }
         return false;
+    }
+
+    private static bool IsBenignNetworkCancellationException(AggregateException exception)
+    {
+        foreach (var inner in exception.Flatten().InnerExceptions)
+        {
+            if (inner is OperationCanceledException || inner is IOException)
+                return true;
+
+            if (inner is System.Net.Sockets.SocketException socketException &&
+                (socketException.SocketErrorCode == System.Net.Sockets.SocketError.OperationAborted ||
+                 socketException.SocketErrorCode == System.Net.Sockets.SocketError.Interrupted))
+            {
+                return true;
+            }
+
+            if (inner.Message.Contains("已中止 I/O 操作") ||
+                inner.Message.Contains("aborted", StringComparison.OrdinalIgnoreCase) ||
+                inner.Message.Contains("operation was canceled", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static string GetExecutableDirectory()
+    {
+        var processPath = Environment.ProcessPath;
+        if (!string.IsNullOrWhiteSpace(processPath))
+        {
+            var directory = Path.GetDirectoryName(processPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+                return directory;
+        }
+
+        return Directory.GetCurrentDirectory();
     }
 
     /// <summary>

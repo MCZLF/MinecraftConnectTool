@@ -145,6 +145,7 @@ public partial class LinkPageViewModel : ViewModelBase
     private static bool IsMacOS => OperatingSystem.IsMacOS();
     private static bool IsArm64 => RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
     private static bool IsX64 => RuntimeInformation.ProcessArchitecture == Architecture.X64;
+    private static bool ShouldValidateWindowsX64Md5 => IsWindows && IsX64;
 
     // ========== 平台相关配置 ==========
     private static string GetCoreFileName()
@@ -180,16 +181,7 @@ public partial class LinkPageViewModel : ViewModelBase
 
     private static string GetCoreMd5()
     {
-        // Windows AMD64: 559a28f9d51dcbec970d2dbc7f2fd8aa
-        // Windows ARM64: 970d6429ea28519b9a928c7917f9901e
-        // Linux ARM64: 984fad280d713a13fbce44d51d6bb92e
-        // Linux AMD64: e340c94c42919753792dd18b8e3a94be
-        // macOS ARM64: e63fbb6ce10fd5c3570318ae44386361
-        // macOS AMD64: 0034c82f6ac39932c6d172698e9a81fd
-        if (IsWindows) return IsArm64 ? "970d6429ea28519b9a928c7917f9901e" : "559a28f9d51dcbec970d2dbc7f2fd8aa";
-        if (IsLinux) return IsArm64 ? "984fad280d713a13fbce44d51d6bb92e" : "e340c94c42919753792dd18b8e3a94be";
-        if (IsMacOS) return IsArm64 ? "e63fbb6ce10fd5c3570318ae44386361" : "0034c82f6ac39932c6d172698e9a81fd";
-        return "559a28f9d51dcbec970d2dbc7f2fd8aa";
+        return WindowsFileMd5;
     }
 
     // ========== 常量 ==========
@@ -252,7 +244,7 @@ public partial class LinkPageViewModel : ViewModelBase
             message = Regex.Replace(message, @"\b" + Regex.Escape(pair.Key) + @"\b", pair.Value);
         }
 
-        string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+        string logFilePath = LocalStorageService.AppLogPath;
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);
@@ -383,13 +375,13 @@ public partial class LinkPageViewModel : ViewModelBase
     }
 
     // ========== MD5校验 ==========
-    public static string? GetFileMD5Hash(string filePath)
+    public static async Task<string?> GetFileMD5HashAsync(string filePath)
     {
         try
         {
-            using FileStream stream = File.OpenRead(filePath);
-            MD5 md5 = MD5.Create();
-            byte[] hashValue = md5.ComputeHash(stream);
+            await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1024 * 1024, true);
+            using var md5 = MD5.Create();
+            byte[] hashValue = await md5.ComputeHashAsync(stream);
             StringBuilder hex = new(hashValue.Length * 2);
             foreach (byte b in hashValue)
             {
@@ -403,13 +395,32 @@ public partial class LinkPageViewModel : ViewModelBase
         }
     }
 
+    private async Task<bool> ValidateCoreBeforeStartAsync(string fileName)
+    {
+        if (!ShouldValidateWindowsX64Md5)
+            return true;
+
+        string? md5Hash = await GetFileMD5HashAsync(fileName);
+        if (md5Hash == GetCoreMd5())
+        {
+            log("启动前核心安全校验通过");
+            return true;
+        }
+
+        log(md5Hash == null ? "启动前核心安全校验读取失败" : "启动前核心安全校验失败");
+        role = "0";
+        IsStatusBadgeVisible = false;
+        StatusBadgeState = BadgeState.Default;
+        StatusBadgeText = "Null";
+        return false;
+    }
+
     // ========== 核心检查和下载 ==========
     public async Task<bool> CheckAndDownloadCoreAsync()
     {
         log("检查LinkMode核心中..");
 
-        string tempDirectory = Path.GetTempPath();
-        string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
+        string customDirectory = LocalStorageService.LinkCoreDirectory;
         string coreFileName = GetCoreFileName();
         string fileName = Path.Combine(customDirectory, coreFileName);
         string downloadUrl = GetCoreDownloadUrl();
@@ -425,33 +436,38 @@ public partial class LinkPageViewModel : ViewModelBase
 
         if (File.Exists(fileName))
         {
-            string? md5Hash = GetFileMD5Hash(fileName);
+            if (ShouldValidateWindowsX64Md5)
+            {
+                string? md5Hash = await GetFileMD5HashAsync(fileName);
 
-            if (md5Hash == expectedMd5)
-            {
-                log("核心已存在且安全校验通过");
-            }
-            else
-            {
-                if (md5Hash == null)
+                if (md5Hash == expectedMd5)
                 {
-                    log("出现错误，进程终止");
-                    role = "0";
-                    IsStatusBadgeVisible = false;
-                    StatusBadgeState = BadgeState.Default;
-                    StatusBadgeText = "Null";
-                    return false;
+                    log("核心已存在且安全校验通过");
                 }
                 else
                 {
+                    if (md5Hash == null)
+                    {
+                        log("出现错误，进程终止");
+                        role = "0";
+                        IsStatusBadgeVisible = false;
+                        StatusBadgeState = BadgeState.Default;
+                        StatusBadgeText = "Null";
+                        return false;
+                    }
+
                     log("核心不存在或安全校验不通过,重新Download中");
                     needsDownload = true;
                 }
             }
+            else
+            {
+                log("核心已存在");
+            }
         }
         else
         {
-            log("核心不存在或安全校验不通过,重新Download中");
+            log(ShouldValidateWindowsX64Md5 ? "核心不存在或安全校验不通过,重新Download中" : "核心不存在,重新Download中");
             needsDownload = true;
         }
 
@@ -553,11 +569,13 @@ public partial class LinkPageViewModel : ViewModelBase
 
         log($"选定端口：{port}，准备启动核心…");
 
-        string tempDirectory = Path.GetTempPath();
-        string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
+        string customDirectory = LocalStorageService.LinkCoreDirectory;
         string coreFileName = GetCoreFileName();
         string fileName = Path.Combine(customDirectory, coreFileName);
         string arguments = $"-s {port}";
+
+        if (!await ValidateCoreBeforeStartAsync(fileName))
+            return;
 
         try
         {
@@ -569,7 +587,7 @@ public partial class LinkPageViewModel : ViewModelBase
             if (IsLinux || IsMacOS)
             {
                 process.StartInfo.FileName = "/bin/bash";
-                process.StartInfo.Arguments = $"-c \"{fileName} {arguments}\"";
+                process.StartInfo.Arguments = $"-c \"'{fileName}' {arguments}\"";
             }
             else
             {
@@ -577,6 +595,7 @@ public partial class LinkPageViewModel : ViewModelBase
                 process.StartInfo.Arguments = arguments;
             }
             
+            process.StartInfo.WorkingDirectory = customDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
@@ -699,11 +718,13 @@ public partial class LinkPageViewModel : ViewModelBase
         IsAlertVisible = true;
         AlertText = "请在局域网世界中查看";
 
-        string tempDirectory = Path.GetTempPath();
-        string customDirectory = Path.Combine(tempDirectory, "MCZLFAPP", "Temp");
+        string customDirectory = LocalStorageService.LinkCoreDirectory;
         string coreFileName = GetCoreFileName();
         string fileName = Path.Combine(customDirectory, coreFileName);
         string arguments = $"-c {user}";
+
+        if (!await ValidateCoreBeforeStartAsync(fileName))
+            return;
 
         try
         {
@@ -715,7 +736,7 @@ public partial class LinkPageViewModel : ViewModelBase
             if (IsLinux || IsMacOS)
             {
                 process.StartInfo.FileName = "/bin/bash";
-                process.StartInfo.Arguments = $"-c \"{fileName} {arguments}\"";
+                process.StartInfo.Arguments = $"-c \"'{fileName}' {arguments}\"";
             }
             else
             {
@@ -723,6 +744,7 @@ public partial class LinkPageViewModel : ViewModelBase
                 process.StartInfo.Arguments = arguments;
             }
             
+            process.StartInfo.WorkingDirectory = customDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
@@ -987,7 +1009,7 @@ public partial class LinkPageViewModel : ViewModelBase
     // 直接添加日志，不经过关键词替换处理
     private void AppendLogDirect(string message)
     {
-        string logFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(), "MCZLFAPP", "Temp", "APPLog.ini");
+        string logFilePath = LocalStorageService.AppLogPath;
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
         File.AppendAllText(logFilePath, logMessage);

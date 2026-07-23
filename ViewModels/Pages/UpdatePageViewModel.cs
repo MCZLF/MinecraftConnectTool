@@ -660,6 +660,19 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
         }
     }
 
+    private string GetExecutableDirectory()
+    {
+        var processPath = Environment.ProcessPath;
+        if (!string.IsNullOrWhiteSpace(processPath))
+        {
+            var directory = Path.GetDirectoryName(processPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+                return directory;
+        }
+
+        throw new Exception("无法获取当前目录");
+    }
+
     private async Task UpdateFromStableAsync()
     {
         if (!CanUpdate) return;
@@ -671,15 +684,8 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
         {
             var (platform, architecture) = GetCurrentPlatformInfo();
             
-            string? currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName);
-            if (string.IsNullOrEmpty(currentDirectory))
-            {
-                currentDirectory = AppContext.BaseDirectory;
-                if (string.IsNullOrEmpty(currentDirectory))
-                    throw new Exception("无法获取当前目录");
-            }
-
-            string currentProcessName = Path.GetFileName(Process.GetCurrentProcess().MainModule?.FileName) ?? "MinecraftConnectTool.exe";
+            string currentDirectory = GetExecutableDirectory();
+            string currentProcessName = Path.GetFileName(Environment.ProcessPath) ?? "MinecraftConnectTool.exe";
             string fileExtension = Path.GetExtension(currentProcessName);
 
             Random random = new();
@@ -781,20 +787,10 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
                 return;
             }
             
-            // 使用进程主模块路径获取应用程序目录（比 AppContext.BaseDirectory 更可靠）
-            string? currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName);
-            if (string.IsNullOrEmpty(currentDirectory))
-            {
-                // 回退到 AppContext.BaseDirectory
-                currentDirectory = AppContext.BaseDirectory;
-                if (string.IsNullOrEmpty(currentDirectory))
-                {
-                    throw new Exception("无法获取当前目录");
-                }
-            }
+            string currentDirectory = GetExecutableDirectory();
 
             // 获取当前实际运行的文件名
-            string currentProcessName = Path.GetFileName(Process.GetCurrentProcess().MainModule?.FileName) ?? "MinecraftConnectTool.exe";
+            string currentProcessName = Path.GetFileName(Environment.ProcessPath) ?? "MinecraftConnectTool.exe";
             string fileExtension = Path.GetExtension(currentProcessName);
 
             // 生成随机数用于文件名

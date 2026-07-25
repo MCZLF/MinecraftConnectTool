@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:MinecraftConnectTool.ViewModels.Pages"
+             xmlns:icons="using:Material.Icons.Avalonia"
              x:Class="MinecraftConnectTool.Views.Pages.HelpPage"
              x:DataType="vm:HelpPageViewModel">
   <ScrollViewer>
@@ -18,20 +19,24 @@
                  Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
 
       <!-- 教程链接卡片 -->
-      <Grid ColumnDefinitions="*,*" Margin="0,16,0,0">
+      <Grid ColumnDefinitions="*,*,*" Margin="0,16,0,0">
         <!-- 图文教程 -->
         <Border Grid.Column="0"
                 Background="{DynamicResource MaterialCardVariantBrush}"
                 CornerRadius="12"
                 Padding="16"
-                Margin="0,0,8,0"
+                Margin="0,0,4,0"
                 PointerPressed="OnTutorialLinkClick">
           <StackPanel Spacing="8">
-            <TextBlock Text="图文教程"
-                       FontSize="14"
-                       FontWeight="Medium"
-                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            <TextBlock Text="http://mcjavao.tttttttttt.top/"
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="BookOpenPageVariant" Width="20" Height="20" VerticalAlignment="Center" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+              <TextBlock Text="图文教程"
+                         FontSize="14"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="https://mct.loft.games/tutorial"
                        FontSize="12"
                        Opacity="0.7"
                        TextTrimming="CharacterEllipsis"
@@ -44,14 +49,42 @@
                 Background="{DynamicResource MaterialCardVariantBrush}"
                 CornerRadius="12"
                 Padding="16"
-                Margin="8,0,0,0"
+                Margin="4,0,4,0"
                 PointerPressed="OnVideoLinkClick">
           <StackPanel Spacing="8">
-            <TextBlock Text="视频教程"
-                       FontSize="14"
-                       FontWeight="Medium"
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="PlayCircle" Width="20" Height="20" VerticalAlignment="Center" Foreground="{DynamicResource MaterialErrorBrush}"/>
+              <TextBlock Text="视频教程"
+                         FontSize="14"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="https://www.bilibili.com/video/BV1DdK66UECG"
+                       FontSize="12"
+                       Opacity="0.7"
+                       TextTrimming="CharacterEllipsis"
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-            <TextBlock Text="https://www.bilibili.com/video/BV1sBXyYgE1j/"
+          </StackPanel>
+        </Border>
+
+        <!-- 官方网站 -->
+        <Border Grid.Column="2"
+                Background="{DynamicResource MaterialCardVariantBrush}"
+                CornerRadius="12"
+                Padding="16"
+                Margin="4,0,0,0"
+                PointerPressed="OnWebsiteLinkClick">
+          <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <icons:MaterialIcon Kind="Web" Width="20" Height="20" VerticalAlignment="Center" Foreground="{DynamicResource MaterialSecondaryBrush}"/>
+              <TextBlock Text="官方网站"
+                         FontSize="14"
+                         FontWeight="Medium"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <TextBlock Text="https://mct.loft.games/"
                        FontSize="12"
                        Opacity="0.7"
                        TextTrimming="CharacterEllipsis"
@@ -64,16 +97,41 @@
       <Border Background="{DynamicResource MaterialCardVariantBrush}"
               CornerRadius="8"
               Padding="16">
-        <TextBlock Text="点击上方链接即可直接打开~                              欢迎加入QQ群一起讨论|690625244"
-                   FontSize="13"
-                   TextWrapping="Wrap"
-                   Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <icons:MaterialIcon Kind="Information" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+            <TextBlock Text="点击上方链接即可直接打开~"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- QQ群 -->
+      <Border Background="{DynamicResource MaterialCardVariantBrush}"
+              CornerRadius="8"
+              Padding="16"
+              PointerPressed="OnQQGroupLinkClick"
+              Cursor="Hand">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <icons:MaterialIcon Kind="AccountGroup" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+          <TextBlock Text="欢迎加入QQ群一起讨论"
+                     FontSize="13"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+          <TextBlock Text="690625244"
+                     FontSize="13"
+                     FontWeight="Bold"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource MaterialPrimaryBrush}"/>
+        </StackPanel>
       </Border>
 
       <!-- 功能按钮 -->
       <Grid ColumnDefinitions="*,*,*,*" Margin="0,16,0,0">
         <Button Grid.Column="0"
-                Content="一图解"
+                Content="Github"
                 Margin="0,0,8,0"
                 HorizontalAlignment="Stretch"
                 Click="OnImageGuideClick"/>
@@ -88,7 +146,7 @@
                 HorizontalAlignment="Stretch"
                 Click="OnCheckRenderingModeClick"/>
         <Button Grid.Column="3"
-                Content="我强迫症"
+                Content="千万别点"
                 Margin="8,0,0,0"
                 HorizontalAlignment="Stretch"
                 Click="OnPlaceholder2Click"/>

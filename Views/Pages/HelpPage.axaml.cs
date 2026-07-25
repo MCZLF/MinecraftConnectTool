@@ -24,18 +24,28 @@ public partial class HelpPage : UserControl
 
     private void OnTutorialLinkClick(object? sender, PointerPressedEventArgs e)
     {
-        OpenUrl("http://mcjavao.tttttttttt.top/");
+        OpenUrl("https://mct.loft.games/tutorial");
     }
 
     private void OnVideoLinkClick(object? sender, PointerPressedEventArgs e)
     {
-        OpenUrl("https://www.bilibili.com/video/BV1sBXyYgE1j/");
+        OpenUrl("https://www.bilibili.com/video/BV1DdK66UECG");
+    }
+
+    private void OnWebsiteLinkClick(object? sender, PointerPressedEventArgs e)
+    {
+        OpenUrl("https://mct.loft.games/");
+    }
+
+    private void OnQQGroupLinkClick(object? sender, PointerPressedEventArgs e)
+    {
+        OpenUrl("https://qm.qq.com/q/gicBD965gI");
     }
 
     private void OnImageGuideClick(object? sender, RoutedEventArgs e)
     {
-        // 显示一图解 - 打开图文教程页面
-        OpenUrl("http://mcjavao.tttttttttt.top/");
+        // 打开 Github 仓库
+        OpenUrl("https://github.com/MCZLF/MinecraftConnectTool");
     }
 
     private void OnBugReportClick(object? sender, RoutedEventArgs e)
@@ -78,7 +88,7 @@ public partial class HelpPage : UserControl
 
     private void OnPlaceholder2Click(object? sender, RoutedEventArgs e)
     {
-        Debug.WriteLine("占位按钮2点击");
+        throw new InvalidOperationException("说了别点。。。为什么要点");
     }
 
     private void OnRestartClick(object? sender, RoutedEventArgs e)

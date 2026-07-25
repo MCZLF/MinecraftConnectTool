@@ -4,7 +4,7 @@
 
 # 🎮 Minecraft Connect Tool
 
-**基于 OpenP2P，轻量便携简单易用的高速不限速联机工具**
+**基于 OpenP2P/EasyTier，轻量便携简单易用的高速不限速联机工具**
 
 <p>
   <a href="https://github.com/MCZLF/MinecraftConnectTool">
@@ -126,7 +126,7 @@ Frp/P2P 混合联机方案
 
 **验证答案：联机**
 
-获取联机教程、NAT 打洞技巧与即时帮助，下载更新、插件配置、故障排查，一站搞定！
+获取联机教程、NAT 打洞技巧与即时帮助，下载更新、Bug反馈、故障排查，一站搞定！
 
 </div>
 
@@ -134,10 +134,10 @@ Frp/P2P 混合联机方案
 
 ## 📋 系统需求
 
-- Windows 10 1809 及以上 x64 / x86 / ARM64
+- Windows 10 1607 及以上 x64 / x86 / ARM64
 - **.NET 8.0 运行时**（首次启动会自动检测并提示安装）
 - 无需 Java、无网络端口手动放行要求
-
+- 注:非Win10,可以使用官方[`Lite版本`](http://mct.loft.games/lite),功能与0.0.7没有太大差别,支持Win7
 ---
 
 ## 🚀 下载 & 运行
@@ -158,9 +158,9 @@ Frp/P2P 混合联机方案
 
 <div align="center">
 
-📺 **视频教程**：[Bilibili 视频](https://www.bilibili.com/video/BV1sBXyYgE1j)
+📺 **视频教程**：[Bilibili 视频](https://www.bilibili.com/video/BV1DdK66UECG)
 
-🌐 **官方网站**：[mcjavao.tttttttttt.top](http://mcjavao.tttttttttt.top) | [mct.mczlf.loft.games](https://mct.mczlf.loft.games)
+🌐 **官方网站**：[官网](https://mct.loft.game) | [官方知识库](https://mct.mczlf.loft.games)
 
 </div>
 
@@ -225,7 +225,7 @@ Frp/P2P 混合联机方案
 | ~~CandyCreateService~~ | ❌ 已停止 | Candy 联机模式已停止支持 |
 | ProbeServer | ✅ 运行中 | 用户统计探针 |
 | Frp (OnlyServerService) | ✅ 运行中 | Frp 中继服务 |
-| **MCTListServer** | 🆕 **新增** | **全新房间管理服务** |
+| MCTListServer | ✅ 不确定 | 全新房间管理服务 |
 
 ---
 
@@ -319,6 +319,11 @@ MinecraftConnectTool/
 - 官网地址：[`https://link.mcilm.top/`](https://link.mcilm.top/)
 - 本项目使用 MCILM-Link 作为备用联机方案之一，特此注明并感谢原作者。
 
+### ETMode - 其中心化组网联机
+由 **EasyTier** 提供
+- 仓库地址：[`https://github.com/EasyTier/Easytier`](https://github.com/EasyTier/Easytier)
+- 本项目使用 EasyTier 作为备用联机方案之一，特此注明并感谢原作者。
+- 
 > 部分内容使用 AI 生成（真的懒得写）
 
 ---
@@ -331,6 +336,8 @@ MinecraftConnectTool/
 > 拒绝刷量与夸大宣传，真实分享即可，我们先行鞠躬感谢！
 >
 > **下载地址（长期有效）：**
+> [`https://mct.loft.games/sdownload`](https://mct.loft.games/sdownload)
+> 
 > [`https://mct.mczlf.loft.games/function/download`](https://mct.mczlf.loft.games/function/download)
 >
 > 建议在简介备注：
@@ -342,9 +349,9 @@ MinecraftConnectTool/
 
 ## 📚 相关链接
 
-| MCT 官方知识库 | 版本查询 API |
-|:---:|:---:|
-| 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) <br> *MinecraftConnectTool 各平台最新版本公示* |
+| MCT 官方网站 | MCT 官方知识库 | 版本查询 API |
+|:---:|:---:|:---:|
+| 🔗 [`https://mct.loft.games`](https://mct.loft.games) | 🔗 [`https://mct.mczlf.loft.games`](https://mct.mczlf.loft.games) | 🔗 [`https://api.mct.mczlf.loft.games`](https://api.mct.mczlf.loft.games) <br> *MinecraftConnectTool 各平台最新版本公示* |
 
 <br>
 

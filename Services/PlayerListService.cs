@@ -68,7 +68,7 @@ public class PlayerListService
     }
 
     private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "http://room.mct.mczlf.loft.games:30148";
+    private readonly string _baseUrl = "http://rom.mct.mczlf.loft.games:30148";//对,就是rom,为了防止旧版本发生崩溃,直接该地址屏蔽旧地址请求
     private System.Timers.Timer? _heartbeatTimer;
     
     // 容错机制相关字段
@@ -509,7 +509,15 @@ public class PlayerListService
         }
         finally
         {
-            _heartbeatLock.Release();
+            // 安全释放：捕获 SemaphoreFullException 防止重复释放导致崩溃
+            try
+            {
+                _heartbeatLock.Release();
+            }
+            catch (SemaphoreFullException)
+            {
+                Log($"[容错] 信号量已满，跳过释放（可能由 StopHeartbeat 引起）");
+            }
         }
     }
 
@@ -518,21 +526,14 @@ public class PlayerListService
     /// </summary>
     private void StopHeartbeat()
     {
+        // 先停止定时器，防止新的心跳任务启动
         _heartbeatTimer?.Stop();
         _heartbeatTimer?.Dispose();
         _heartbeatTimer = null;
         
-        // 释放锁资源（确保不会阻塞）
-        try
-        {
-            if (_heartbeatLock.CurrentCount == 0)
-            {
-                _heartbeatLock.Release();
-            }
-        }
-        catch
-        {
-            // 忽略释放失败
-        }
+        // 不主动释放信号量，原因：
+        // 1. 如果在心跳回调内部调用（SendHeartbeatAsync中被踢出/容错失败），finally块会自动释放
+        // 2. 如果在外部调用（LeaveRoomAsync等），可能有正在执行的心跳任务，避免重复释放导致崩溃
+        // 3. 信号量会在下次StartHeartbeat时重新初始化或由正在执行的任务自然释放
     }
 }

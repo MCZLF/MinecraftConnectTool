@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.054";
+    public static readonly string version = "0.0.7.056";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -663,7 +663,7 @@ public partial class MainWindow : Window
     }
     
     /// <summary>
-    /// 检查公告 - 严格按照Form1实现
+    /// 检查公告
     /// </summary>
     private async Task CheckAnnouncementAsync()
     {

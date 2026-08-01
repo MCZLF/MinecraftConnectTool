@@ -68,7 +68,7 @@ public class PlayerListService
     }
 
     private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "http://rom.mct.mczlf.loft.games:30148";//对,就是rom,为了防止旧版本发生崩溃,直接该地址屏蔽旧地址请求
+    private readonly string _baseUrl = "http://rom.mct.mczlf.loft.games";//对,就是rom,为了防止旧版本发生崩溃,直接该地址屏蔽旧地址请求
     private System.Timers.Timer? _heartbeatTimer;
     
     // 容错机制相关字段

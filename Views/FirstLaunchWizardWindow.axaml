@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MinecraftConnectTool.ViewModels"
+        xmlns:services="using:MinecraftConnectTool.Services"
         xmlns:icons="using:Material.Icons.Avalonia"
         xmlns:controls="using:MinecraftConnectTool.Controls"
         x:Class="MinecraftConnectTool.Views.FirstLaunchWizardWindow"
@@ -124,6 +125,12 @@
                        Opacity="0.75"
                        TextWrapping="Wrap"
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <TextBlock Text="检测到 AppImage 运行环境，当前目录为只读挂载目录，已禁用当前目录存储并默认使用系统 Temp。"
+                       FontSize="13"
+                       Opacity="0.75"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding IsAppImageEnvironment}"
+                       Foreground="{DynamicResource MaterialPrimaryBrush}"/>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
               <ComboBox Grid.Column="0"
                         ItemsSource="{Binding StorageOptions}"
@@ -134,8 +141,9 @@
                         BorderThickness="0,0,0,1"
                         BorderBrush="{DynamicResource MaterialOutlineBrush}">
                 <ComboBox.ItemTemplate>
-                  <DataTemplate>
-                    <StackPanel Spacing="2">
+                  <DataTemplate x:DataType="services:LocalStorageOption">
+                    <StackPanel Spacing="2"
+                                IsEnabled="{Binding IsEnabled}">
                       <TextBlock Text="{Binding DisplayName}"
                                  FontSize="14"
                                  FontWeight="Medium"

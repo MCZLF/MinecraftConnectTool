@@ -101,6 +101,8 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
     public IReadOnlyList<LocalStorageOption> StorageOptions => LocalStorageService.PresetOptions;
 
+    public bool IsAppImageEnvironment => LocalStorageService.IsAppImageEnvironment;
+
     public bool IsCustomStorageSelected => SelectedStorageOption?.Mode == LocalStorageMode.Custom;
 
     #endregion
@@ -608,7 +610,7 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     public FirstLaunchWizardViewModel()
     {
         WelcomeTitle = File.Exists(LocalStorageService.BootstrapFilePath) ? "Hi，再次见面" : "Hi，初次见面";
-        SelectedStorageOption = StorageOptions.FirstOrDefault(option => option.Mode == LocalStorageService.StorageMode) ?? StorageOptions[0];
+        SelectedStorageOption = LocalStorageService.GetStorageOption(LocalStorageService.StorageMode);
         CustomStorageDirectory = LocalStorageService.CustomDirectory;
 
         RefreshPresetImagePaths();
@@ -781,9 +783,13 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
 
     private void ApplyStorageSettings()
     {
-        var option = SelectedStorageOption ?? StorageOptions[0];
+        var option = SelectedStorageOption ?? LocalStorageService.GetDefaultStorageOption();
+        if (!option.IsEnabled)
+            option = LocalStorageService.GetDefaultStorageOption();
+
         var customDirectory = option.Mode == LocalStorageMode.Custom ? CustomStorageDirectory : null;
         LocalStorageService.Configure(option.Mode, customDirectory);
+        SelectedStorageOption = LocalStorageService.GetStorageOption(LocalStorageService.StorageMode);
         ConfigService.ReloadFromStorage();
         RefreshPresetImagePaths();
     }

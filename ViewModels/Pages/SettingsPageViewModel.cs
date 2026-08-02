@@ -167,6 +167,12 @@ public partial class SettingsPageViewModel : ViewModelBase
 
     partial void OnSelectedStorageOptionChanged(LocalStorageOption? value)
     {
+        if (value != null && !value.IsEnabled)
+        {
+            SelectedStorageOption = LocalStorageService.GetDefaultStorageOption();
+            return;
+        }
+
         IsCustomStorageSelected = value?.Mode == LocalStorageMode.Custom;
         if (!_isLoadingSettings && value != null && value.Mode != LocalStorageMode.Custom)
         {
@@ -184,6 +190,8 @@ public partial class SettingsPageViewModel : ViewModelBase
     private string _currentStoragePath = "";
 
     public IReadOnlyList<LocalStorageOption> StorageOptions => LocalStorageService.PresetOptions;
+
+    public bool IsAppImageEnvironment => LocalStorageService.IsAppImageEnvironment;
 
     /// <summary>
     /// 启用全局文字加粗
@@ -498,7 +506,7 @@ public partial class SettingsPageViewModel : ViewModelBase
         // 渲染方式
         RenderingMode = ThemeService.Instance.RenderingMode;
 
-        SelectedStorageOption = StorageOptions.FirstOrDefault(option => option.Mode == LocalStorageService.StorageMode) ?? StorageOptions[0];
+        SelectedStorageOption = LocalStorageService.GetStorageOption(LocalStorageService.StorageMode);
         CustomStorageDirectory = LocalStorageService.CustomDirectory;
         IsCustomStorageSelected = SelectedStorageOption.Mode == LocalStorageMode.Custom;
         CurrentStoragePath = LocalStorageService.AppRootDirectory;
@@ -823,17 +831,21 @@ public partial class SettingsPageViewModel : ViewModelBase
 
     private void ApplyStorageSettings()
     {
-        var option = SelectedStorageOption ?? StorageOptions[0];
+        var option = SelectedStorageOption ?? LocalStorageService.GetDefaultStorageOption();
+        if (!option.IsEnabled)
+            option = LocalStorageService.GetDefaultStorageOption();
+
         var previousStoragePath = LocalStorageService.AppRootDirectory;
         var previousPhotoBackgroundPath = ConfigService.Read<string?>("PhotoBackgroundPath", null);
         var customDirectory = option.Mode == LocalStorageMode.Custom ? CustomStorageDirectory : null;
         LocalStorageService.Configure(option.Mode, customDirectory, true);
+        SelectedStorageOption = LocalStorageService.GetStorageOption(LocalStorageService.StorageMode);
         ConfigService.ReloadFromStorage();
         CurrentStoragePath = LocalStorageService.AppRootDirectory;
         UpdateMigratedPhotoBackgroundPath(previousStoragePath, CurrentStoragePath, previousPhotoBackgroundPath);
         ShowToast(string.Equals(previousStoragePath, CurrentStoragePath, StringComparison.OrdinalIgnoreCase)
-            ? "存储目录已更新，重启应用后完全生效"
-            : "存储目录已更新并迁移现有数据，重启应用后完全生效", true);
+            ? "存储目录已更新，重启后生效"
+            : "存储目录已迁移，重启后生效", true);
     }
 
     private void UpdateMigratedPhotoBackgroundPath(string previousStoragePath, string currentStoragePath, string? previousPhotoBackgroundPath)

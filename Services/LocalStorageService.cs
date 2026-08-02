@@ -13,7 +13,7 @@ public enum LocalStorageMode
     Custom
 }
 
-public sealed record LocalStorageOption(LocalStorageMode Mode, string DisplayName, string Description);
+public sealed record LocalStorageOption(LocalStorageMode Mode, string DisplayName, string Description, bool IsEnabled = true);
 
 public static class LocalStorageService
 {
@@ -50,21 +50,26 @@ public static class LocalStorageService
 
     public static string LegacyConfigFilePath => Path.Combine(LegacyTempDirectory, "APPconfig.json");
 
-    public static LocalStorageMode StorageMode => LoadSettings().Mode;
+    public static LocalStorageMode StorageMode
+    {
+        get
+        {
+            var mode = LoadSettings().Mode;
+            return IsStorageModeAllowed(mode) ? mode : DefaultStorageMode;
+        }
+    }
 
     public static string CustomDirectory => LoadSettings().CustomDirectory ?? string.Empty;
 
-    public static IReadOnlyList<LocalStorageOption> PresetOptions { get; } = new[]
-    {
-        new LocalStorageOption(LocalStorageMode.AppDirectory, "当前目录", "主程序目录下的 MCTConfig 文件夹"),
-        new LocalStorageOption(LocalStorageMode.SystemTemp, "系统 Temp", "兼容旧版的系统临时目录"),
-        new LocalStorageOption(LocalStorageMode.Custom, "自定义地址", "由用户手动选择存放目录")
-    };
+    public static IReadOnlyList<LocalStorageOption> PresetOptions { get; } = CreatePresetOptions();
+
+    public static LocalStorageMode DefaultStorageMode => IsAppImageEnvironment ? LocalStorageMode.SystemTemp : LocalStorageMode.AppDirectory;
 
     public static string GetRootDirectory()
     {
         var settings = LoadSettings();
-        var directory = settings.Mode switch
+        var mode = IsStorageModeAllowed(settings.Mode) ? settings.Mode : DefaultStorageMode;
+        var directory = mode switch
         {
             LocalStorageMode.SystemTemp => LegacyRootDirectory,
             LocalStorageMode.Custom when !string.IsNullOrWhiteSpace(settings.CustomDirectory) => settings.CustomDirectory!,
@@ -87,10 +92,30 @@ public static class LocalStorageService
 
     public static string GetPresetImagePath(string fileName) => Path.Combine(TempDirectory, fileName);
 
+    public static bool IsAppImageEnvironment => OperatingSystem.IsLinux() && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("APPIMAGE"));
+
+    public static bool IsStorageModeAllowed(LocalStorageMode mode)
+    {
+        return !IsAppImageEnvironment || mode != LocalStorageMode.AppDirectory;
+    }
+
+    public static LocalStorageOption GetDefaultStorageOption()
+    {
+        return PresetOptions.First(option => option.Mode == DefaultStorageMode);
+    }
+
+    public static LocalStorageOption GetStorageOption(LocalStorageMode mode)
+    {
+        return PresetOptions.FirstOrDefault(option => option.Mode == mode && option.IsEnabled) ?? GetDefaultStorageOption();
+    }
+
     public static void Configure(LocalStorageMode mode, string? customDirectory = null, bool migrateExistingData = true)
     {
+        if (!IsStorageModeAllowed(mode))
+            mode = DefaultStorageMode;
+
         if (mode == LocalStorageMode.Custom && string.IsNullOrWhiteSpace(customDirectory))
-            mode = LocalStorageMode.AppDirectory;
+            mode = DefaultStorageMode;
 
         var previousRoot = AppRootDirectory;
         var nextSettings = new LocalStorageSettings
@@ -294,7 +319,7 @@ public static class LocalStorageService
             }
             catch { }
 
-            _settings = new LocalStorageSettings { Mode = LocalStorageMode.AppDirectory };
+            _settings = new LocalStorageSettings { Mode = DefaultStorageMode };
             return _settings;
         }
     }
@@ -313,6 +338,21 @@ public static class LocalStorageService
     }
 
     private static string GetSystemTempDirectory() => Path.GetTempPath();
+
+    private static IReadOnlyList<LocalStorageOption> CreatePresetOptions()
+    {
+        var appDirectoryEnabled = !IsAppImageEnvironment;
+        var appDirectoryDescription = appDirectoryEnabled
+            ? "主程序目录下的 MCTConfig 文件夹"
+            : "AppImage 挂载目录不可写，当前环境不可用";
+
+        return new[]
+        {
+            new LocalStorageOption(LocalStorageMode.AppDirectory, "当前目录", appDirectoryDescription, appDirectoryEnabled),
+            new LocalStorageOption(LocalStorageMode.SystemTemp, "系统 Temp", "兼容旧版的系统临时目录"),
+            new LocalStorageOption(LocalStorageMode.Custom, "自定义地址", "由用户手动选择存放目录")
+        };
+    }
 
     private static string GetExecutableDirectory()
     {

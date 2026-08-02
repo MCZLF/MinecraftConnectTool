@@ -318,6 +318,12 @@
                          Opacity="0.7"
                          TextWrapping="Wrap"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="检测到 AppImage 运行环境，当前目录为只读挂载目录，已禁用当前目录存储并默认使用系统 Temp。"
+                         FontSize="12"
+                         Opacity="0.75"
+                         TextWrapping="Wrap"
+                         IsVisible="{Binding IsAppImageEnvironment}"
+                         Foreground="{DynamicResource MaterialPrimaryBrush}"/>
               <TextBlock Text="{Binding CurrentStoragePath}"
                          FontSize="12"
                          Opacity="0.6"
@@ -336,8 +342,9 @@
                         BorderThickness="0,0,0,1"
                         BorderBrush="{DynamicResource MaterialOutlineBrush}">
                 <ComboBox.ItemTemplate>
-                  <DataTemplate>
-                    <StackPanel Spacing="2" MinWidth="150" VerticalAlignment="Center">
+                  <DataTemplate x:DataType="services:LocalStorageOption">
+                    <StackPanel Spacing="2" MinWidth="150" VerticalAlignment="Center"
+                                IsEnabled="{Binding IsEnabled}">
                       <TextBlock Text="{Binding DisplayName}"
                                  FontSize="13"
                                  TextTrimming="CharacterEllipsis"
@@ -1107,25 +1114,28 @@
             Padding="20,12"
             CornerRadius="28"
             Background="{DynamicResource MaterialCardVariantBrush}"
-            MaxWidth="360"
+            MaxWidth="680"
             Opacity="{Binding ToastOpacity, FallbackValue=0}"
             IsVisible="{Binding IsToastVisible, FallbackValue=False}"
             BoxShadow="0 6 16 0 #60000000"
             ZIndex="100">
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
         <icons:MaterialIcon x:Name="ToastIcon"
+                            Grid.Column="0"
                             Kind="{Binding ToastIconKind, FallbackValue=AlertCircle}"
                             Width="24"
                             Height="24"
-                            Foreground="{Binding ToastIconColor, FallbackValue=#F44336}"/>
+                            Foreground="{Binding ToastIconColor, FallbackValue=#F44336}"
+                            VerticalAlignment="Center"/>
         <TextBlock x:Name="ToastText"
+                   Grid.Column="1"
                    Text="{Binding ToastMessage, FallbackValue=操作成功}"
                    FontSize="14"
                    FontWeight="Medium"
                    Foreground="{DynamicResource MaterialOnSurfaceBrush}"
                    VerticalAlignment="Center"
                    TextWrapping="Wrap"/>
-      </StackPanel>
+      </Grid>
     </Border>
   </Grid>
 </UserControl>

@@ -305,7 +305,6 @@ jobs:
         run: |
           timestamp=$(date +"%Y%m%d_%H%M%S")
           bundle="MinecraftConnectTool.app"
-          output="${{ env.VERSION }}_AutoBuild_${timestamp}_${{ matrix.rid }}.zip"
           rm -rf "$bundle"
           mkdir -p "$bundle/Contents/MacOS"
           mkdir -p "$bundle/Contents/Resources"
@@ -339,10 +338,9 @@ jobs:
           EOF
           sed -i '' 's/^          //' "$bundle/Contents/Info.plist"
           codesign --force --deep --sign - "$bundle"
-          ditto -c -k --sequesterRsrc --keepParent "$bundle" "$output"
 
       - name: Upload macOS app Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ./*.zip
+          path: MinecraftConnectTool.app

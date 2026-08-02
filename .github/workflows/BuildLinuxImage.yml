@@ -37,14 +37,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick desktop-file-utils file curl
 
-      - name: Publish Linux self-contained
+      - name: Publish Linux framework-dependent
         run: |
           dotnet publish MinecraftConnectTool.csproj \
             -c Release \
             -r ${{ matrix.rid }} \
-            --self-contained true \
+            --self-contained false \
             -o publish/${{ matrix.rid }} \
-            -p:PublishSingleFile=false \
+            -p:PublishSingleFile=true \
             -p:PublishReadyToRun=false
 
       - name: Prepare AppDir
@@ -84,11 +84,12 @@ jobs:
 
       - name: Build AppImage
         run: |
-          curl -L -o appimagetool-x86_64.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-          chmod +x appimagetool-x86_64.AppImage
+          mkdir -p tools artifacts
+          curl -L -o tools/appimagetool-x86_64.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x tools/appimagetool-x86_64.AppImage
           timestamp=$(date +"%Y%m%d_%H%M%S")
-          output="${{ env.VERSION }}_ManualBuild_${timestamp}_${{ matrix.rid }}.AppImage"
-          ARCH=${{ matrix.arch }} APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage AppDir "$output"
+          output="artifacts/${{ env.VERSION }}_ManualBuild_${timestamp}_${{ matrix.rid }}.AppImage"
+          ARCH=${{ matrix.arch }} APPIMAGE_EXTRACT_AND_RUN=1 ./tools/appimagetool-x86_64.AppImage AppDir "$output"
           chmod +x "$output"
           file "$output"
 
@@ -96,4 +97,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ./*.AppImage
+          path: artifacts/*.AppImage

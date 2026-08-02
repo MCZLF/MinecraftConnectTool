@@ -43,6 +43,7 @@ public partial class PanelPlayerManagerViewModel : ObservableObject
 {
     private readonly PlayerListService _playerListService;
     private System.Timers.Timer? _refreshTimer;
+    private bool _isRefreshingPlayers;
 
     [ObservableProperty]
     private ObservableCollection<PlayerViewModel> _players = new();
@@ -195,33 +196,45 @@ public partial class PanelPlayerManagerViewModel : ObservableObject
     /// </summary>
     private async Task RefreshPlayersListAsync()
     {
-        var players = await _playerListService.GetPlayersAsync();
+        if (_isRefreshingPlayers) return;
 
-        // 在UI线程上更新列表，避免重合问题
-        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        _isRefreshingPlayers = true;
+        try
         {
-            Players.Clear();
-
-            // 排序：房主在最上方，其他玩家按加入时间排序
-            var sortedPlayers = players
-                .OrderByDescending(p => p.Nickname == "房主")
-                .ThenBy(p => p.JoinedAt)
-                .ToList();
-
-            foreach (var player in sortedPlayers)
+            var players = await _playerListService.GetPlayersAsync();
+            if (players.Count == 0 && Players.Count > 0 && _playerListService.IsConnected)
             {
-                Players.Add(new PlayerViewModel
-                {
-                    Id = player.Id,
-                    Nickname = player.Nickname,
-                    Version = player.Version,
-                    JoinedAt = player.JoinedAt
-                });
+                return;
             }
 
-            IsEmpty = Players.Count == 0;
-            PlayerCountText = $"{Players.Count}人在线";
-        });
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Players.Clear();
+
+                var sortedPlayers = players
+                    .OrderByDescending(p => p.Nickname == "房主")
+                    .ThenBy(p => p.JoinedAt)
+                    .ToList();
+
+                foreach (var player in sortedPlayers)
+                {
+                    Players.Add(new PlayerViewModel
+                    {
+                        Id = player.Id,
+                        Nickname = player.Nickname,
+                        Version = player.Version,
+                        JoinedAt = player.JoinedAt
+                    });
+                }
+
+                IsEmpty = Players.Count == 0;
+                PlayerCountText = $"{Players.Count}人在线";
+            });
+        }
+        finally
+        {
+            _isRefreshingPlayers = false;
+        }
     }
 
     /// <summary>

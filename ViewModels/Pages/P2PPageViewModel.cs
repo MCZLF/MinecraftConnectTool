@@ -85,6 +85,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool _isPlayerListConnected;
 
+    private bool _hasShownPlayerListDegraded;
+
     // 主状态指示灯 (badge3)
     [ObservableProperty]
     private bool _isStatusBadgeVisible;
@@ -148,7 +150,51 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     /// </summary>
     private void OnPlayerListLogMessage(object? sender, string message)
     {
-        AddLog(message);
+        var displayMessage = FormatPlayerListLog(message);
+        if (!string.IsNullOrEmpty(displayMessage))
+        {
+            AddLog($"[MCTRoomList] {displayMessage}");
+        }
+    }
+
+    private string? FormatPlayerListLog(string message)
+    {
+        if (!message.StartsWith("[容错]")) return message;
+
+        if (message.Contains("启动心跳定时器"))
+        {
+            _hasShownPlayerListDegraded = false;
+            return null;
+        }
+
+        if (message.Contains("心跳恢复") || message.Contains("忽略过期心跳") || message.Contains("继续容错") || message.Contains("恢复探测失败") || message.Contains("房主心跳异常"))
+        {
+            return null;
+        }
+
+        if (message.Contains("容错次数耗尽") && !_hasShownPlayerListDegraded)
+        {
+            _hasShownPlayerListDegraded = true;
+            return "房间管理服务暂时不可用，已切换为后台低频恢复，不影响当前联机";
+        }
+
+        if (message.Contains("已恢复") || message.Contains("重注册成功"))
+        {
+            _hasShownPlayerListDegraded = false;
+            return "房间管理服务已恢复，玩家列表将继续同步";
+        }
+
+        if (message.Contains("房间丢失") || message.Contains("玩家丢失"))
+        {
+            return "房间管理状态丢失，正在自动恢复玩家列表";
+        }
+
+        if (message.Contains("收到踢出指令"))
+        {
+            return "收到房主踢出指令";
+        }
+
+        return null;
     }
     
     /// <summary>

@@ -39,6 +39,7 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <StackTraceSupport>false</StackTraceSupport>
     <MetricsSupport>false</MetricsSupport>
+    <DefaultItemExcludes>$(DefaultItemExcludes);temp\**;temp\**\*;Temp\**;Temp\**\*</DefaultItemExcludes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>none</DebugType>
@@ -58,6 +59,8 @@
     <Compile Remove="temp\**" />
     <EmbeddedResource Remove="temp\**" />
     <None Remove="temp\**" />
+    <Content Remove="temp\**" />
+    <AvaloniaResource Remove="temp\**" />
   </ItemGroup>
 
   <!-- 排除 MCTListServer 服务端项目 -->

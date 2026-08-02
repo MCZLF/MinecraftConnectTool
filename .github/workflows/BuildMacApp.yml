@@ -1,0 +1,87 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERSION: '0.0.7'
+
+jobs:
+  build-macos-app:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: osx-x64
+            artifact: MacOS_X64_App
+          - rid: osx-arm64
+            artifact: MacOS_Arm64_App
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish macOS self-contained
+        run: |
+          dotnet publish MinecraftConnectTool.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -o publish/${{ matrix.rid }} \
+            -p:PublishSingleFile=false \
+            -p:PublishReadyToRun=false
+
+      - name: Build macOS app bundle
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          bundle="MinecraftConnectTool.app"
+          output="${{ env.VERSION }}_ManualBuild_${timestamp}_${{ matrix.rid }}.zip"
+          rm -rf "$bundle"
+          mkdir -p "$bundle/Contents/MacOS"
+          mkdir -p "$bundle/Contents/Resources"
+          cp -a publish/${{ matrix.rid }}/. "$bundle/Contents/MacOS/"
+          chmod +x "$bundle/Contents/MacOS/MinecraftConnectTool"
+          cat > "$bundle/Contents/Info.plist" <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>MinecraftConnectTool</string>
+              <key>CFBundleIdentifier</key>
+              <string>studio.mczlf.minecraftconnecttool</string>
+              <key>CFBundleName</key>
+              <string>Minecraft Connect Tool</string>
+              <key>CFBundleDisplayName</key>
+              <string>Minecraft Connect Tool</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>${{ env.VERSION }}</string>
+              <key>CFBundleVersion</key>
+              <string>${{ env.VERSION }}</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>10.15</string>
+              <key>NSHighResolutionCapable</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          sed -i '' 's/^          //' "$bundle/Contents/Info.plist"
+          codesign --force --deep --sign - "$bundle"
+          ditto -c -k --sequesterRsrc --keepParent "$bundle" "$output"
+
+      - name: Upload macOS app Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ./*.zip

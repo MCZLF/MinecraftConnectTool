@@ -183,3 +183,165 @@ jobs:
         with:
           name: MacOS_Arm64
           path: bin/Release/net8.0/osx-arm64/publish/*MacOS_Arm64
+
+  build-linux-appimage:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            arch: x86_64
+            artifact: Linux_X64_AppImage
+          - rid: linux-arm64
+            arch: aarch64
+            artifact: Linux_Arm64_AppImage
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install AppImage dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick desktop-file-utils file curl
+
+      - name: Publish Linux self-contained
+        run: |
+          dotnet publish MinecraftConnectTool.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -o publish/${{ matrix.rid }} \
+            -p:PublishSingleFile=false \
+            -p:PublishReadyToRun=false
+
+      - name: Prepare AppDir
+        run: |
+          rm -rf AppDir
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          cp -a publish/${{ matrix.rid }}/. AppDir/usr/bin/
+          chmod +x AppDir/usr/bin/MinecraftConnectTool
+          convert 'IconGroup3000.ico[0]' -resize 256x256 AppDir/minecraftconnecttool.png
+          cp AppDir/minecraftconnecttool.png AppDir/.DirIcon
+          cp AppDir/minecraftconnecttool.png AppDir/usr/share/icons/hicolor/256x256/apps/minecraftconnecttool.png
+          cat > AppDir/minecraftconnecttool.desktop <<'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Minecraft Connect Tool
+          Comment=Minecraft Connect Tool 桌面端
+          Exec=MinecraftConnectTool
+          Icon=minecraftconnecttool
+          Terminal=false
+          Categories=Game;Network;
+          StartupNotify=true
+          EOF
+          sed -i 's/^          //' AppDir/minecraftconnecttool.desktop
+          cp AppDir/minecraftconnecttool.desktop AppDir/usr/share/applications/minecraftconnecttool.desktop
+          cat > AppDir/AppRun <<'EOF'
+          #!/usr/bin/env bash
+          set -e
+          HERE="$(dirname "$(readlink -f "$0")")"
+          cd "$HERE/usr/bin"
+          exec "$HERE/usr/bin/MinecraftConnectTool" "$@"
+          EOF
+          sed -i 's/^          //' AppDir/AppRun
+          chmod +x AppDir/AppRun
+          desktop-file-validate AppDir/minecraftconnecttool.desktop
+
+      - name: Build AppImage
+        run: |
+          curl -L -o appimagetool-x86_64.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          output="${{ env.VERSION }}_AutoBuild_${timestamp}_${{ matrix.rid }}.AppImage"
+          ARCH=${{ matrix.arch }} APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage AppDir "$output"
+          chmod +x "$output"
+          file "$output"
+
+      - name: Upload AppImage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ./*.AppImage
+
+  build-macos-app:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: osx-x64
+            artifact: MacOS_X64_App
+          - rid: osx-arm64
+            artifact: MacOS_Arm64_App
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish macOS self-contained
+        run: |
+          dotnet publish MinecraftConnectTool.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -o publish/${{ matrix.rid }} \
+            -p:PublishSingleFile=false \
+            -p:PublishReadyToRun=false
+
+      - name: Build macOS app bundle
+        run: |
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          bundle="MinecraftConnectTool.app"
+          output="${{ env.VERSION }}_AutoBuild_${timestamp}_${{ matrix.rid }}.zip"
+          rm -rf "$bundle"
+          mkdir -p "$bundle/Contents/MacOS"
+          mkdir -p "$bundle/Contents/Resources"
+          cp -a publish/${{ matrix.rid }}/. "$bundle/Contents/MacOS/"
+          chmod +x "$bundle/Contents/MacOS/MinecraftConnectTool"
+          cat > "$bundle/Contents/Info.plist" <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>MinecraftConnectTool</string>
+              <key>CFBundleIdentifier</key>
+              <string>studio.mczlf.minecraftconnecttool</string>
+              <key>CFBundleName</key>
+              <string>Minecraft Connect Tool</string>
+              <key>CFBundleDisplayName</key>
+              <string>Minecraft Connect Tool</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>${{ env.VERSION }}</string>
+              <key>CFBundleVersion</key>
+              <string>${{ env.VERSION }}</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>10.15</string>
+              <key>NSHighResolutionCapable</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          sed -i '' 's/^          //' "$bundle/Contents/Info.plist"
+          codesign --force --deep --sign - "$bundle"
+          ditto -c -k --sequesterRsrc --keepParent "$bundle" "$output"
+
+      - name: Upload macOS app Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ./*.zip

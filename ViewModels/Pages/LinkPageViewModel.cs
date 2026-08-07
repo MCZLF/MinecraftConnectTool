@@ -1067,49 +1067,46 @@ public partial class LinkPageViewModel : ViewModelBase
     // ========== 显示错误提示窗 ==========
     public async void ShowErrorToast(string message)
     {
-        // 取消之前的自动隐藏任务
         _toastCancellationTokenSource?.Cancel();
-        _toastCancellationTokenSource = new System.Threading.CancellationTokenSource();
-        var token = _toastCancellationTokenSource.Token;
-
-        // 设置文本并显示
-        ErrorToastText = message;
-        IsErrorToastVisible = true;
-
-        // 淡入动画 - 30ms间隔，从0到1，共300ms
-        for (double i = 0; i <= 1; i += 0.1)
-        {
-            if (token.IsCancellationRequested) return;
-            ErrorToastOpacity = i;
-            await Task.Delay(30, token);
-        }
-        ErrorToastOpacity = 1;
+        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+        _toastCancellationTokenSource = cancellationTokenSource;
+        var token = cancellationTokenSource.Token;
 
         try
         {
-            // 显示6.4秒后淡出（总共约7秒：0.3s淡入 + 6.4s显示 + 0.3s淡出）
+            ErrorToastText = message;
+            IsErrorToastVisible = true;
+
+            for (double i = 0; i <= 1; i += 0.1)
+            {
+                token.ThrowIfCancellationRequested();
+                ErrorToastOpacity = i;
+                await Task.Delay(30, token);
+            }
+            ErrorToastOpacity = 1;
+
             await Task.Delay(6400, token);
 
-            // 淡出动画 - 30ms间隔，从1到0，共300ms
             for (double i = 1; i >= 0; i -= 0.1)
             {
-                if (token.IsCancellationRequested) return;
+                token.ThrowIfCancellationRequested();
                 ErrorToastOpacity = i;
                 await Task.Delay(30, token);
             }
             ErrorToastOpacity = 0;
             IsErrorToastVisible = false;
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            // 任务被取消，淡出隐藏
-            for (double i = ErrorToastOpacity; i >= 0; i -= 0.1)
+        }
+        finally
+        {
+            if (ReferenceEquals(_toastCancellationTokenSource, cancellationTokenSource))
             {
-                ErrorToastOpacity = i;
-                await Task.Delay(30);
+                _toastCancellationTokenSource = null;
             }
-            ErrorToastOpacity = 0;
-            IsErrorToastVisible = false;
+
+            cancellationTokenSource.Dispose();
         }
     }
 

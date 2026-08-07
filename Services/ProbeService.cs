@@ -60,51 +60,51 @@ public static class ProbeService
     /// </summary>
     public static async Task SendAsync()
     {
-        // 检查是否允许 Probe
-        bool allowProbe = ConfigService.Read<bool>("AllowProbe", true);
-        if (!allowProbe) return;
-
-        // 如果已经发送过，则跳过
-        if (!ShouldSend()) return;
-
-        await Task.Run(async () =>
+        try
         {
-            try
+            bool allowProbe = ConfigService.Read<bool>("AllowProbe", true);
+            if (!allowProbe) return;
+
+            if (!ShouldSend()) return;
+
+            await Task.Run(async () =>
             {
-                string body =
+                try
+                {
+                    string body =
 $@"====ProbeContext====
 Version = {Version}
 Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
 ";
-                byte[] data = Encoding.UTF8.GetBytes(body);
-                using (TcpClient client = new TcpClient())
-                {
-                    using var timeoutCts = new System.Threading.CancellationTokenSource(TIMEOUT);
-                    await client.ConnectAsync(HOST, PORT, timeoutCts.Token);
+                    byte[] data = Encoding.UTF8.GetBytes(body);
+                    using (TcpClient client = new TcpClient())
+                    {
+                        using var timeoutCts = new System.Threading.CancellationTokenSource(TIMEOUT);
+                        await client.ConnectAsync(HOST, PORT, timeoutCts.Token);
 
-                    var stream = client.GetStream();
-                    stream.WriteTimeout = TIMEOUT;
-                    stream.ReadTimeout = TIMEOUT;
+                        var stream = client.GetStream();
+                        stream.WriteTimeout = TIMEOUT;
+                        stream.ReadTimeout = TIMEOUT;
 
-                    await stream.WriteAsync(data, timeoutCts.Token);
-                    byte[] buffer = new byte[256];
-                    int n = await stream.ReadAsync(buffer, timeoutCts.Token);
-                    string response = Encoding.UTF8.GetString(buffer, 0, n).Trim();
+                        await stream.WriteAsync(data, timeoutCts.Token);
+                        byte[] buffer = new byte[256];
+                        int n = await stream.ReadAsync(buffer, timeoutCts.Token);
+                        string response = Encoding.UTF8.GetString(buffer, 0, n).Trim();
 
-                    // 无论返回什么结果，都正常处理
-                    _ = response;
+                        _ = response;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                // 静默处理，仅输出到控制台
-                Console.WriteLine($"[Probe] 发送失败: {ex.Message}");
-            }
-            finally
-            {
-                // 无论成功与否，都标记为已发送（避免重复尝试）
-                MarkAsSent();
-            }
-        });
+                catch
+                {
+                }
+                finally
+                {
+                    MarkAsSent();
+                }
+            });
+        }
+        catch
+        {
+        }
     }
 }

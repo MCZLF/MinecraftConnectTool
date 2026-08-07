@@ -131,26 +131,71 @@
       <!-- 功能按钮 -->
       <Grid ColumnDefinitions="*,*,*,*" Margin="0,16,0,0">
         <Button Grid.Column="0"
-                Content="Github"
                 Margin="0,0,8,0"
                 HorizontalAlignment="Stretch"
-                Click="OnImageGuideClick"/>
+                Click="OnImageGuideClick">
+          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+            <icons:MaterialIcon Kind="Github" Width="18" Height="18"/>
+            <TextBlock Text="Github" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
         <Button Grid.Column="1"
-                Content="BUG反馈"
                 Margin="4,0,4,0"
                 HorizontalAlignment="Stretch"
-                Click="OnBugReportClick"/>
+                Click="OnBugReportClick">
+          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+            <icons:MaterialIcon Kind="BugReport" Width="18" Height="18"/>
+            <TextBlock Text="BUG反馈" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
         <Button Grid.Column="2"
-                Content="查询渲染模式"
                 Margin="4,0,4,0"
                 HorizontalAlignment="Stretch"
-                Click="OnCheckRenderingModeClick"/>
+                Click="OnCheckRenderingModeClick">
+          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+            <icons:MaterialIcon Kind="MonitorEye" Width="18" Height="18"/>
+            <TextBlock Text="查询渲染模式" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
         <Button Grid.Column="3"
-                Content="千万别点"
+                x:Name="RemoteControlButton"
                 Margin="8,0,0,0"
                 HorizontalAlignment="Stretch"
-                Click="OnPlaceholder2Click"/>
+                Click="OnRemoteControlClick">
+          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+            <icons:MaterialIcon x:Name="RemoteControlButtonIcon" Kind="PlayCircle" Width="18" Height="18"/>
+            <TextBlock x:Name="RemoteControlButtonText" Text="启动远程控制" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
       </Grid>
+
+      <Border x:Name="RemoteControlDownloadBorder"
+              Background="{DynamicResource MaterialPrimaryContainerBrush}"
+              CornerRadius="12"
+              Padding="16"
+              IsVisible="False">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="RemoteControlDownloadText"
+                       Grid.Column="0"
+                       Text="正在下载远程控制组件..."
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+            <TextBlock x:Name="RemoteControlDownloadPercentText"
+                       Grid.Column="1"
+                       Text="0%"
+                       FontSize="14"
+                       FontWeight="Medium"
+                       Foreground="{DynamicResource MaterialOnPrimaryContainerBrush}"/>
+          </Grid>
+          <ProgressBar x:Name="RemoteControlDownloadProgressBar"
+                       Minimum="0"
+                       Maximum="100"
+                       Value="0"
+                       Height="6"/>
+        </StackPanel>
+      </Border>
 
       <!-- 渲染模式显示区域 -->
       <Border x:Name="RenderingModeBorder"

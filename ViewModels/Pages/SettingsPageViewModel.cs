@@ -7,6 +7,7 @@ using MinecraftConnectTool.Services;
 using MinecraftConnectTool.Views;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -188,6 +189,8 @@ public partial class SettingsPageViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _currentStoragePath = "";
+
+    public string CoreStoragePath => LocalStorageService.TempDirectory;
 
     public IReadOnlyList<LocalStorageOption> StorageOptions => LocalStorageService.PresetOptions;
 
@@ -829,6 +832,27 @@ public partial class SettingsPageViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void OpenCoreStorageDirectory()
+    {
+        try
+        {
+            var directory = LocalStorageService.TempDirectory;
+            Directory.CreateDirectory(directory);
+            OnPropertyChanged(nameof(CoreStoragePath));
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = directory,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            ShowToast($"打开核心存放目录失败: {ex.Message}");
+        }
+    }
+
     private void ApplyStorageSettings()
     {
         var option = SelectedStorageOption ?? LocalStorageService.GetDefaultStorageOption();
@@ -842,6 +866,7 @@ public partial class SettingsPageViewModel : ViewModelBase
         SelectedStorageOption = LocalStorageService.GetStorageOption(LocalStorageService.StorageMode);
         ConfigService.ReloadFromStorage();
         CurrentStoragePath = LocalStorageService.AppRootDirectory;
+        OnPropertyChanged(nameof(CoreStoragePath));
         UpdateMigratedPhotoBackgroundPath(previousStoragePath, CurrentStoragePath, previousPhotoBackgroundPath);
         ShowToast(string.Equals(previousStoragePath, CurrentStoragePath, StringComparison.OrdinalIgnoreCase)
             ? "存储目录已更新，重启后生效"
@@ -1119,61 +1144,57 @@ public partial class SettingsPageViewModel : ViewModelBase
     /// </summary>
     public async void ShowToast(string message, bool isSuccess = false)
     {
-        // 取消之前的自动隐藏任务
         _toastCancellationTokenSource?.Cancel();
-        _toastCancellationTokenSource = new System.Threading.CancellationTokenSource();
-        var token = _toastCancellationTokenSource.Token;
-
-        // 根据类型设置样式
-        if (isSuccess)
-        {
-            ToastIconKind = "CheckCircle";
-            ToastIconColor = "#4CAF50";  // 绿色，成功
-        }
-        else
-        {
-            ToastIconKind = "AlertCircle";
-            ToastIconColor = "#F44336";  // 红色，错误
-        }
-
-        // 设置文本并显示
-        ToastMessage = message;
-        IsToastVisible = true;
-
-        // 淡入动画 - 30ms间隔，从0到1，共300ms
-        for (double i = 0; i <= 1; i += 0.1)
-        {
-            if (token.IsCancellationRequested) return;
-            ToastOpacity = i;
-            await Task.Delay(30, token);
-        }
-        ToastOpacity = 1;
+        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+        _toastCancellationTokenSource = cancellationTokenSource;
+        var token = cancellationTokenSource.Token;
 
         try
         {
-            // 显示2.4秒后淡出（总共约3秒：0.3s淡入 + 2.4s显示 + 0.3s淡出）
+            if (isSuccess)
+            {
+                ToastIconKind = "CheckCircle";
+                ToastIconColor = "#4CAF50";  // 绿色，成功
+            }
+            else
+            {
+                ToastIconKind = "AlertCircle";
+                ToastIconColor = "#F44336";  // 红色，错误
+            }
+
+            ToastMessage = message;
+            IsToastVisible = true;
+
+            for (double i = 0; i <= 1; i += 0.1)
+            {
+                token.ThrowIfCancellationRequested();
+                ToastOpacity = i;
+                await Task.Delay(30, token);
+            }
+            ToastOpacity = 1;
+
             await Task.Delay(2400, token);
 
-            // 淡出动画 - 30ms间隔，从1到0，共300ms
             for (double i = 1; i >= 0; i -= 0.1)
             {
-                if (token.IsCancellationRequested) return;
+                token.ThrowIfCancellationRequested();
                 ToastOpacity = i;
                 await Task.Delay(30, token);
             }
             ToastOpacity = 0;
             IsToastVisible = false;
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            // 任务被取消，淡出隐藏
-            for (double i = ToastOpacity; i >= 0; i -= 0.1)
+        }
+        finally
+        {
+            if (ReferenceEquals(_toastCancellationTokenSource, cancellationTokenSource))
             {
-                ToastOpacity = i;
-                await Task.Delay(30);
+                _toastCancellationTokenSource = null;
             }
-            ToastOpacity = 0;
-            IsToastVisible = false;
+
+            cancellationTokenSource.Dispose();
         }
     }
 

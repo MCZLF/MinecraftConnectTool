@@ -78,8 +78,12 @@ jobs:
           sed -i '' 's/^          //' "$bundle/Contents/Info.plist"
           codesign --force --deep --sign - "$bundle"
 
+      - name: Zip macOS app bundle
+        run: |
+          zip -r "MinecraftConnectTool_${{ matrix.rid }}.zip" "MinecraftConnectTool.app"
+
       - name: Upload macOS app Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: MinecraftConnectTool.app
+          path: MinecraftConnectTool_${{ matrix.rid }}.zip

@@ -409,6 +409,22 @@
                           VerticalAlignment="Center"/>
           </Grid>
 
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="自动检测冲突程序"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="启动时检测 RadminLan 等可能冲突的程序并提醒"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding AutoDetectConflictProgram, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
           <!-- 动画速度设置 -->
           <Grid ColumnDefinitions="Auto,*,Auto">
             <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">

@@ -736,6 +736,40 @@
                        Foreground="{DynamicResource MaterialOnPrimaryBrush}"/>
           </Border>
 
+          <Border x:Name="ConflictProgramToastBorder"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Bottom"
+                  Margin="32,0,32,84"
+                  Padding="20,12"
+                  CornerRadius="28"
+                  Background="{DynamicResource MaterialErrorContainerBrush}"
+                  MaxWidth="720"
+                  ClipToBounds="True"
+                  Opacity="0"
+                  IsVisible="False"
+                  Cursor="Hand"
+                  PointerPressed="ConflictProgramToastBorder_PointerPressed">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <icons:MaterialIcon Kind="AlertCircle"
+                                  Width="20"
+                                  Height="20"
+                                  VerticalAlignment="Center"
+                                  Foreground="{DynamicResource MaterialErrorBrush}"/>
+              <TextBlock x:Name="ConflictProgramToastText"
+                         FontSize="14"
+                         FontWeight="Medium"
+                         TextWrapping="Wrap"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource MaterialOnErrorContainerBrush}"/>
+              <icons:MaterialIcon Kind="Close"
+                                  Width="18"
+                                  Height="18"
+                                  VerticalAlignment="Center"
+                                  Opacity="0.6"
+                                  Foreground="{DynamicResource MaterialOnErrorContainerBrush}"/>
+            </StackPanel>
+          </Border>
+
           <!-- 内存监控显示 - 仅在性能模式开启时显示，支持拖动 -->
           <Canvas x:Name="MemoryMonitorCanvas"
                   HorizontalAlignment="Stretch"

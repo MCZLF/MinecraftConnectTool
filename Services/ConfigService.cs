@@ -36,6 +36,7 @@ public static class ConfigService
                 ["goupdatewhenstart"] = false,
                 ["Bar"] = 1,
                 ["AutoCheckP2PIFOpen"] = true,
+                ["AutoDetectConflictProgram"] = true,
                 ["ServerPostEnable"] = true,
                 ["nonotifywhenstart"] = false,
                 ["EnableVersionCheck"] = true,

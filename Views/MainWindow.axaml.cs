@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.057";
+    public static readonly string version = "0.0.7.058";
 
     // 版本代号
     public static readonly string designation = "我们终将重逢_摘自 漫画«有兽焉»_1000话";
@@ -44,6 +44,16 @@ public partial class MainWindow : Window
     
     // ET是否显示公共节点列表
     public static readonly bool EnableETNodeList = false;
+
+    private sealed record ConflictProgramDefinition(string DisplayName, string[] ExecutableNames, string Message);
+
+    private static readonly ConflictProgramDefinition[] ConflictPrograms =
+    [
+        new(
+            "RadminLan",
+            ["RvRvpnGui.exe"],
+            "检测到已启用RadminLan,强烈建议关闭RadminLan后再继续使用MCT")
+    ];
     
     // 复用的JsonSerializerOptions
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -61,6 +71,7 @@ public partial class MainWindow : Window
     private int _aiTimeoutSeconds = 120;
     private Bitmap? _backgroundBitmap;
     private string? _currentBackgroundPath;
+    private System.Threading.CancellationTokenSource? _conflictProgramToastCancellationTokenSource;
 
     // 缓存 InitializePhotoBackground 用到的控件引用，避免重复遍历视觉树
     private Image? _cachedBackgroundImage;
@@ -186,6 +197,7 @@ public partial class MainWindow : Window
         
         // 检查 AI 功能远程配置
         _ = CheckAiConfigAsync();
+        _ = CheckConflictProgramOnStartupAsync();
     }
 
     /// <summary>
@@ -643,6 +655,13 @@ public partial class MainWindow : Window
         }
         
         greetingBorder.IsVisible = false;
+
+        // 如果冲突程序通知正在显示，将其滑动到底部
+        var conflictToast = this.FindControl<Border>("ConflictProgramToastBorder");
+        if (conflictToast is { IsVisible: true })
+        {
+            await SlideConflictToastBottomMargin(conflictToast, 84, 24);
+        }
     }
     
     /// <summary>
@@ -660,6 +679,132 @@ public partial class MainWindow : Window
             >= 14 and < 18 => $"下午好, {userName}",
             _ => $"晚上好, {userName}"
         };
+    }
+
+    private async Task CheckConflictProgramOnStartupAsync()
+    {
+        if (!ConfigService.Read<bool>("AutoDetectConflictProgram", true))
+            return;
+
+        for (var attempt = 0; attempt < 3; attempt++)
+        {
+            var detectedProgram = FindDetectedConflictProgram();
+            if (detectedProgram != null)
+            {
+                ShowConflictProgramToast(detectedProgram.Message);
+                return;
+            }
+
+            await Task.Delay(attempt == 0 ? 1500 : 3000);
+        }
+    }
+
+    private static ConflictProgramDefinition? FindDetectedConflictProgram()
+    {
+        foreach (var conflictProgram in ConflictPrograms)
+        {
+            foreach (var executableName in conflictProgram.ExecutableNames)
+            {
+                var processName = Path.GetFileNameWithoutExtension(executableName);
+                var processes = Process.GetProcessesByName(processName);
+                try
+                {
+                    if (processes.Length > 0)
+                        return conflictProgram;
+                }
+                finally
+                {
+                    foreach (var p in processes) p.Dispose();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async void ShowConflictProgramToast(string message)
+    {
+        _conflictProgramToastCancellationTokenSource?.Cancel();
+        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+        _conflictProgramToastCancellationTokenSource = cancellationTokenSource;
+        var token = cancellationTokenSource.Token;
+
+        try
+        {
+            var toastBorder = this.FindControl<Border>("ConflictProgramToastBorder");
+            var toastText = this.FindControl<TextBlock>("ConflictProgramToastText");
+            if (toastBorder == null || toastText == null) return;
+
+            toastText.Text = message;
+            toastBorder.IsVisible = true;
+
+            // 根据问候语是否可见，决定通知位置
+            var greetingBorder = this.FindControl<Border>("GreetingBorder");
+            var isGreetingVisible = greetingBorder is { IsVisible: true };
+            toastBorder.Margin = new Thickness(32, 0, 32, isGreetingVisible ? 84 : 24);
+
+            for (double i = 0; i <= 1; i += 0.1)
+            {
+                token.ThrowIfCancellationRequested();
+                toastBorder.Opacity = i;
+                await Task.Delay(30, token);
+            }
+            toastBorder.Opacity = 1;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(_conflictProgramToastCancellationTokenSource, cancellationTokenSource))
+            {
+                _conflictProgramToastCancellationTokenSource = null;
+            }
+            cancellationTokenSource.Dispose();
+        }
+    }
+
+    private async void ConflictProgramToastBorder_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        _conflictProgramToastCancellationTokenSource?.Cancel();
+        var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+        _conflictProgramToastCancellationTokenSource = cancellationTokenSource;
+        var token = cancellationTokenSource.Token;
+
+        try
+        {
+            var toastBorder = this.FindControl<Border>("ConflictProgramToastBorder");
+            if (toastBorder == null) return;
+
+            for (double i = 1; i >= 0; i -= 0.1)
+            {
+                token.ThrowIfCancellationRequested();
+                toastBorder.Opacity = i;
+                await Task.Delay(30, token);
+            }
+            toastBorder.Opacity = 0;
+            toastBorder.IsVisible = false;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            _conflictProgramToastCancellationTokenSource = null;
+            cancellationTokenSource.Dispose();
+        }
+    }
+
+    private static async Task SlideConflictToastBottomMargin(Border toastBorder, double from, double to)
+    {
+        const int steps = 10;
+        const int delayMs = 30;
+        var step = (to - from) / steps;
+        for (var i = 0; i <= steps; i++)
+        {
+            toastBorder.Margin = new Thickness(32, 0, 32, from + step * i);
+            await Task.Delay(delayMs);
+        }
     }
     
     /// <summary>

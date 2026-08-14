@@ -117,6 +117,12 @@ public partial class SettingsPageViewModel : ViewModelBase
     private bool _autoCheckP2PIFOpen = true;
 
     /// <summary>
+    /// 自动检测冲突程序
+    /// </summary>
+    [ObservableProperty]
+    private bool _autoDetectConflictProgram = true;
+
+    /// <summary>
     /// 启动后默认显示页面
     /// </summary>
     [ObservableProperty]
@@ -491,6 +497,7 @@ public partial class SettingsPageViewModel : ViewModelBase
         GoUpdateWhenStart = ConfigService.Read<bool>("goupdatewhenstart", false);
         EnableVersionCheck = ConfigService.Read<bool>("EnableVersionCheck", true);
         AutoCheckP2PIFOpen = ConfigService.Read<bool>("AutoCheckP2PIFOpen", true);
+        AutoDetectConflictProgram = ConfigService.Read<bool>("AutoDetectConflictProgram", true);
         var defaultStartupPageKey = ConfigService.Read<string>("DefaultStartupPage", "Home");
         var defaultStartupPage = StartupPageOptions.FirstOrDefault(option => option.PageKey == defaultStartupPageKey);
         if (defaultStartupPage == null)
@@ -623,6 +630,11 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnAutoCheckP2PIFOpenChanged(bool value)
     {
         ConfigService.Write("AutoCheckP2PIFOpen", value);
+    }
+
+    partial void OnAutoDetectConflictProgramChanged(bool value)
+    {
+        ConfigService.Write("AutoDetectConflictProgram", value);
     }
 
     partial void OnServerPostEnableChanged(bool value)

@@ -40,6 +40,7 @@ artifacts/
 
 # Publish output
 publish/
+[Pp]roperties/[Pp]ublish[Pp]rofiles/
 
 # Project specific
 temp/

@@ -214,6 +214,7 @@ internal static class ScfLobbyCodeGenerator
     public static bool TryParse(string input, out ScfLobbyInfo? info)
     {
         info = null;
+        input = input?.Trim() ?? "";
         if (string.IsNullOrWhiteSpace(input) || !input.StartsWith("U/", StringComparison.OrdinalIgnoreCase) || input.Length != 21)
             return false;
 
@@ -1008,6 +1009,7 @@ public class ETModeService : IDisposable
                 if (!ScfLobbyCodeGenerator.TryParse(promptCode, out var lobby) || lobby == null)
                 {
                     Log("无效的提示码格式");
+                    _state = ETCoreState.Stopped;
                     return false;
                 }
                 _lobbyInfo = lobby;

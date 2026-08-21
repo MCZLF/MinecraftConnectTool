@@ -336,7 +336,7 @@ MinecraftConnectTool/
 > 拒绝刷量与夸大宣传，真实分享即可，我们先行鞠躬感谢！
 >
 > **下载地址（长期有效）：**
-> [`https://mct.loft.games/sdownload`](https://mct.loft.games/download)
+> [`https://mct.loft.games/download`](https://mct.loft.games/download)
 > 
 > [`https://mct.mczlf.loft.games/function/download`](https://mct.mczlf.loft.games/function/download)
 >

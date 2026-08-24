@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,12 +15,38 @@ namespace MinecraftConnectTool.Services;
 /// </summary>
 public static class CrashReportService
 {
+    private const string ReportHost = "mctservice.mczlf.loft.games";
+    private const int ReportPort = 17600;
+    private const int ReportTimeout = 4000;
+    private const int FatalExitTimeout = 5000;
+    private const int MaxReportBytes = 1024 * 256;
     private static readonly string CrashReportsDirectory;
     private static readonly object LockObject = new();
+    private static int _fatalExitWatchdogStarted;
 
     static CrashReportService()
     {
         CrashReportsDirectory = GetExecutableDirectory();
+    }
+
+    public static bool TryRunCrashReportUploader(string[] args)
+    {
+        if (args.Length < 2 || args[0] != "--upload-crash-report") return false;
+
+        try
+        {
+            var reportPath = Encoding.UTF8.GetString(Convert.FromBase64String(args[1]));
+            if (!File.Exists(reportPath)) return true;
+
+            var report = File.ReadAllText(reportPath, Encoding.UTF8);
+            UploadCrashReportAsync(report, Path.GetFileName(reportPath)).Wait(ReportTimeout + 1000);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[崩溃报告] 独立上传失败: {ex.Message}");
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -42,13 +69,11 @@ public static class CrashReportService
     /// </summary>
     private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
+        StartFatalExitWatchdog();
         var exception = e.ExceptionObject as Exception;
         var isTerminating = e.IsTerminating;
         
         GenerateCrashReport(exception, "未处理异常", isTerminating);
-        
-        // 给一点时间让日志写入，然后退出程序
-        Task.Delay(500).Wait();
         Environment.Exit(1);
     }
 
@@ -158,6 +183,8 @@ public static class CrashReportService
                 {
                     // 忽略打开失败
                 }
+
+                StartCrashReportUploaderIfEnabled(filePath);
             }
         }
         catch (Exception ex)
@@ -166,6 +193,76 @@ public static class CrashReportService
             Debug.WriteLine($"[崩溃报告] 生成崩溃报告失败: {ex.Message}");
             Debug.WriteLine($"[崩溃报告] 原始异常: {exception?.ToString()}");
         }
+    }
+
+    public static void StartFatalExitWatchdog()
+    {
+        if (Interlocked.Exchange(ref _fatalExitWatchdogStarted, 1) == 1) return;
+
+        var watchdog = new Thread(() =>
+        {
+            Thread.Sleep(FatalExitTimeout);
+            Environment.Exit(1);
+        })
+        {
+            IsBackground = true
+        };
+        watchdog.Start();
+    }
+
+    private static void StartCrashReportUploaderIfEnabled(string reportPath)
+    {
+        try
+        {
+            if (!ConfigService.Read<bool>("AutoReportCrashLog", true)) return;
+
+            var processPath = Environment.ProcessPath;
+            if (string.IsNullOrWhiteSpace(processPath)) return;
+
+            var encodedPath = Convert.ToBase64String(Encoding.UTF8.GetBytes(reportPath));
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = processPath,
+                Arguments = $"--upload-crash-report {encodedPath}",
+                WorkingDirectory = Environment.CurrentDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[崩溃报告] 启动独立上传进程失败: {ex.Message}");
+        }
+    }
+
+    private static async Task UploadCrashReportAsync(string report, string fileName)
+    {
+        var reportBytes = Encoding.UTF8.GetBytes(report);
+        if (reportBytes.Length > MaxReportBytes)
+        {
+            report = Encoding.UTF8.GetString(reportBytes, 0, MaxReportBytes) + Environment.NewLine + "[报告已截断]";
+        }
+
+        var body = $@"====CrashReport====
+Version = {MinecraftConnectTool.Views.MainWindow.version}
+Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+FileName = {fileName}
+ContentLength = {Encoding.UTF8.GetByteCount(report)}
+
+{report}";
+        var data = Encoding.UTF8.GetBytes(body);
+
+        using var client = new TcpClient();
+        using var timeoutCts = new CancellationTokenSource(ReportTimeout);
+        await client.ConnectAsync(ReportHost, ReportPort, timeoutCts.Token);
+
+        var stream = client.GetStream();
+        stream.WriteTimeout = ReportTimeout;
+        stream.ReadTimeout = ReportTimeout;
+
+        await stream.WriteAsync(data, timeoutCts.Token);
+        await stream.FlushAsync(timeoutCts.Token);
+        await Task.Delay(500, timeoutCts.Token);
     }
 
     /// <summary>

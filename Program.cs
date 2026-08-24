@@ -23,6 +23,8 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        if (CrashReportService.TryRunCrashReportUploader(args)) return;
+
         // 注册全局异常处理（必须在最前面）
         CrashReportService.RegisterGlobalExceptionHandlers();
 

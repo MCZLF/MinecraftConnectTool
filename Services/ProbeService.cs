@@ -27,34 +27,6 @@ public static class ProbeService
     //================ 版本号 ================
     public static string Version { get; set; } = "Unknown";
 
-    //================ Probe 标记文件路径 ================
-    private static string ProbeMarkerPath => LocalStorageService.GetTempFilePath("Probe");
-
-    /// <summary>
-    /// 检查是否需要发送 Probe（通过标记文件）
-    /// </summary>
-    public static bool ShouldSend()
-    {
-        return !File.Exists(ProbeMarkerPath);
-    }
-
-    /// <summary>
-    /// 标记 Probe 已发送（创建标记文件）
-    /// </summary>
-    public static void MarkAsSent()
-    {
-        try
-        {
-            string? directory = Path.GetDirectoryName(ProbeMarkerPath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            File.WriteAllText(ProbeMarkerPath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-        }
-        catch { /* 静默处理 */ }
-    }
-
     /// <summary>
     /// 发送 Probe 数据
     /// </summary>
@@ -64,8 +36,6 @@ public static class ProbeService
         {
             bool allowProbe = ConfigService.Read<bool>("AllowProbe", true);
             if (!allowProbe) return;
-
-            if (!ShouldSend()) return;
 
             await Task.Run(async () =>
             {
@@ -96,10 +66,6 @@ Time = {DateTime.Now:yyyy-MM-dd HH:mm:ss}
                 }
                 catch
                 {
-                }
-                finally
-                {
-                    MarkAsSent();
                 }
             });
         }

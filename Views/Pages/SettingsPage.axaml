@@ -930,6 +930,23 @@
                           VerticalAlignment="Center"/>
           </Grid>
 
+          <!-- 自动上报崩溃日志 -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="自动上报崩溃日志"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="程序崩溃后自动发送崩溃日志，帮助定位和修复问题"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{Binding AutoReportCrashLog, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
           <!-- 清除缓存 -->
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Spacing="4">

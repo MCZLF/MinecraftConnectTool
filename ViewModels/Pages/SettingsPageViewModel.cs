@@ -279,6 +279,12 @@ public partial class SettingsPageViewModel : ViewModelBase
     private bool _allowProbe = true;
 
     /// <summary>
+    /// 自动上报崩溃日志
+    /// </summary>
+    [ObservableProperty]
+    private bool _autoReportCrashLog = true;
+
+    /// <summary>
     /// 是否显示镜像源选择器
     /// </summary>
     [ObservableProperty]
@@ -542,6 +548,7 @@ public partial class SettingsPageViewModel : ViewModelBase
         // GitHubMirrorType = ConfigService.Read<string>("githubmirrortype", "fastly");
         IsMirrorTypeSelectorVisible = false;
         AllowProbe = ConfigService.Read<bool>("AllowProbe", true);
+        AutoReportCrashLog = ConfigService.Read<bool>("AutoReportCrashLog", true);
 
         // 自定义设置
         CodeUpdate = ConfigService.Read<int>("codeupdate", 1);
@@ -735,6 +742,14 @@ public partial class SettingsPageViewModel : ViewModelBase
         }
 
         ConfigService.Write("AllowProbe", value);
+    }
+
+    partial void OnAutoReportCrashLogChanged(bool value)
+    {
+        if (_isLoadingSettings) return;
+
+        ShowToast(value ? "自动上报崩溃日志已开启" : "自动上报崩溃日志已关闭");
+        ConfigService.Write("AutoReportCrashLog", value);
     }
 
     partial void OnCodeUpdateChanged(int value)

@@ -42,6 +42,7 @@ public partial class App : Application, IDisposable
     /// </summary>
     private void OnUIThreadException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
+        CrashReportService.StartFatalExitWatchdog();
         CrashReportService.GenerateCrashReport(e.Exception, "UI线程未处理异常", true);
         e.Handled = true; // 标记为已处理
         
@@ -56,6 +57,9 @@ public partial class App : Application, IDisposable
         // 检查是否是首次启动（同时检查全局开关EnableFirstLaunchWizard）
         bool alreadyFirstGuild = ConfigService.Read<bool>("AlreadyFirstGuild", false);
         bool enableFirstLaunchWizard = MainWindow.EnableFirstLaunchWizard;
+
+        // 发送 Probe 上报（静默执行，不阻塞启动）
+        _ = SendProbeAsync();
 
         if (!alreadyFirstGuild && enableFirstLaunchWizard)
         {
@@ -90,9 +94,6 @@ public partial class App : Application, IDisposable
 
             // 启动GC定时器（默认模式和性能模式都启用，但策略不同）
             StartGcTimer();
-
-            // 发送 Probe 上报（静默执行，不阻塞启动）
-            _ = SendProbeAsync();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {

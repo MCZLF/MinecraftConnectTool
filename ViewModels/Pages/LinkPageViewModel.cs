@@ -703,7 +703,17 @@ public partial class LinkPageViewModel : ViewModelBase
     [RelayCommand]
     public async Task JoinRoomAsync()
     {
-        string user = JoinCode;
+        string user = JoinCode?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(user))
+        {
+            IsAlertVisible = false;
+            IsInfoButtonVisible = false;
+            AlertText = string.Empty;
+            InfoButtonText = string.Empty;
+            AppendLogDirect("请输入提示码");
+            return;
+        }
+
         role = "2";
         string processName = GetProcessName();
 

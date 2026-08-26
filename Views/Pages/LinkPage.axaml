@@ -291,7 +291,7 @@
               <icons:MaterialIcon Grid.Column="0" Kind="Key" Width="20" Height="20" Margin="12,0,8,0" Foreground="{DynamicResource MaterialOnSurfaceBrush}" VerticalAlignment="Center"/>
               <TextBox Grid.Column="1"
                        Watermark="输入提示码"
-                       Text="{Binding JoinCode}"
+                       Text="{Binding JoinCode, UpdateSourceTrigger=PropertyChanged}"
                        Height="44"
                        Foreground="{DynamicResource MaterialOnSurfaceBrush}"
                        BorderBrush="{DynamicResource MaterialOutlineBrush}"

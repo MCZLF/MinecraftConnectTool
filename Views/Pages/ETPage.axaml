@@ -40,7 +40,7 @@
                               Width="32"
                               Height="32"
                               Foreground="{DynamicResource MaterialPrimaryBrush}"/>
-          <TextBlock Text="ET 模式(测试)"
+          <TextBlock Text="ET 模式"
                      FontSize="28"
                      FontWeight="Bold"
                      VerticalAlignment="Center"
@@ -90,7 +90,7 @@
                                 Width="16"
                                 Height="16"
                                 Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"/>
-            <TextBlock Text="Win / Linux / Mac"
+            <TextBlock Text="Win / Linux / Mac / Android"
                        FontSize="12"
                        FontWeight="Medium"
                        Foreground="{DynamicResource MaterialOnTertiaryContainerBrush}"

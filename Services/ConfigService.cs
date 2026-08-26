@@ -45,7 +45,9 @@ public static class ConfigService
                 ["CustomAnimationDuration"] = 200,
                 ["RenderingMode"] = "SystemDefault",
                 ["DefaultStartupPage"] = "Home",
-                ["SimulateFluentDesign"] = true
+                ["SimulateFluentDesign"] = true,
+                ["AutoReportCrashLog"] = true,  //错误日志自动上报 默认值True
+                ["AllowProbe"] = true //是否允许上报Probe数据 默认值True
             };
 
             SaveConfig(defaultConfig);

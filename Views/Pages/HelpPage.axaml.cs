@@ -12,8 +12,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Material.Icons;
 using Material.Icons.Avalonia;
-using MinecraftConnectTool.ViewModels.Pages;
 using MinecraftConnectTool.Services;
+using MinecraftConnectTool.ViewModels.Pages;
 
 namespace MinecraftConnectTool.Views.Pages;
 
@@ -68,35 +68,34 @@ public partial class HelpPage : UserControl
         OpenUrl("https://qm.qq.com/q/8NAoszhKqk");
     }
 
-    private void OnCheckRenderingModeClick(object? sender, RoutedEventArgs e)
+    private async void OnForceKillCoreClick(object? sender, RoutedEventArgs e)
     {
-        var renderingMode = ThemeService.Instance.RenderingMode;
-        var renderingModeText = this.FindControl<TextBlock>("RenderingModeText");
-        var renderingModeDetail = this.FindControl<TextBlock>("RenderingModeDetail");
-        var renderingModeBorder = this.FindControl<Border>("RenderingModeBorder");
+        var killedCount = 0;
+        var failedCount = 0;
 
-        if (renderingModeText != null && renderingModeDetail != null && renderingModeBorder != null)
+        try
         {
-            string modeName = renderingMode switch
-            {
-                RenderingMode.SystemDefault => "系统默认",
-                RenderingMode.Gpu => "GPU 渲染",
-                RenderingMode.Cpu => "CPU 渲染",
-                _ => "未知"
-            };
-
-            string modeDescription = renderingMode switch
-            {
-                RenderingMode.SystemDefault => "使用系统默认的渲染方式，自动选择最佳方案",
-                RenderingMode.Gpu => "使用硬件加速渲染，性能更好但内存占用较高",
-                RenderingMode.Cpu => "使用软件渲染，兼容性更好且内存占用较低",
-                _ => "无法获取渲染模式信息"
-            };
-
-            renderingModeText.Text = $"当前渲染模式: {modeName}";
-            renderingModeDetail.Text = modeDescription;
-            renderingModeBorder.IsVisible = true;
+            Server_Post.Stop_Post();
         }
+        catch
+        {
+        }
+
+        try
+        {
+            global::MinecraftConnectTool.Server_Post.Stop_Post();
+        }
+        catch
+        {
+        }
+
+        KillProcessesByName("main", ref killedCount, ref failedCount, true);
+        KillProcessesByName("easytier-core", ref killedCount, ref failedCount, true);
+        KillProcessesByName("link", ref killedCount, ref failedCount, true);
+
+        P2PStateService.SetRunning(false);
+
+        await ShowForceKillCoreMessageAsync(killedCount, failedCount);
     }
 
     private async void OnRemoteControlClick(object? sender, RoutedEventArgs e)
@@ -219,6 +218,43 @@ public partial class HelpPage : UserControl
                 await ExtensionUI.MD3MessageDialog.ShowInfoAsync(desktop.MainWindow, message, "提示");
             }
         }
+    }
+
+    private static void KillProcessesByName(string processName, ref int killedCount, ref int failedCount, bool killEntireProcessTree = false)
+    {
+        foreach (var process in Process.GetProcessesByName(processName))
+        {
+            try
+            {
+                process.Kill(killEntireProcessTree);
+                process.WaitForExit();
+                killedCount++;
+            }
+            catch
+            {
+                failedCount++;
+            }
+            finally
+            {
+                process.Dispose();
+            }
+        }
+    }
+
+    private static async Task ShowForceKillCoreMessageAsync(int killedCount, int failedCount)
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop || desktop.MainWindow == null)
+        {
+            return;
+        }
+
+        if (failedCount > 0)
+        {
+            await ExtensionUI.MD3MessageDialog.ShowErrorAsync(desktop.MainWindow, $"已终止 {killedCount} 个核心进程，{failedCount} 个进程终止失败", "强制终止核心");
+            return;
+        }
+
+        await ExtensionUI.MD3MessageDialog.ShowInfoAsync(desktop.MainWindow, killedCount > 0 ? $"已终止 {killedCount} 个核心进程" : "未发现正在运行的核心进程", "强制终止核心");
     }
 
     private static bool IsRemoteControlSupported()

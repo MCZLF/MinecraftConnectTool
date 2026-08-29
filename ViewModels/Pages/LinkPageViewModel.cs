@@ -48,18 +48,52 @@ public partial class LinkPageViewModel : ViewModelBase
     [ObservableProperty]
     private string _logText = "";
 
-    // 日志最大字符数限制（防止长时间运行导致 OOM）
     private const int MaxLogLength = 300_000;
     private const int LogTrimTargetLength = 240_000;
+    private const int MaxUiLogEntryLength = 20_000;
+    private static readonly string LogTrimNotice = $"...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...{Environment.NewLine}";
+    private readonly object _logTextLock = new();
+
     private void AppendUiLog(string message)
     {
-        var newText = message + Environment.NewLine;
-        if (LogText.Length + newText.Length > MaxLogLength)
+        var newText = LimitUiLogEntry(message) + Environment.NewLine;
+
+        lock (_logTextLock)
         {
-            var keepLength = Math.Min(LogTrimTargetLength, LogText.Length);
-            LogText = $"...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...{Environment.NewLine}{LogText[^keepLength..]}";
+            var currentText = LogText;
+            var availableLength = MaxLogLength - newText.Length - LogTrimNotice.Length;
+
+            if (availableLength <= 0)
+            {
+                var keepEntryLength = Math.Min(LogTrimTargetLength, Math.Max(0, MaxLogLength - LogTrimNotice.Length));
+                LogText = LogTrimNotice + newText[^keepEntryLength..];
+                return;
+            }
+
+            if (currentText.Length > availableLength)
+            {
+                var keepLength = Math.Min(LogTrimTargetLength, availableLength);
+                currentText = LogTrimNotice + currentText[^keepLength..];
+            }
+
+            LogText = currentText + newText;
         }
-        LogText += newText;
+    }
+
+    private static string LimitUiLogEntry(string message)
+    {
+        if (message.Length <= MaxUiLogEntryLength)
+        {
+            return message;
+        }
+
+        var headLength = MaxUiLogEntryLength / 2;
+        var tailLength = MaxUiLogEntryLength - headLength;
+        return message[..headLength]
+            + Environment.NewLine
+            + "...(单条日志过长，中间内容已省略，完整日志请使用 AI 日志分析或 APPLog.ini)..."
+            + Environment.NewLine
+            + message[^tailLength..];
     }
 
     [ObservableProperty]

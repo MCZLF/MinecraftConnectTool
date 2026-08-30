@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MinecraftConnectTool.Services;
@@ -16,39 +18,71 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _logText = "";
 
-    private const int MaxLogLength = 300_000;
-    private const int LogTrimTargetLength = 240_000;
-    private const int MaxUiLogEntryLength = 20_000;
+    private const int MaxLogEntries = 1_000;
+    private const int MaxUiLogEntryLength = 4_000;
     private const int MaxRecentErrorMessages = 128;
     private const string LogTrimNotice = "...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...\n";
     private readonly object _logTextLock = new();
+    private readonly Queue<string> _uiLogEntries = new();
     private readonly Queue<string> _recentErrorMessages = new();
     private readonly HashSet<string> _recentErrorMessageSet = new(StringComparer.OrdinalIgnoreCase);
+    private bool _uiLogTrimmed;
+    private bool _uiLogUpdateQueued;
 
     private void AppendUiLog(string message)
     {
         var newText = $"[{DateTime.Now:HH:mm:ss}] {LimitUiLogEntry(message)}\n";
+        var shouldQueueUpdate = false;
 
         lock (_logTextLock)
         {
-            var currentText = LogText;
-            var availableLength = MaxLogLength - newText.Length - LogTrimNotice.Length;
+            _uiLogEntries.Enqueue(newText);
 
-            if (availableLength <= 0)
+            while (_uiLogEntries.Count > MaxLogEntries)
             {
-                var keepEntryLength = Math.Min(LogTrimTargetLength, Math.Max(0, MaxLogLength - LogTrimNotice.Length));
-                LogText = LogTrimNotice + newText[^keepEntryLength..];
-                return;
+                _uiLogEntries.Dequeue();
+                _uiLogTrimmed = true;
             }
 
-            if (currentText.Length > availableLength)
+            if (!_uiLogUpdateQueued)
             {
-                var keepLength = Math.Min(LogTrimTargetLength, availableLength);
-                currentText = LogTrimNotice + currentText[^keepLength..];
+                _uiLogUpdateQueued = true;
+                shouldQueueUpdate = true;
             }
-
-            LogText = currentText + newText;
         }
+
+        if (!shouldQueueUpdate)
+        {
+            return;
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            FlushUiLog();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(FlushUiLog);
+        }
+    }
+
+    private void FlushUiLog()
+    {
+        string logText;
+
+        lock (_logTextLock)
+        {
+            _uiLogUpdateQueued = false;
+            var builder = new StringBuilder(_uiLogTrimmed ? LogTrimNotice : string.Empty);
+            foreach (var entry in _uiLogEntries)
+            {
+                builder.Append(entry);
+            }
+            logText = builder.ToString();
+        }
+
+        LogText = logText;
+        LogTextChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private static string LimitUiLogEntry(string message)
@@ -638,7 +672,6 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             TempRunLogService.Append("ET模式", message);
 
         AppendUiLog(message);
-        LogTextChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private bool ShouldFilterLog(string message)

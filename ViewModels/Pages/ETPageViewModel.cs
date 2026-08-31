@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -19,15 +20,22 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     private string _logText = "";
 
     private const int MaxLogEntries = 1_000;
+    private const int MaxUiLogTextLength = 300_000;
+    private const int UiLogEmergencyTrimLength = 260_000;
     private const int MaxUiLogEntryLength = 4_000;
     private const int MaxRecentErrorMessages = 128;
     private const string LogTrimNotice = "...(前面日志已省略，完整日志请使用 AI 日志分析或 APPLog.ini)...\n";
+    private const string LogMemoryFallbackNotice = "[预测到即将崩溃]已清空溢出的文本空间\n";
     private readonly object _logTextLock = new();
     private readonly Queue<string> _uiLogEntries = new();
     private readonly Queue<string> _recentErrorMessages = new();
     private readonly HashSet<string> _recentErrorMessageSet = new(StringComparer.OrdinalIgnoreCase);
+    private int _uiLogTextLength;
     private bool _uiLogTrimmed;
     private bool _uiLogUpdateQueued;
+    private bool _uiLogMemoryReclaimPending;
+    private bool _uiLogMemoryReclaimQueued;
+    private DateTime _lastUiLogMemoryReclaim = DateTime.MinValue;
 
     private void AppendUiLog(string message)
     {
@@ -37,12 +45,8 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         lock (_logTextLock)
         {
             _uiLogEntries.Enqueue(newText);
-
-            while (_uiLogEntries.Count > MaxLogEntries)
-            {
-                _uiLogEntries.Dequeue();
-                _uiLogTrimmed = true;
-            }
+            _uiLogTextLength += newText.Length;
+            TrimUiLogBuffer();
 
             if (!_uiLogUpdateQueued)
             {
@@ -58,11 +62,39 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
         if (Dispatcher.UIThread.CheckAccess())
         {
-            FlushUiLog();
+            FlushUiLogSafely();
         }
         else
         {
-            Dispatcher.UIThread.Post(FlushUiLog);
+            Dispatcher.UIThread.Post(FlushUiLogSafely);
+        }
+    }
+
+    private void TrimUiLogBuffer()
+    {
+        while (_uiLogEntries.Count > MaxLogEntries || _uiLogTextLength > UiLogEmergencyTrimLength)
+        {
+            if (!_uiLogEntries.TryDequeue(out var removedEntry))
+            {
+                _uiLogTextLength = 0;
+                break;
+            }
+
+            _uiLogTextLength -= removedEntry.Length;
+            _uiLogTrimmed = true;
+            _uiLogMemoryReclaimPending = true;
+        }
+    }
+
+    private void FlushUiLogSafely()
+    {
+        try
+        {
+            FlushUiLog();
+        }
+        catch (OutOfMemoryException)
+        {
+            ClearUiLogAfterMemoryPressure();
         }
     }
 
@@ -73,7 +105,12 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         lock (_logTextLock)
         {
             _uiLogUpdateQueued = false;
-            var builder = new StringBuilder(_uiLogTrimmed ? LogTrimNotice : string.Empty);
+            var builder = new StringBuilder(Math.Min(MaxUiLogTextLength + LogTrimNotice.Length, _uiLogTextLength + LogTrimNotice.Length));
+            if (_uiLogTrimmed)
+            {
+                builder.Append(LogTrimNotice);
+            }
+
             foreach (var entry in _uiLogEntries)
             {
                 builder.Append(entry);
@@ -83,6 +120,58 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
         LogText = logText;
         LogTextChanged?.Invoke(this, EventArgs.Empty);
+        ReclaimUiLogMemoryIfNeeded();
+    }
+
+    private void ReclaimUiLogMemoryIfNeeded()
+    {
+        if (!_uiLogMemoryReclaimPending || _uiLogMemoryReclaimQueued)
+        {
+            return;
+        }
+
+        QueueUiLogMemoryReclaim(force: false);
+    }
+
+    private void QueueUiLogMemoryReclaim(bool force)
+    {
+        if (!force && DateTime.Now - _lastUiLogMemoryReclaim < TimeSpan.FromSeconds(30))
+        {
+            return;
+        }
+
+        _uiLogMemoryReclaimQueued = true;
+        _uiLogMemoryReclaimPending = false;
+        _lastUiLogMemoryReclaim = DateTime.Now;
+
+        Task.Run(() =>
+        {
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: true);
+            _uiLogMemoryReclaimQueued = false;
+        });
+    }
+
+    private void ClearUiLogAfterMemoryPressure()
+    {
+        lock (_logTextLock)
+        {
+            ClearUiLogBufferForMemoryPressure();
+            _uiLogUpdateQueued = false;
+        }
+
+        LogText = LogMemoryFallbackNotice;
+        LogTextChanged?.Invoke(this, EventArgs.Empty);
+        QueueUiLogMemoryReclaim(force: true);
+    }
+
+    private void ClearUiLogBufferForMemoryPressure()
+    {
+        _uiLogEntries.Clear();
+        _uiLogEntries.Enqueue(LogMemoryFallbackNotice);
+        _uiLogTextLength = LogMemoryFallbackNotice.Length;
+        _uiLogTrimmed = true;
+        _uiLogMemoryReclaimPending = true;
     }
 
     private static string LimitUiLogEntry(string message)

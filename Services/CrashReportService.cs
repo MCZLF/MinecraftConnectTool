@@ -1,8 +1,9 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
-using System.Reflection;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -20,6 +21,7 @@ public static class CrashReportService
     private const int ReportTimeout = 4000;
     private const int FatalExitTimeout = 5000;
     private const int MaxReportBytes = 1024 * 256;
+    private const int MaxCrashReportBuilderCapacity = 512 * 1024;
     private static readonly string CrashReportsDirectory;
     private static readonly object LockObject = new();
     private static int _fatalExitWatchdogStarted;
@@ -270,7 +272,7 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
     /// </summary>
     private static string BuildCrashReport(Exception? exception, string crashType, bool isFatal)
     {
-        var sb = new StringBuilder();
+        var sb = new StringBuilder(32 * 1024);
         // 从 MainWindow 获取版本号
         var version = MinecraftConnectTool.Views.MainWindow.version;
 
@@ -283,33 +285,22 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
         // ========== 基本信息 ==========
         sb.AppendLine("【基本信息】");
         sb.AppendLine($"  崩溃时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        sb.AppendLine($"  崩溃UTC时间: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}Z");
         sb.AppendLine($"  崩溃类型: {crashType}");
         sb.AppendLine($"  是否致命: {(isFatal ? "是" : "否")}");
         sb.AppendLine($"  程序版本: {version}");
         sb.AppendLine($"  报告ID: {Guid.NewGuid():N}");
+        sb.AppendLine($"  进程启动时间: {GetSafeValue(() => Process.GetCurrentProcess().StartTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture))}");
+        sb.AppendLine($"  进程运行时长: {GetSafeValue(() => FormatDuration(DateTime.Now - Process.GetCurrentProcess().StartTime))}");
+        sb.AppendLine($"  命令行: {MaskSensitiveText(Environment.CommandLine)}");
+        sb.AppendLine($"  程序路径: {Environment.ProcessPath}");
         sb.AppendLine();
 
-        // ========== 系统信息 ==========
-        sb.AppendLine("【系统信息】");
-        sb.AppendLine($"  操作系统: {RuntimeInformation.OSDescription}");
-        sb.AppendLine($"  系统架构: {RuntimeInformation.OSArchitecture}");
-        sb.AppendLine($"  进程架构: {RuntimeInformation.ProcessArchitecture}");
-        sb.AppendLine($"  运行时版本: {RuntimeInformation.FrameworkDescription}");
-        sb.AppendLine($"  机器名称: {Environment.MachineName}");
-        sb.AppendLine($"  用户名: {Environment.UserName}");
-        sb.AppendLine($"  进程ID: {Environment.ProcessId}");
-        sb.AppendLine($"  工作目录: {Environment.CurrentDirectory}");
-        sb.AppendLine();
-
-        // ========== 内存信息 ==========
-        sb.AppendLine("【内存信息】");
-        var proc = Process.GetCurrentProcess();
-        sb.AppendLine($"  工作集内存: {FormatBytes(proc.WorkingSet64)}");
-        sb.AppendLine($"  私有内存: {FormatBytes(proc.PrivateMemorySize64)}");
-        sb.AppendLine($"  虚拟内存: {FormatBytes(proc.VirtualMemorySize64)}");
-        sb.AppendLine($"  GC总内存: {FormatBytes(GC.GetTotalMemory(false))}");
-        sb.AppendLine($"  GC已用代数: {GC.MaxGeneration}");
-        sb.AppendLine();
+        AppendSafeSection(sb, "系统信息", AppendSystemInfo);
+        AppendSafeSection(sb, "进程信息", AppendProcessInfo);
+        AppendSafeSection(sb, "运行时信息", AppendRuntimeInfo);
+        AppendSafeSection(sb, "内存信息", AppendMemoryInfo);
+        AppendSafeSection(sb, "存储路径", AppendStorageInfo);
 
         // ========== 异常详情 ==========
         sb.AppendLine("【异常详情】");
@@ -328,20 +319,11 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
         sb.AppendLine(Environment.StackTrace);
         sb.AppendLine();
 
-        // ========== 线程信息 ==========
-        sb.AppendLine("【线程信息】");
-        sb.AppendLine($"  当前线程ID: {Environment.CurrentManagedThreadId}");
-        sb.AppendLine($"  线程池线程: {Thread.CurrentThread.IsThreadPoolThread}");
-        sb.AppendLine($"  后台线程: {Thread.CurrentThread.IsBackground}");
-        sb.AppendLine($"  线程优先级: {Thread.CurrentThread.Priority}");
-        sb.AppendLine();
+        AppendSafeSection(sb, "线程信息", AppendThreadInfo);
+        AppendSafeSection(sb, "最近应用日志", AppendRecentAppLog);
+        AppendSafeSection(sb, "最近页面运行日志", AppendRecentPageLogs);
 
-        // ========== 环境变量 ==========
-        sb.AppendLine("【环境变量】");
-        sb.AppendLine($"  DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}");
-        sb.AppendLine($"  DOTNET_ENVIRONMENT: {Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")}");
-        sb.AppendLine($"  ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
-        sb.AppendLine();
+        TrimReportBuilderIfNeeded(sb);
 
         // ========== 结尾 ==========
         sb.AppendLine("═══════════════════════════════════════════════════════════════════════════════");
@@ -350,6 +332,108 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
         sb.AppendLine("═══════════════════════════════════════════════════════════════════════════════");
 
         return sb.ToString();
+    }
+
+    private static void AppendSafeSection(StringBuilder sb, string title, Action<StringBuilder> appendAction)
+    {
+        sb.AppendLine($"【{title}】");
+        try
+        {
+            appendAction(sb);
+        }
+        catch (Exception ex)
+        {
+            sb.AppendLine($"  收集失败: {ex.GetType().FullName}: {ex.Message}");
+        }
+        sb.AppendLine();
+    }
+
+    private static void AppendSystemInfo(StringBuilder sb)
+    {
+        sb.AppendLine($"  操作系统: {RuntimeInformation.OSDescription}");
+        sb.AppendLine($"  OS版本: {Environment.OSVersion}");
+        sb.AppendLine($"  系统架构: {RuntimeInformation.OSArchitecture}");
+        sb.AppendLine($"  进程架构: {RuntimeInformation.ProcessArchitecture}");
+        sb.AppendLine($"  64位系统: {Environment.Is64BitOperatingSystem}");
+        sb.AppendLine($"  64位进程: {Environment.Is64BitProcess}");
+        sb.AppendLine($"  处理器数量: {Environment.ProcessorCount}");
+    }
+
+    private static void AppendProcessInfo(StringBuilder sb)
+    {
+        using var proc = Process.GetCurrentProcess();
+        sb.AppendLine($"  进程ID: {Environment.ProcessId}");
+        sb.AppendLine($"  进程名称: {proc.ProcessName}");
+        sb.AppendLine($"  主模块: {GetSafeValue(() => proc.MainModule?.FileName ?? string.Empty)}");
+        sb.AppendLine($"  工作目录: {Environment.CurrentDirectory}");
+        sb.AppendLine($"  基础目录: {AppContext.BaseDirectory}");
+        sb.AppendLine($"  当前托管线程ID: {Environment.CurrentManagedThreadId}");
+        sb.AppendLine($"  线程数: {GetSafeValue(() => proc.Threads.Count.ToString(CultureInfo.InvariantCulture))}");
+    }
+
+    private static void AppendRuntimeInfo(StringBuilder sb)
+    {
+        sb.AppendLine($"  运行时版本: {RuntimeInformation.FrameworkDescription}");
+        sb.AppendLine($"  Environment.Version: {Environment.Version}");
+        sb.AppendLine($"  GC延迟模式: {GCSettings.LatencyMode}");
+        sb.AppendLine($"  GC是否服务器模式: {GCSettings.IsServerGC}");
+        sb.AppendLine($"  GC已用代数: {GC.MaxGeneration}");
+        sb.AppendLine($"  当前托管内存: {FormatBytes(GC.GetTotalMemory(false))}");
+    }
+
+    private static void AppendMemoryInfo(StringBuilder sb)
+    {
+        using var proc = Process.GetCurrentProcess();
+        var gcInfo = GC.GetGCMemoryInfo();
+        sb.AppendLine($"  工作集内存: {FormatBytes(proc.WorkingSet64)}");
+        sb.AppendLine($"  峰值工作集: {FormatBytes(proc.PeakWorkingSet64)}");
+        sb.AppendLine($"  私有内存: {FormatBytes(proc.PrivateMemorySize64)}");
+        sb.AppendLine($"  虚拟内存: {FormatBytes(proc.VirtualMemorySize64)}");
+        sb.AppendLine($"  峰值虚拟内存: {FormatBytes(proc.PeakVirtualMemorySize64)}");
+        sb.AppendLine($"  GC总内存: {FormatBytes(GC.GetTotalMemory(false))}");
+        sb.AppendLine($"  GC堆大小: {FormatBytes(gcInfo.HeapSizeBytes)}");
+        sb.AppendLine($"  GC负载字节: {FormatBytes(gcInfo.MemoryLoadBytes)}");
+        sb.AppendLine($"  GC高内存阈值: {FormatBytes(gcInfo.HighMemoryLoadThresholdBytes)}");
+        sb.AppendLine($"  已碎片化内存: {FormatBytes(gcInfo.FragmentedBytes)}");
+        sb.AppendLine($"  Gen0回收次数: {GC.CollectionCount(0)}");
+        sb.AppendLine($"  Gen1回收次数: {GC.CollectionCount(1)}");
+        sb.AppendLine($"  Gen2回收次数: {GC.CollectionCount(2)}");
+    }
+
+    private static void AppendStorageInfo(StringBuilder sb)
+    {
+        sb.AppendLine($"  崩溃报告目录: {CrashReportsDirectory}");
+        sb.AppendLine($"  应用根目录: {LocalStorageService.AppRootDirectory}");
+        sb.AppendLine($"  临时目录: {LocalStorageService.TempDirectory}");
+        sb.AppendLine($"  配置文件: {LocalStorageService.ConfigFilePath}");
+        sb.AppendLine($"  应用日志: {LocalStorageService.AppLogPath}");
+        sb.AppendLine($"  存储模式: {LocalStorageService.StorageMode}");
+        AppendFileInfo(sb, "配置文件状态", LocalStorageService.ConfigFilePath);
+        AppendFileInfo(sb, "应用日志状态", LocalStorageService.AppLogPath);
+    }
+
+    private static void AppendThreadInfo(StringBuilder sb)
+    {
+        sb.AppendLine($"  当前线程ID: {Environment.CurrentManagedThreadId}");
+        sb.AppendLine($"  线程池线程: {Thread.CurrentThread.IsThreadPoolThread}");
+        sb.AppendLine($"  后台线程: {Thread.CurrentThread.IsBackground}");
+        sb.AppendLine($"  线程优先级: {Thread.CurrentThread.Priority}");
+        ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
+        ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
+        sb.AppendLine($"  线程池可用工作线程: {workerThreads}/{maxWorkerThreads}");
+        sb.AppendLine($"  线程池可用IO线程: {completionPortThreads}/{maxCompletionPortThreads}");
+    }
+
+    private static void AppendRecentAppLog(StringBuilder sb)
+    {
+        AppendLogStats(sb, "APPLog.ini", LocalStorageService.AppLogPath);
+    }
+
+    private static void AppendRecentPageLogs(StringBuilder sb)
+    {
+        AppendPageLogStats(sb, "Link模式", Path.Combine(LocalStorageService.TempDirectory, "TempRunLog", "Link.log"));
+        AppendPageLogStats(sb, "P2P模式", Path.Combine(LocalStorageService.TempDirectory, "TempRunLog", "P2P.log"));
+        AppendPageLogStats(sb, "ET模式", Path.Combine(LocalStorageService.TempDirectory, "TempRunLog", "ET.log"));
     }
 
     /// <summary>
@@ -390,6 +474,143 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
                 sb.AppendLine($"{indent}  {key}: {exception.Data[key]}");
             }
         }
+    }
+
+    private static void AppendFileInfo(StringBuilder sb, string name, string path)
+    {
+        if (!File.Exists(path))
+        {
+            sb.AppendLine($"  {name}: 不存在 ({path})");
+            return;
+        }
+
+        var fileInfo = new FileInfo(path);
+        sb.AppendLine($"  {name}: 存在, 大小 {FormatBytes(fileInfo.Length)}, 修改时间 {fileInfo.LastWriteTime:yyyy-MM-dd HH:mm:ss}, 路径 {path}");
+    }
+
+    private static void AppendLogStats(StringBuilder sb, string name, string path)
+    {
+        sb.AppendLine($"  ---- {name} ----");
+        if (!File.Exists(path))
+        {
+            sb.AppendLine($"  日志不存在: {path}");
+            return;
+        }
+
+        var fileInfo = new FileInfo(path);
+        var lineCount = CountFileLines(path);
+        var charCount = CountFileChars(path);
+        sb.AppendLine($"  路径: {path}");
+        sb.AppendLine($"  大小: {FormatBytes(fileInfo.Length)}");
+        sb.AppendLine($"  字符数: {charCount}");
+        sb.AppendLine($"  行数: {lineCount}");
+        sb.AppendLine($"  修改时间: {fileInfo.LastWriteTime:yyyy-MM-dd HH:mm:ss}");
+    }
+
+    private static void AppendPageLogStats(StringBuilder sb, string name, string path)
+    {
+        sb.AppendLine($"  ---- {name} ----");
+        if (!File.Exists(path))
+        {
+            sb.AppendLine($"  日志不存在: {path}");
+            return;
+        }
+
+        var fileInfo = new FileInfo(path);
+        var charCount = CountFileChars(path);
+        sb.AppendLine($"  大小/字符数: {FormatBytes(fileInfo.Length)}/{charCount}字符");
+    }
+
+    private static long CountFileLines(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        var buffer = new byte[8192];
+        long lineCount = 0;
+        var hasAnyByte = false;
+        var lastByte = (byte)0;
+
+        while (true)
+        {
+            var read = stream.Read(buffer, 0, buffer.Length);
+            if (read == 0)
+                break;
+
+            hasAnyByte = true;
+            for (var i = 0; i < read; i++)
+            {
+                if (buffer[i] == (byte)'\n')
+                    lineCount++;
+            }
+            lastByte = buffer[read - 1];
+        }
+
+        if (hasAnyByte && lastByte != (byte)'\n')
+            lineCount++;
+
+        return lineCount;
+    }
+
+    private static long CountFileChars(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 8192);
+        var buffer = new char[8192];
+        long charCount = 0;
+
+        while (true)
+        {
+            var read = reader.Read(buffer, 0, buffer.Length);
+            if (read == 0)
+                break;
+
+            charCount += read;
+        }
+
+        return charCount;
+    }
+
+    private static string MaskSensitiveText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        var sensitiveWords = new[] { "token", "password", "passwd", "secret", "apikey", "api_key", "authorization", "cookie", "session", "accesskey", "privatekey" };
+        foreach (var word in sensitiveWords)
+        {
+            if (text.Contains(word, StringComparison.OrdinalIgnoreCase))
+                return "[已隐藏疑似敏感内容]";
+        }
+
+        return text;
+    }
+
+    private static string GetSafeValue(Func<string> valueFactory)
+    {
+        try
+        {
+            return valueFactory();
+        }
+        catch (Exception ex)
+        {
+            return $"收集失败: {ex.GetType().Name}";
+        }
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        return $"{(int)duration.TotalDays}天 {duration.Hours:D2}:{duration.Minutes:D2}:{duration.Seconds:D2}";
+    }
+
+    private static void TrimReportBuilderIfNeeded(StringBuilder sb)
+    {
+        if (sb.Length <= MaxCrashReportBuilderCapacity)
+            return;
+
+        var keepTailLength = MaxCrashReportBuilderCapacity / 2;
+        var tail = sb.ToString(sb.Length - keepTailLength, keepTailLength);
+        sb.Clear();
+        sb.AppendLine("[崩溃报告内容过长，已保留关键头部并截断中间内容]");
+        sb.AppendLine(tail);
     }
 
     /// <summary>

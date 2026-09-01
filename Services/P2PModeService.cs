@@ -59,6 +59,22 @@ public class P2PModeService : IDisposable
     private string RuntimeConfigPath => Path.Combine(CoreDirectory, "config.json");
     private string RuntimeBackupConfigPath => Path.Combine(CoreDirectory, "config.json0");
     
+    private void SafeDeleteRuntimeFile(string path)
+    {
+        try
+        {
+            if (!File.Exists(path))
+                return;
+
+            File.SetAttributes(path, FileAttributes.Normal);
+            File.Delete(path);
+        }
+        catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+        {
+            log($"清理运行配置失败，已跳过: {Path.GetFileName(path)} {ex.Message}");
+        }
+    }
+    
     // 基础URL
     private string BaseUrl => "https://api.mct.mczlf.loft.games/Core";
     
@@ -235,8 +251,8 @@ public class P2PModeService : IDisposable
         Directory.CreateDirectory(CoreDirectory);
         
         // 清理运行垃圾
-        if (File.Exists(RuntimeConfigPath)) File.Delete(RuntimeConfigPath);
-        if (File.Exists(RuntimeBackupConfigPath)) File.Delete(RuntimeBackupConfigPath);
+        SafeDeleteRuntimeFile(RuntimeConfigPath);
+        SafeDeleteRuntimeFile(RuntimeBackupConfigPath);
         
         // 增强提醒 - 生成提示码
         int codeupate = ConfigService.Read("codeupdate", 1);
@@ -566,8 +582,8 @@ public class P2PModeService : IDisposable
         Directory.CreateDirectory(CoreDirectory);
         
         // 清理运行垃圾
-        if (File.Exists(RuntimeConfigPath)) File.Delete(RuntimeConfigPath);
-        if (File.Exists(RuntimeBackupConfigPath)) File.Delete(RuntimeBackupConfigPath);
+        SafeDeleteRuntimeFile(RuntimeConfigPath);
+        SafeDeleteRuntimeFile(RuntimeBackupConfigPath);
         
         // 显示增强提醒
         string joinAddress = $"127.0.0.1:{randomPort}";

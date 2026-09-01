@@ -33,7 +33,10 @@ public static class TempRunLogService
             lock (SyncRoot)
             {
                 Directory.CreateDirectory(BaseDirectory);
-                File.AppendAllText(GetPageLogPath(pageName), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}", Encoding.UTF8);
+                var logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
+                var bytes = Encoding.UTF8.GetBytes(logMessage);
+                using var stream = new FileStream(GetPageLogPath(pageName), FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
+                stream.Write(bytes, 0, bytes.Length);
             }
         }
         catch { }
@@ -44,13 +47,7 @@ public static class TempRunLogService
         if (string.IsNullOrEmpty(message))
             return;
 
-        try
-        {
-            var logPath = LocalStorageService.AppLogPath;
-            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
-            File.AppendAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}", Encoding.UTF8);
-        }
-        catch { }
+        LocalStorageService.AppendAppLog($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}");
     }
 
     public static void AppendPageAndApp(string pageName, string message)

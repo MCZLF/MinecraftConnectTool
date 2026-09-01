@@ -111,10 +111,8 @@ public class P2PModeService : IDisposable
         }
 
         // 2. 写入日志文件
-        string logFilePath = LocalStorageService.AppLogPath;
-        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
-        File.AppendAllText(logFilePath, logMessage);
+        LocalStorageService.AppendAppLog(logMessage);
         TempRunLogService.Append("P2P模式", message);
 
         // 3. 状态指示器处理
@@ -1101,12 +1099,7 @@ public class P2PModeService : IDisposable
         }
         catch (Exception ex)
         {
-            try 
-            { 
-                Directory.CreateDirectory(Path.GetDirectoryName(LocalStorageService.AppLogPath)!);
-                File.AppendAllText(LocalStorageService.AppLogPath, $"ReadPeerConfig 异常：{ex}"); 
-            } 
-            catch { }
+            LocalStorageService.AppendAppLog($"ReadPeerConfig 异常：{ex}{Environment.NewLine}");
         }
     }
 

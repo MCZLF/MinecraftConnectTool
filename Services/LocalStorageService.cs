@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace MinecraftConnectTool.Services;
 
@@ -289,8 +291,24 @@ public static class LocalStorageService
 
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(AppLogPath)!);
-            File.AppendAllText(AppLogPath, message);
+            lock (SyncRoot)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(AppLogPath)!);
+                var bytes = Encoding.UTF8.GetBytes(message);
+                for (var attempt = 0; attempt < 3; attempt++)
+                {
+                    try
+                    {
+                        using var stream = new FileStream(AppLogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
+                        stream.Write(bytes, 0, bytes.Length);
+                        return;
+                    }
+                    catch (IOException) when (attempt < 2)
+                    {
+                        Thread.Sleep(20);
+                    }
+                }
+            }
         }
         catch { }
     }

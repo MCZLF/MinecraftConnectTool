@@ -705,12 +705,7 @@ public class ETModeService : IDisposable
 
     private void LogToFile(string msg)
     {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(LocalStorageService.AppLogPath)!);
-            File.AppendAllText(LocalStorageService.AppLogPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ET] {msg}{Environment.NewLine}");
-        }
-        catch { }
+        LocalStorageService.AppendAppLog($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ET] {msg}{Environment.NewLine}");
     }
 
     /// <summary>

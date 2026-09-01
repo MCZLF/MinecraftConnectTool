@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.062";
+    public static readonly string version = "0.0.7.063";
 
     // 版本代号
     public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";
@@ -970,13 +970,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void LogSupportStatus(string status)
     {
-        try
-        {
-            string logPath = LocalStorageService.AppLogPath;
-            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
-            File.AppendAllText(logPath, status + Environment.NewLine);
-        }
-        catch { }
+        LocalStorageService.AppendAppLog(status + Environment.NewLine);
     }
     
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)

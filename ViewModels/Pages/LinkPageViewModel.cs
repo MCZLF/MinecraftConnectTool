@@ -445,10 +445,8 @@ public partial class LinkPageViewModel : ViewModelBase
             message = Regex.Replace(message, @"\b" + Regex.Escape(pair.Key) + @"\b", pair.Value);
         }
 
-        string logFilePath = LocalStorageService.AppLogPath;
-        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
-        File.AppendAllText(logFilePath, logMessage);
+        LocalStorageService.AppendAppLog(logMessage);
         TempRunLogService.Append("Link模式", message);
 
         // 处理消息并添加到日志
@@ -1220,10 +1218,8 @@ public partial class LinkPageViewModel : ViewModelBase
     // 直接添加日志，不经过关键词替换处理
     private void AppendLogDirect(string message)
     {
-        string logFilePath = LocalStorageService.AppLogPath;
-        Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
         string logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}{Environment.NewLine}";
-        File.AppendAllText(logFilePath, logMessage);
+        LocalStorageService.AppendAppLog(logMessage);
         TempRunLogService.Append("Link模式", message);
         
         // 直接添加到UI，不经过ProcessLogMessage处理

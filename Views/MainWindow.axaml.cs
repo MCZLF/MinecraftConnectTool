@@ -30,7 +30,7 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.063";
+    public static readonly string version = "0.0.7.064";
 
     // 版本代号
     public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";

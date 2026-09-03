@@ -15,24 +15,41 @@ namespace MinecraftConnectTool
         // 启动多播发送
         public static void Post_Main(int post)
         {
-            string multicastGroup = "224.0.2.60";
-            int multicastPort = 4445;
-
-            using UdpClient client = new(post);
-            IPEndPoint remoteEP = new(IPAddress.Parse(multicastGroup), multicastPort);
-
-            byte[] ttl = [2]; // 多播数据包的存活时间
-            client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
-
-            isRunning = true; // 设置标志为运行状态
-            while (isRunning)
+            try
             {
-                string message = $"[MOTD]§b§l[MCT][局域网多播插件] §2局域网世界 §bServerPost[/MOTD][AD]{post}[/AD]";
-                byte[] data = Encoding.UTF8.GetBytes(message);
+                string multicastGroup = "224.0.2.60";
+                int multicastPort = 4445;
 
-                client.Send(data, data.Length, remoteEP);
+                using UdpClient client = new(post);
+                IPEndPoint remoteEP = new(IPAddress.Parse(multicastGroup), multicastPort);
 
-                Thread.Sleep(100);
+                byte[] ttl = [2]; // 多播数据包的存活时间
+                client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
+
+                isRunning = true; // 设置标志为运行状态
+                while (isRunning)
+                {
+                    string message = $"[MOTD]§b§l[MCT][局域网多播插件] §2局域网世界 §bServerPost[/MOTD][AD]{post}[/AD]";
+                    byte[] data = Encoding.UTF8.GetBytes(message);
+
+                    try
+                    {
+                        client.Send(data, data.Length, remoteEP);
+                    }
+                    catch (SocketException ex)
+                    {
+                        Console.WriteLine("多播发送失败: " + ex.Message);
+                        isRunning = false;
+                        break;
+                    }
+
+                    Thread.Sleep(100);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("多播线程异常: " + ex.Message);
+                isRunning = false;
             }
         }
 

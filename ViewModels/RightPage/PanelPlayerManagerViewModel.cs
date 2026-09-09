@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,6 +36,12 @@ public partial class PlayerViewModel : ObservableObject
     /// 首字母（用于头像显示）
     /// </summary>
     public string Initial => string.IsNullOrEmpty(Nickname) ? "?" : Nickname.Substring(0, 1).ToUpper();
+
+    partial void OnNicknameChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsHostPlayer));
+        OnPropertyChanged(nameof(Initial));
+    }
 }
 
 /// <summary>
@@ -42,8 +50,9 @@ public partial class PlayerViewModel : ObservableObject
 public partial class PanelPlayerManagerViewModel : ObservableObject
 {
     private readonly PlayerListService _playerListService;
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private System.Timers.Timer? _refreshTimer;
-    private bool _isRefreshingPlayers;
+    private bool _isDisposed;
 
     [ObservableProperty]
     private ObservableCollection<PlayerViewModel> _players = new();
@@ -196,45 +205,73 @@ public partial class PanelPlayerManagerViewModel : ObservableObject
     /// </summary>
     private async Task RefreshPlayersListAsync()
     {
-        if (_isRefreshingPlayers) return;
+        if (_isDisposed) return;
+        if (!await _refreshLock.WaitAsync(0)) return;
 
-        _isRefreshingPlayers = true;
         try
         {
             var players = await _playerListService.GetPlayersAsync();
+            if (_isDisposed) return;
             if (players.Count == 0 && Players.Count > 0 && _playerListService.IsConnected)
             {
                 return;
             }
 
+            var sortedPlayers = players
+                .OrderByDescending(p => p.Nickname == "房主")
+                .ThenBy(p => p.JoinedAt)
+                .ToList();
+
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
             {
-                Players.Clear();
+                if (_isDisposed) return;
 
-                var sortedPlayers = players
-                    .OrderByDescending(p => p.Nickname == "房主")
-                    .ThenBy(p => p.JoinedAt)
-                    .ToList();
-
-                foreach (var player in sortedPlayers)
-                {
-                    Players.Add(new PlayerViewModel
-                    {
-                        Id = player.Id,
-                        Nickname = player.Nickname,
-                        Version = player.Version,
-                        JoinedAt = player.JoinedAt
-                    });
-                }
-
-                IsEmpty = Players.Count == 0;
-                PlayerCountText = $"{Players.Count}人在线";
+                ApplyPlayers(sortedPlayers);
             });
         }
         finally
         {
-            _isRefreshingPlayers = false;
+            _refreshLock.Release();
         }
+    }
+
+    private void ApplyPlayers(IReadOnlyList<PlayerInfo> players)
+    {
+        for (var i = Players.Count - 1; i >= 0; i--)
+        {
+            if (players.All(player => player.Id != Players[i].Id))
+            {
+                Players.RemoveAt(i);
+            }
+        }
+
+        for (var i = 0; i < players.Count; i++)
+        {
+            var player = players[i];
+            var existing = Players.FirstOrDefault(item => item.Id == player.Id);
+
+            if (existing == null)
+            {
+                existing = new PlayerViewModel();
+                Players.Insert(i, existing);
+            }
+            else
+            {
+                var currentIndex = Players.IndexOf(existing);
+                if (currentIndex != i)
+                {
+                    Players.Move(currentIndex, i);
+                }
+            }
+
+            existing.Id = player.Id;
+            existing.Nickname = player.Nickname;
+            existing.Version = player.Version;
+            existing.JoinedAt = player.JoinedAt;
+        }
+
+        IsEmpty = Players.Count == 0;
+        PlayerCountText = $"{Players.Count}人在线";
     }
 
     /// <summary>
@@ -282,8 +319,6 @@ public partial class PanelPlayerManagerViewModel : ObservableObject
     [RelayCommand]
     private void Close()
     {
-        _refreshTimer?.Stop();
-        _refreshTimer?.Dispose();
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -292,10 +327,17 @@ public partial class PanelPlayerManagerViewModel : ObservableObject
     /// </summary>
     public void Dispose()
     {
+        if (_isDisposed) return;
+
+        _isDisposed = true;
         _refreshTimer?.Stop();
         _refreshTimer?.Dispose();
+        _refreshTimer = null;
         _playerListService.PlayersChanged -= OnPlayersChanged;
         _playerListService.JoinedRoom -= OnJoinedRoom;
         _playerListService.Kicked -= OnKicked;
+        Players.Clear();
+        GC.Collect(2, GCCollectionMode.Optimized, false, false);
+        GC.SuppressFinalize(this);
     }
 }

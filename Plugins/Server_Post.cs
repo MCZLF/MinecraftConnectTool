@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.IO;
+using MinecraftConnectTool.Services;
 
 namespace MinecraftConnectTool
 {
@@ -15,42 +16,31 @@ namespace MinecraftConnectTool
         // 启动多播发送
         public static void Post_Main(int post)
         {
-            try
+            string multicastGroup = "224.0.2.60";
+            int multicastPort = 4445;
+
+            using UdpClient client = new(post);
+            IPEndPoint remoteEP = new(IPAddress.Parse(multicastGroup), multicastPort);
+
+            byte[] ttl = [2]; // 多播数据包的存活时间
+            client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
+
+            isRunning = true; // 设置标志为运行状态
+            while (isRunning)
             {
-                string multicastGroup = "224.0.2.60";
-                int multicastPort = 4445;
+                string message = $"[MOTD]§b§l[MCT][局域网多播插件] §2局域网世界 §bServerPost[/MOTD][AD]{post}[/AD]";
+                byte[] data = Encoding.UTF8.GetBytes(message);
 
-                using UdpClient client = new(post);
-                IPEndPoint remoteEP = new(IPAddress.Parse(multicastGroup), multicastPort);
+                client.Send(data, data.Length, remoteEP);
 
-                byte[] ttl = [2]; // 多播数据包的存活时间
-                client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
-
-                isRunning = true; // 设置标志为运行状态
-                while (isRunning)
-                {
-                    string message = $"[MOTD]§b§l[MCT][局域网多播插件] §2局域网世界 §bServerPost[/MOTD][AD]{post}[/AD]";
-                    byte[] data = Encoding.UTF8.GetBytes(message);
-
-                    try
-                    {
-                        client.Send(data, data.Length, remoteEP);
-                    }
-                    catch (SocketException ex)
-                    {
-                        Console.WriteLine("多播发送失败: " + ex.Message);
-                        isRunning = false;
-                        break;
-                    }
-
-                    Thread.Sleep(100);
-                }
+                Thread.Sleep(100);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("多播线程异常: " + ex.Message);
-                isRunning = false;
-            }
+        }
+
+        private static void LogPostMessage(string message)
+        {
+            Console.WriteLine(message);
+            TempRunLogService.AppendPageAndApp("P2P模式", message);
         }
 
         // 停止多播发送
@@ -76,12 +66,25 @@ namespace MinecraftConnectTool
         {
             if (Post_Thread == null || !Post_Thread.IsAlive)
             {
-                Post_Thread = new Thread(() => Post_Main(port));
+                Post_Thread = new Thread(() => RunPostThread(port));
                 Post_Thread.Start();
             }
             else
             {
                 Console.WriteLine("多播线程已经在运行！");
+            }
+        }
+
+        private static void RunPostThread(int port)
+        {
+            try
+            {
+                Post_Main(port);
+            }
+            catch (Exception ex)
+            {
+                LogPostMessage("多播线程未处理异常已拦截: " + ex.Message);
+                isRunning = false;
             }
         }
 

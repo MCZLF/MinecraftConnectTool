@@ -536,6 +536,29 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     private void OnLogMessage(object? sender, string message)
     {
         AppendUiLog(message);
+
+        if (_p2pService.role == "1" && message.Contains("P2PNetwork login error"))
+        {
+            _ = ResetHostRoomForP2PNetworkLoginErrorAsync();
+        }
+    }
+
+    private async Task ResetHostRoomForP2PNetworkLoginErrorAsync()
+    {
+        if (_playerListService.IsHost)
+        {
+            await _playerListService.CloseRoomAsync();
+        }
+        else
+        {
+            await _playerListService.LeaveRoomAsync();
+        }
+
+        IsPlayerListConnected = false;
+        await _p2pService.stopp2p();
+        IsStatusBadgeVisible = true;
+        StatusBadgeState = BadgeState.Error;
+        StatusBadgeText = "当前网络环境无法使用P2P模式,请更换其他模式尝试";
     }
 
     private void OnProgressChanged(object? sender, double progress)
@@ -612,6 +635,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
     private void OnStatusChanged(object? sender, (string BadgeState, string BadgeText) e)
     {
+        if (_p2pService.role == "1" && e.BadgeText == "对方不在线") return;
+
         AddLog($"状态更新: {e.BadgeState} - {e.BadgeText}");
         
         // 更新状态指示灯 - 严格按照原代码的badge3逻辑
@@ -631,6 +656,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
     private void OnErrorOccurred(object? sender, string e)
     {
+        if (_p2pService.role == "1" && e == "对方不在线,请检查是否有输入错误,或好友是否正确的启动了房间") return;
+
         AddLog($"错误: {e}");
         // 错误状态下指示灯变红
         IsStatusBadgeVisible = true;

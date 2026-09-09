@@ -678,27 +678,41 @@ public partial class LinkPageViewModel : ViewModelBase
             log("Downloader启动");
             Console.Write($"下载地址: {downloadUrl}");
 
-            using var unityClient = new HttpClient();
-            using var response = await unityClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-
-            long totalBytes = response.Content.Headers.ContentLength ?? 0;
-            long downloadedBytes = 0;
-
-            using var httpStream = await response.Content.ReadAsStreamAsync();
-            using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Write, bufferSize: 8192, useAsync: true);
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = await httpStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            try
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead);
-                downloadedBytes += bytesRead;
+                using var unityClient = new HttpClient(new HttpClientHandler { UseProxy = false });
+                using var response = await unityClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                response.EnsureSuccessStatusCode();
 
-                if (totalBytes > 0)
+                long totalBytes = response.Content.Headers.ContentLength ?? 0;
+                long downloadedBytes = 0;
+
+                using var httpStream = await response.Content.ReadAsStreamAsync();
+                using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Write, bufferSize: 8192, useAsync: true);
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+
+                while ((bytesRead = await httpStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
-                    ProgressValue = (int)((downloadedBytes * 100) / totalBytes);
+                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                    downloadedBytes += bytesRead;
+
+                    if (totalBytes > 0)
+                    {
+                        ProgressValue = (int)((downloadedBytes * 100) / totalBytes);
+                    }
                 }
+            }
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException)
+            {
+                log($"下载Link核心失败: {ex.Message}");
+                role = "0";
+                IsProgressVisible = false;
+                ProgressValue = 0;
+                IsStatusBadgeVisible = true;
+                StatusBadgeState = BadgeState.Error;
+                StatusBadgeText = "Link核心下载失败，请检查网络或代理设置";
+                return false;
             }
 
             log("Task:下载核心中..");

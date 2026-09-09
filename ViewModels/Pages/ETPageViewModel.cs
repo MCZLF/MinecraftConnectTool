@@ -566,7 +566,17 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         IsETRunningForPanel = true;
         P2PStateService.SetRunning(true, CoreMode.ET);
 
-        var success = await _etService.StartHostAsync(port, playerName);
+        bool success;
+        try
+        {
+            success = await _etService.StartHostAsync(port, playerName);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"创建房间失败: {ex.Message}");
+            success = false;
+        }
+
         if (!success)
         {
             IsETRunning = false;
@@ -575,6 +585,9 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             CanStopET = false;
             IsProgressVisible = false;
             ProgressValue = 0;
+            IsStatusBadgeVisible = true;
+            StatusBadgeState = BadgeState.Error;
+            StatusBadgeText = "核心启动失败，请检查网络或代理设置";
             P2PStateService.SetRunning(false);
             AddLog("创建房间失败");
         }
@@ -605,7 +618,17 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         AddLog("=== 开始加入 ET 联机房间 ===");
         AddLog($"提示码: {JoinPromptCode}");
         ResetErrorDeduplication();
-        var success = await _etService.StartJoinAsync(JoinPromptCode, playerName);
+        bool success;
+        try
+        {
+            success = await _etService.StartJoinAsync(JoinPromptCode, playerName);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"加入房间失败: {ex.Message}");
+            success = false;
+        }
+
         if (!success)
         {
             IsETRunning = false;
@@ -614,6 +637,9 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             CanStopET = false;
             IsProgressVisible = false;
             ProgressValue = 0;
+            IsStatusBadgeVisible = true;
+            StatusBadgeState = BadgeState.Error;
+            StatusBadgeText = "核心启动失败，请检查网络或代理设置";
             P2PStateService.SetRunning(false);
             AddLog("加入房间失败");
         }

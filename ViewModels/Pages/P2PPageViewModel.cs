@@ -683,7 +683,22 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         // 同步配置到服务
         _p2pService.useoldway = UseLegacyMode;
         
-        var success = await _p2pService.StartHostAsync();
+        bool success;
+        try
+        {
+            success = await _p2pService.StartHostAsync();
+        }
+        catch (Exception ex)
+        {
+            AddLog($"开启房间失败: {ex.Message}");
+            IsProgressVisible = false;
+            ProgressValue = 0;
+            IsStatusBadgeVisible = true;
+            StatusBadgeState = BadgeState.Error;
+            StatusBadgeText = "核心启动失败，请检查网络或代理设置";
+            P2PStateService.SetRunning(false);
+            return;
+        }
         
         if (success)
         {
@@ -783,7 +798,22 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         // 同步配置到服务
         _p2pService.useoldway = UseLegacyMode;
         
-        var success = await _p2pService.StartJoinAsync(RoomCode, TargetPort);
+        bool success;
+        try
+        {
+            success = await _p2pService.StartJoinAsync(RoomCode, TargetPort);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"加入房间失败: {ex.Message}");
+            IsProgressVisible = false;
+            ProgressValue = 0;
+            IsStatusBadgeVisible = true;
+            StatusBadgeState = BadgeState.Error;
+            StatusBadgeText = "核心启动失败，请检查网络或代理设置";
+            P2PStateService.SetRunning(false);
+            return;
+        }
         
         if (success)
         {

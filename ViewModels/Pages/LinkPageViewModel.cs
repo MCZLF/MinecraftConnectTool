@@ -625,6 +625,8 @@ public partial class LinkPageViewModel : ViewModelBase
         string downloadUrl = GetCoreDownloadUrl();
         string expectedMd5 = GetCoreMd5();
 
+        Directory.CreateDirectory(customDirectory);
+
         // 记录平台信息
         string platformInfo = $"平台: {(IsWindows ? "Windows" : IsLinux ? "Linux" : IsMacOS ? "macOS" : "Unknown")} " +
                               $"架构: {(IsArm64 ? "ARM64" : IsX64 ? "x64" : "Unknown")}";
@@ -675,12 +677,12 @@ public partial class LinkPageViewModel : ViewModelBase
             IsProgressVisible = true;
             ProgressValue = 0;
 
-            log("Downloader启动");
-            Console.Write($"下载地址: {downloadUrl}");
-
             try
             {
-                using var unityClient = new HttpClient(new HttpClientHandler { UseProxy = false });
+                log("Downloader启动");
+                Console.Write($"下载地址: {downloadUrl}");
+
+                using var unityClient = new HttpClient();
                 using var response = await unityClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
 
@@ -703,7 +705,7 @@ public partial class LinkPageViewModel : ViewModelBase
                     }
                 }
             }
-            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is HttpRequestException || ex is IOException || ex is TaskCanceledException || ex is UnauthorizedAccessException)
             {
                 log($"下载Link核心失败: {ex.Message}");
                 role = "0";
@@ -711,7 +713,8 @@ public partial class LinkPageViewModel : ViewModelBase
                 ProgressValue = 0;
                 IsStatusBadgeVisible = true;
                 StatusBadgeState = BadgeState.Error;
-                StatusBadgeText = "Link核心下载失败，请检查网络或代理设置";
+                StatusBadgeText = "核心下载失败，请检查网络或代理设置";
+                ShowErrorToast("核心下载失败，请检查网络或代理设置");
                 return false;
             }
 

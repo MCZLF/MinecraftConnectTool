@@ -85,24 +85,69 @@ public static class ConfigService
     {
         lock (LockObj)
         {
-            try
+            var json = SerializeConfig(config);
+            if (TrySaveConfigFile(ConfigFilePath, json))
             {
-                // 使用 JsonSerializer 序列化整个对象
-                var dict = new System.Collections.Generic.Dictionary<string, object?>();
-                foreach (var prop in config)
-                {
-                    dict[prop.Key] = prop.Value?.GetValue<object?>();
-                }
-                var json = JsonSerializer.Serialize(dict, JsonOptions);
-                Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
-                File.WriteAllText(ConfigFilePath, json);
                 _configCache = config;
+                return;
             }
-            catch (Exception ex)
+
+            if (LocalStorageService.StorageMode != LocalStorageMode.SystemTemp && TrySwitchToFallbackStorage())
             {
-                Console.WriteLine($"保存配置失败: {ex.Message}");
-                throw;
+                if (TrySaveConfigFile(ConfigFilePath, json))
+                {
+                    _configCache = config;
+                    return;
+                }
             }
+
+            Console.WriteLine($"保存配置失败，已保留内存配置: {ConfigFilePath}");
+            _configCache = config;
+        }
+    }
+
+    private static string SerializeConfig(JsonObject config)
+    {
+        var dict = new System.Collections.Generic.Dictionary<string, object?>();
+        foreach (var prop in config)
+        {
+            dict[prop.Key] = prop.Value?.GetValue<object?>();
+        }
+
+        return JsonSerializer.Serialize(dict, JsonOptions);
+    }
+
+    private static bool TrySaveConfigFile(string path, string json)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            if (File.Exists(path))
+                File.SetAttributes(path, File.GetAttributes(path) & ~FileAttributes.ReadOnly);
+
+            File.WriteAllText(path, json);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+        {
+            Console.WriteLine($"保存配置失败: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static bool TrySwitchToFallbackStorage()
+    {
+        try
+        {
+            Console.WriteLine($"当前配置目录不可写，切换到系统 Temp 存储: {ConfigFilePath}");
+            LocalStorageService.Configure(LocalStorageMode.SystemTemp, migrateExistingData: false);
+            ConfigFilePath = LocalStorageService.ConfigFilePath;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"切换系统 Temp 存储失败: {ex.Message}");
+            return false;
         }
     }
 
@@ -219,7 +264,17 @@ public static class ConfigService
         {
             _configCache = null;
             ConfigFilePath = LocalStorageService.ConfigFilePath;
-            Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                Console.WriteLine($"初始化配置目录失败: {ex.Message}");
+                if (LocalStorageService.StorageMode != LocalStorageMode.SystemTemp)
+                    TrySwitchToFallbackStorage();
+            }
+
             InitializeDefaultConfig();
         }
     }

@@ -975,9 +975,16 @@ public partial class MainWindow : Window
     
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
-        // 清理配置
-        ConfigService.Delete("Server");
-        ConfigService.Write("EnableRelay", false);
+        try
+        {
+            ConfigService.Delete("Server");
+            ConfigService.Write("EnableRelay", false);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"清理关闭配置异常: {ex.Message}");
+            LocalStorageService.AppendAppLog($"清理关闭配置异常：{ex}{Environment.NewLine}");
+        }
 
         // 停止多播服务
         try

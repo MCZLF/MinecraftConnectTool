@@ -9,7 +9,6 @@
              mc:Ignorable="d" d:DesignWidth="930" d:DesignHeight="775"
         x:Class="MinecraftConnectTool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/IconGroup3000.ico"
         Title="Minecraft Connect Tool"
         Width="1080"
         Height="720"

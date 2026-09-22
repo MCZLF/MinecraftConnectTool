@@ -319,7 +319,7 @@ MinecraftConnectTool/
 - 官网地址：[`https://link.mcilm.top/`](https://link.mcilm.top/)
 - 本项目使用 MCILM-Link 作为备用联机方案之一，特此注明并感谢原作者。
 
-### ETMode - 其中心化组网联机
+### ETMode - 去中心化组网联机
 由 **EasyTier** 提供
 - 仓库地址：[`https://github.com/EasyTier/Easytier`](https://github.com/EasyTier/Easytier)
 - 本项目使用 EasyTier 作为备用联机方案之一，特此注明并感谢原作者。

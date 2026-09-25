@@ -1023,9 +1023,18 @@ del /f /q ""%~nx0""";
     }
 
     [RelayCommand]
-    private void DebugAction()
+    private async Task DebugAction()
     {
-        // 调试功能 - 模拟原版的异常抛出
+        bool confirmed = await ShowConfirmDialogAsync(
+            "触发测试崩溃",
+            "确定要触发测试异常吗？",
+            "确认后程序将立即抛出未处理异常并退出。此操作仅用于测试崩溃报告。 ");
+
+        if (!confirmed)
+        {
+            return;
+        }
+
         UpdateLogContent = "调试模式已激活\n准备抛出测试异常...";
         throw new Exception("114514,点继续就没事了");
     }

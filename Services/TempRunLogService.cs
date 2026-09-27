@@ -56,7 +56,7 @@ public static class TempRunLogService
         AppendAppLog(message);
     }
 
-    public static string Read(string pageName)
+    public static string Read(string pageName, long maxBytes = 4_000_000, int maxLines = 5_000)
     {
         try
         {
@@ -66,9 +66,7 @@ public static class TempRunLogService
 
             lock (SyncRoot)
             {
-                using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-                return reader.ReadToEnd();
+                return LocalStorageService.ReadTextTail(path, maxBytes, maxLines);
             }
         }
         catch

@@ -313,6 +313,38 @@ public static class LocalStorageService
         catch { }
     }
 
+    public static string ReadTextTail(string path, long maxBytes, int maxLines = 0, Encoding? encoding = null)
+    {
+        if (string.IsNullOrWhiteSpace(path) || maxBytes <= 0 || !File.Exists(path))
+            return string.Empty;
+
+        encoding ??= Encoding.UTF8;
+
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        if (stream.Length > maxBytes)
+            stream.Seek(-maxBytes, SeekOrigin.End);
+
+        using var reader = new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true);
+        if (maxLines > 0)
+            return ReadLastLines(reader, maxLines);
+
+        return reader.ReadToEnd();
+    }
+
+    private static string ReadLastLines(StreamReader reader, int maxLines)
+    {
+        var lines = new Queue<string>(maxLines);
+        while (reader.ReadLine() is { } line)
+        {
+            if (lines.Count == maxLines)
+                lines.Dequeue();
+
+            lines.Enqueue(line);
+        }
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
     private static LocalStorageSettings LoadSettings()
     {
         if (_settings != null)

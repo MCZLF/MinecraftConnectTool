@@ -61,6 +61,9 @@ public partial class MainWindow : Window
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
+    private const long MaxMclogsUploadLogBytes = 32_000_000;
+    private const long MaxAiAnalyzeLogBytes = 4_000_000;
+    private const int MaxAiAnalyzeLogLines = 5_000;
     //==============================================================
     private readonly PlatformService _platformService;
     private readonly P2PModeService _p2pService;
@@ -1339,15 +1342,11 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // 读取 APPLog.ini（限制最大 32MB）
             string logContent;
             var logFileInfo = new FileInfo(logPath);
-            if (logFileInfo.Length > 32_000_000)
+            if (logFileInfo.Length > MaxMclogsUploadLogBytes)
             {
-                using var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                fs.Seek(-32_000_000, SeekOrigin.End);
-                using var reader = new StreamReader(fs, Encoding.UTF8);
-                logContent = reader.ReadToEnd();
+                logContent = LocalStorageService.ReadTextTail(logPath, MaxMclogsUploadLogBytes);
             }
             else
             {
@@ -1567,23 +1566,9 @@ public partial class MainWindow : Window
         }
         else
         {
-            // 其他页面：读取全局 APPLog.ini（只读取最后32MB，避免OOM）
             string logFilePath = LocalStorageService.AppLogPath;
             if (File.Exists(logFilePath))
-            {
-                var fi = new FileInfo(logFilePath);
-                if (fi.Length > 32_000_000)
-                {
-                    using var fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    fs.Seek(-32_000_000, SeekOrigin.End);
-                    using var reader = new StreamReader(fs, Encoding.UTF8);
-                    logContent = reader.ReadToEnd();
-                }
-                else
-                {
-                    logContent = File.ReadAllText(logFilePath);
-                }
-            }
+                logContent = LocalStorageService.ReadTextTail(logFilePath, MaxAiAnalyzeLogBytes, MaxAiAnalyzeLogLines);
             pageName = "全局日志";
         }
 
@@ -1618,7 +1603,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var runLog = TempRunLogService.Read(pageName);
+            var runLog = TempRunLogService.Read(pageName, MaxAiAnalyzeLogBytes, MaxAiAnalyzeLogLines);
             if (!string.IsNullOrWhiteSpace(runLog))
                 return runLog;
         }

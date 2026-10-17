@@ -1030,8 +1030,11 @@ public class P2PModeService : IDisposable
             // 停止所有main进程
             foreach (var process in Process.GetProcessesByName("main"))
             {
-                process.Kill();
-                process.Dispose();
+                using (process)
+                {
+                    if (CoreProcessOwnership.IsManaged(process))
+                        process.Kill();
+                }
             }
             
             role = "0";

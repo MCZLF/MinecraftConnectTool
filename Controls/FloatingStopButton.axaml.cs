@@ -80,6 +80,7 @@ public partial class FloatingStopButton : UserControl
             {
                 Command.Execute(CommandParameter);
             }
+            return;
         }
         // 触发事件（向后兼容）
         StopRequested?.Invoke(this, EventArgs.Empty);

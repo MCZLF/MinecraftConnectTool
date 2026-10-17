@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:icons="using:Material.Icons.Avalonia"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="MinecraftConnectTool.ExtensionUI.CloseBehaviorDialog">
+    <UserControl.Styles>
+        <Style Selector="Button.dialog-close">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.dialog-close:pointerover">
+            <Setter Property="Background" Value="{DynamicResource MaterialSurfaceVariantBrush}"/>
+        </Style>
+        <Style Selector="Button.dialog-close:pressed">
+            <Setter Property="Background" Value="{DynamicResource MaterialSecondaryContainerBrush}"/>
+        </Style>
+        <Style Selector="CheckBox.remember-choice">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <Setter Property="Theme" Value="{StaticResource MaterialCheckBox}"/>
+            <Setter Property="assists:SelectionControlAssist.InnerForeground" Value="{DynamicResource MaterialPrimaryBrush}"/>
+        </Style>
+        <Style Selector="CheckBox.remember-choice:not(:checked):not(:indeterminate) /template/ Path#Graphic">
+            <Setter Property="Fill" Value="{DynamicResource MaterialOnSurfaceBrush}"/>
+        </Style>
+        <Style Selector="CheckBox.remember-choice:checked /template/ Path#Graphic">
+            <Setter Property="Data" Value="M5,3 H19 A2,2 0 0 1 21,5 V19 A2,2 0 0 1 19,21 H5 A2,2 0 0 1 3,19 V5 A2,2 0 0 1 5,3 Z"/>
+        </Style>
+        <Style Selector="CheckBox.remember-choice /template/ Path#Graphic">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Fill" Duration="0:0:0.16"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="CheckBox.remember-choice /template/ Ellipse#PART_HoverEffect">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.16"/>
+                </Transitions>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+    <Grid Background="#CC000000">
+    <Border Background="{DynamicResource MaterialPaperBrush}"
+            Width="520"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            BoxShadow="0 16 48 0 #60000000"
+            CornerRadius="12"
+            BorderBrush="{DynamicResource MaterialOutlineVariantBrush}"
+            BorderThickness="1">
+        <Grid RowDefinitions="Auto,Auto">
+            <Border Height="4"
+                    Background="{DynamicResource MaterialErrorBrush}"
+                    CornerRadius="12,12,0,0"/>
+            <StackPanel Grid.Row="1" Margin="24,20,24,24" Spacing="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Width="44" Height="44" CornerRadius="22" Margin="0,0,14,0"
+                            Background="{DynamicResource MaterialErrorContainerBrush}">
+                        <icons:MaterialIcon Kind="AlertCircle" Width="24" Height="24"
+                                            Foreground="{DynamicResource MaterialErrorBrush}"/>
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="联机核心仍在运行" FontSize="18" FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    <Button Grid.Column="2" Width="32" Height="32" Padding="4"
+                            Classes="dialog-close"
+                            Background="Transparent" BorderThickness="0"
+                            Click="OnCancelClick" AutomationProperties.Name="取消关闭">
+                        <icons:MaterialIcon Kind="Close" Width="20" Height="20"
+                                            Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                    </Button>
+                </Grid>
+                <TextBlock x:Name="CoreRunningMessage"
+                           FontSize="14" TextWrapping="Wrap" LineHeight="22"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                <TextBlock x:Name="HideDescription" Text="隐藏后联机核心将继续运行，可通过托盘图标恢复窗口。"
+                           FontSize="13" TextWrapping="Wrap" LineHeight="20"
+                           Foreground="{DynamicResource MaterialOnSurfaceBrush}" Opacity="0.8"/>
+                <CheckBox x:Name="RememberChoiceCheckBox"
+                          Classes="remember-choice"
+                          HorizontalAlignment="Left">
+                    <TextBlock Text="记住我的选择，下次不再询问"
+                               Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </CheckBox>
+                <Border Height="1" Background="{DynamicResource MaterialOutlineVariantBrush}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                    <Button Content="取消" Classes="outlined" MinWidth="80"
+                            CornerRadius="18" Height="36" Click="OnCancelClick"/>
+                    <Button x:Name="HideButton" Content="隐藏至托盘" Classes="outlined" MinWidth="120"
+                            CornerRadius="18" Height="36" Click="OnHideClick"/>
+                    <Button Content="关闭并退出" Classes="accent" MinWidth="120"
+                            CornerRadius="18" Height="36" Click="OnExitClick"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+    </Grid>
+</UserControl>

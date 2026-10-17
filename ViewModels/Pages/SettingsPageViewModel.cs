@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MinecraftConnectTool.Services;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MinecraftConnectTool.ViewModels.Pages;
@@ -449,6 +451,20 @@ public partial class SettingsPageViewModel : ViewModelBase
     /// </summary>
     private bool _isLoadingSettings = false;
 
+    [ObservableProperty]
+    private bool _isWindowCloseBehaviorVisible;
+
+    [ObservableProperty]
+    private StartupPageOption? _selectedWindowCloseBehavior;
+
+    public IReadOnlyList<StartupPageOption> WindowCloseBehaviorOptions { get; } = new[]
+    {
+        new StartupPageOption("MinimizeToTray", OperatingSystem.IsWindows() ? "隐藏至托盘" : "最小化窗口"),
+        new StartupPageOption("Exit", "退出核心并关闭程序")
+    };
+
+    private bool _isRefreshingWindowCloseBehavior;
+
     #endregion
 
     public SettingsPageViewModel()
@@ -463,6 +479,68 @@ public partial class SettingsPageViewModel : ViewModelBase
         {
             GetPreUpdate = false;
             ConfigService.Write("getpreupdate", false);
+        }
+
+        RefreshWindowCloseBehavior();
+        var weakReference = new WeakReference<SettingsPageViewModel>(this);
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        timer.Tick += (_, _) =>
+        {
+            if (weakReference.TryGetTarget(out var viewModel))
+                viewModel.RefreshWindowCloseBehavior();
+            else
+                timer.Stop();
+        };
+        timer.Start();
+    }
+
+    private void RefreshWindowCloseBehavior()
+    {
+        string? behavior = null;
+        try
+        {
+            var path = ConfigService.GetConfigFilePath();
+            if (File.Exists(path))
+            {
+                using var document = JsonDocument.Parse(File.ReadAllText(path));
+                if (document.RootElement.ValueKind == JsonValueKind.Object &&
+                    document.RootElement.TryGetProperty("WindowCloseBehavior", out var value) &&
+                    value.ValueKind == JsonValueKind.String)
+                {
+                    behavior = value.GetString();
+                }
+            }
+        }
+        catch (IOException)
+        {
+            return;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return;
+        }
+        catch (JsonException)
+        {
+        }
+
+        _isRefreshingWindowCloseBehavior = true;
+        try
+        {
+            SelectedWindowCloseBehavior = WindowCloseBehaviorOptions.FirstOrDefault(option => option.PageKey == behavior);
+            IsWindowCloseBehaviorVisible = SelectedWindowCloseBehavior != null;
+        }
+        finally
+        {
+            _isRefreshingWindowCloseBehavior = false;
+        }
+    }
+
+    partial void OnSelectedWindowCloseBehaviorChanged(StartupPageOption? value)
+    {
+        if (!_isRefreshingWindowCloseBehavior && IsWindowCloseBehaviorVisible &&
+            value != null && WindowCloseBehaviorOptions.Contains(value))
+        {
+            ConfigService.Write("WindowCloseBehavior", value.PageKey);
         }
     }
 

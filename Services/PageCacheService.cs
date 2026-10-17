@@ -61,6 +61,12 @@ public class PageCacheService : IPageCacheService
         }
     }
 
+    public Control? GetCachedPage(string pageKey)
+    {
+        lock (_lockObj)
+            return _pageCache.GetValueOrDefault(pageKey);
+    }
+
     /// <summary>
     /// 更新页面访问顺序
     /// </summary>

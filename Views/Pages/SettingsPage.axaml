@@ -306,6 +306,39 @@
             </ComboBox>
           </Grid>
 
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"
+                IsVisible="{Binding IsWindowCloseBehaviorVisible}">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Text="核心未退出时关闭窗口处理方式"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="选择联机核心仍在运行时关闭窗口的处理方式"
+                         FontSize="14"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding WindowCloseBehaviorOptions}"
+                      SelectedItem="{Binding SelectedWindowCloseBehavior, Mode=TwoWay}"
+                      VerticalAlignment="Center"
+                      Width="220"
+                      MinHeight="40"
+                      Padding="12,8"
+                      Background="Transparent"
+                      BorderThickness="0,0,0,1"
+                      BorderBrush="{DynamicResource MaterialOutlineBrush}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:StartupPageOption">
+                  <TextBlock Text="{Binding DisplayName}"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
           <!-- 存储目录 -->
           <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="12" ColumnSpacing="12">
             <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">

@@ -93,7 +93,14 @@ public partial class HelpPage : UserControl
         KillProcessesByName("easytier-core", ref killedCount, ref failedCount, true);
         KillProcessesByName("link", ref killedCount, ref failedCount, true);
 
-        P2PStateService.SetRunning(false);
+        if (failedCount == 0)
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
+                desktop.MainWindow?.DataContext is MinecraftConnectTool.ViewModels.MainWindowViewModel mainVm)
+                await mainVm.StopLinkForExitAsync();
+
+            P2PStateService.SetRunning(false);
+        }
 
         await ShowForceKillCoreMessageAsync(killedCount, failedCount);
     }
@@ -226,6 +233,8 @@ public partial class HelpPage : UserControl
         {
             try
             {
+                if (!CoreProcessOwnership.IsManaged(process))
+                    continue;
                 process.Kill(killEntireProcessTree);
                 process.WaitForExit();
                 killedCount++;

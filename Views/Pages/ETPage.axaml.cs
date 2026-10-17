@@ -26,16 +26,6 @@ public partial class ETPage : UserControl
         // 订阅打开玩家管理面板事件
         _viewModel.OpenPlayerManagerRequested += OnOpenPlayerManagerRequested;
 
-        // 页面卸载时取消订阅
-        this.Unloaded += (_, _) =>
-        {
-            if (_viewModel != null)
-            {
-                _viewModel.LogTextChanged -= OnLogTextChanged;
-                _viewModel.RequestPortInput -= OnRequestPortInput;
-                _viewModel.OpenPlayerManagerRequested -= OnOpenPlayerManagerRequested;
-            }
-        };
     }
 
     private void InitializeComponent()

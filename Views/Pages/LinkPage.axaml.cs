@@ -23,13 +23,7 @@ public partial class LinkPage : UserControl
         _viewModel = new LinkPageViewModel();
         DataContext = _viewModel;
 
-        // 订阅全局停止请求事件
-        MainWindow.LinkStopRequested += OnLinkStopRequested;
-
-        // 订阅端口输入请求事件
         _viewModel.RequestPortInput += OnRequestPortInput;
-
-        // 订阅打开玩家管理面板事件
         _viewModel.OpenPlayerManagerRequested += OnOpenPlayerManagerRequested;
 
         // 绑定复制按钮点击事件（必须在 _viewModel 初始化之后）
@@ -39,16 +33,6 @@ public partial class LinkPage : UserControl
             copyButton.Click += async (s, e) => await _viewModel.CopyPromptCodeAsync();
         }
 
-        // 控件卸载时取消订阅
-        Unloaded += (s, e) =>
-        {
-            MainWindow.LinkStopRequested -= OnLinkStopRequested;
-            if (_viewModel != null)
-            {
-                _viewModel.RequestPortInput -= OnRequestPortInput;
-                _viewModel.OpenPlayerManagerRequested -= OnOpenPlayerManagerRequested;
-            }
-        };
     }
 
     private void InitializeComponent()
@@ -74,14 +58,6 @@ public partial class LinkPage : UserControl
                 }
             };
         }
-    }
-
-    /// <summary>
-    /// 处理全局停止请求
-    /// </summary>
-    private void OnLinkStopRequested(object? sender, EventArgs e)
-    {
-        _viewModel?.StopLink();
     }
 
     /// <summary>

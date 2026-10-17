@@ -141,14 +141,19 @@ public partial class App : Application, IDisposable
             // 性能模式：激进GC，每2秒执行一次
             _gcTimer = new Timer(_ =>
             {
-                // 执行激进GC，释放内存
-                for (int i = 0; i < 3; i++)
+                try
                 {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+                        GC.WaitForPendingFinalizers();
+                    }
+                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                     GC.Collect(2, GCCollectionMode.Aggressive, true, true);
-                    GC.WaitForPendingFinalizers();
                 }
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+                catch (Exception)
+                {
+                }
             }, null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
         }
         else
@@ -156,23 +161,26 @@ public partial class App : Application, IDisposable
             // 默认模式：每10秒执行一次GC，保持内存低于100MB
             _gcTimer = new Timer(_ =>
             {
-                // 检查内存使用，如果超过80MB则执行更积极的GC
-                var proc = Process.GetCurrentProcess();
-                proc.Refresh();
-                var memoryMB = proc.WorkingSet64 / (1024 * 1024);
+                try
+                {
+                    using var proc = Process.GetCurrentProcess();
+                    proc.Refresh();
+                    var memoryMB = proc.WorkingSet64 / (1024 * 1024);
 
-                if (memoryMB > 80)
-                {
-                    // 内存较高，执行积极GC
-                    GC.Collect(2, GCCollectionMode.Optimized, true);
-                    GC.WaitForPendingFinalizers();
-                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                    GC.Collect(2, GCCollectionMode.Optimized, true);
+                    if (memoryMB > 80)
+                    {
+                        GC.Collect(2, GCCollectionMode.Optimized, true);
+                        GC.WaitForPendingFinalizers();
+                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                        GC.Collect(2, GCCollectionMode.Optimized, true);
+                    }
+                    else
+                    {
+                        GC.Collect(1, GCCollectionMode.Optimized, false);
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    // 内存正常，执行温和GC
-                    GC.Collect(1, GCCollectionMode.Optimized, false);
                 }
             }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
         }

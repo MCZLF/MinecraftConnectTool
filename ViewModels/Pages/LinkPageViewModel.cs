@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
+using Newtonsoft.Json;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -352,6 +353,7 @@ public partial class LinkPageViewModel : ViewModelBase
         // 订阅玩家列表服务事件
         _playerListService.Kicked += OnPlayerKicked;
         _playerListService.LogMessage += OnPlayerListLogMessage;
+        P2PStateService.StateChanged += OnCoreRunningStateChanged;
 
         InitializeLog();
     }
@@ -1042,6 +1044,26 @@ public partial class LinkPageViewModel : ViewModelBase
     // ========== 停止和清理 ==========
     public async void stoplink()
     {
+        await StopLinkAsync();
+    }
+
+    private void OnCoreRunningStateChanged(object? sender, bool isRunning)
+    {
+        if (isRunning)
+            return;
+
+        var running = false;
+        foreach (var process in Process.GetProcessesByName("link"))
+        {
+            using (process)
+                running |= CoreProcessOwnership.IsManaged(process);
+        }
+        if (!running)
+            Avalonia.Threading.Dispatcher.UIThread.Post(ResetStoppedState);
+    }
+
+    public void ResetStoppedState()
+    {
         role = "0";
 
         ClearAllFloatButtons();
@@ -1052,6 +1074,16 @@ public partial class LinkPageViewModel : ViewModelBase
 
         IsInfoButtonVisible = false;
         IsAlertVisible = false;
+        AlertText = string.Empty;
+        IsPlayerListConnected = false;
+        IsLabelVisible = false;
+        LabelText = string.Empty;
+        StopStatusPolling();
+    }
+
+    public async Task StopLinkAsync()
+    {
+        ResetStoppedState();
 
         // 清理玩家管理房间
         if (_playerListService.IsHost)
@@ -1073,13 +1105,19 @@ public partial class LinkPageViewModel : ViewModelBase
         {
             try
             {
+                if (!CoreProcessOwnership.IsManaged(process))
+                    continue;
                 process.Kill();
-                process.WaitForExit();
+                await process.WaitForExitAsync();
                 log("进程已结束~");
             }
             catch (Exception ex)
             {
                 log($"无法关闭进程: {ex.Message}");
+            }
+            finally
+            {
+                process.Dispose();
             }
         }
 

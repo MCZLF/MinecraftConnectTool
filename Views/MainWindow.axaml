@@ -219,14 +219,14 @@
                           Spacing="12"
                           Margin="24,8,24,20">
                 <Button Command="{Binding GlobalModalCancelCommand}"
-                        Width="90"
+                        MinWidth="90"
                         Height="36"
                         CornerRadius="18"
                         Classes="outlined">
                   <TextBlock Text="取消" FontSize="13"/>
                 </Button>
                 <Button Command="{Binding GlobalModalConfirmCommand}"
-                        Width="90"
+                        MinWidth="90"
                         Height="36"
                         CornerRadius="18"
                         Classes="accent">

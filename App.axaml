@@ -21,6 +21,11 @@
       <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineBrush}"/>
       <Setter Property="BorderThickness" Value="1"/>
     </Style>
+    <Style Selector="MenuFlyoutPresenter">
+      <Setter Property="Background" Value="{DynamicResource MaterialSurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource MaterialOutlineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
     <Style Selector="MenuItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="Foreground" Value="{DynamicResource MaterialOnSurfaceBrush}"/>

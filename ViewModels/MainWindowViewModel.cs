@@ -126,70 +126,24 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateStopButtonToolTip();
     }
 
+    public Func<Task>? StopAllCoresHandler { get; set; }
+    public Func<System.Collections.Generic.IReadOnlyList<string>>? ActiveCoreNamesProvider { get; set; }
+
     [RelayCommand]
     private async Task StopCore()
     {
-        // 根据当前模式调用相应的停止命令
-        if (P2PStateService.CurrentMode == CoreMode.Link)
-        {
-            // 停止Link核心 - 通过获取当前页面来执行停止
-            if (CurrentPage is LinkPage linkPage && linkPage.DataContext is LinkPageViewModel linkVm)
-            {
-                linkVm.StopLink();
-            }
-            else
-            {
-                // 如果当前不在Link页面，尝试从缓存获取
-                var linkPageFromCache = _pageCacheService.GetOrCreatePage("Link", () => new LinkPage());
-                if (linkPageFromCache?.DataContext is LinkPageViewModel linkVmCached)
-                {
-                    linkVmCached.StopLink();
-                }
-            }
-        }
-        else if (P2PStateService.CurrentMode == CoreMode.ET)
-        {
-            // 停止ET核心 - 通过获取当前页面来执行停止
-            if (CurrentPage is ETPage etPage && etPage.DataContext is ETPageViewModel etVm)
-            {
-                await etVm.StopET();
-            }
-            else
-            {
-                // 如果当前不在ET页面，尝试从缓存获取
-                var etPageFromCache = _pageCacheService.GetOrCreatePage("ET", () => new ETPage());
-                if (etPageFromCache?.DataContext is ETPageViewModel etVmCached)
-                {
-                    await etVmCached.StopET();
-                }
-            }
-        }
-        else
-        {
-            // 停止P2P核心 - 通过获取当前页面来执行停止
-            if (CurrentPage is P2PPage p2pPage && p2pPage.DataContext is P2PPageViewModel p2pVm)
-            {
-                await p2pVm.StopP2P();
-            }
-            else
-            {
-                // 如果当前不在P2P页面，尝试从缓存获取
-                var p2pPageFromCache = _pageCacheService.GetOrCreatePage("P2P", () => new P2PPage());
-                if (p2pPageFromCache?.DataContext is P2PPageViewModel p2pVmCached)
-                {
-                    await p2pVmCached.StopP2P();
-                }
-            }
-        }
+        if (StopAllCoresHandler != null)
+            await StopAllCoresHandler();
     }
 
-    private void UpdateStopButtonToolTip()
+    public void UpdateStopButtonToolTip()
     {
-        StopButtonToolTip = P2PStateService.CurrentMode switch
+        var cores = ActiveCoreNamesProvider?.Invoke();
+        StopButtonToolTip = cores?.Count switch
         {
-            CoreMode.Link => "关闭Link核心",
-            CoreMode.ET => "关闭ET核心",
-            _ => "关闭P2P核心"
+            1 => $"关闭{cores[0]}核心",
+            >= 2 => "关闭所有核心",
+            _ => "关闭核心"
         };
     }
 
@@ -234,12 +188,15 @@ public partial class MainWindowViewModel : ViewModelBase
     /// </summary>
     public Task<bool> ShowGlobalModalAsync(string title, string message, string detail)
     {
+        if (IsGlobalModalVisible && _globalModalTcs != null)
+            return Task.FromResult(false);
+
         GlobalModalTitle = title;
         GlobalModalMessage = message;
         GlobalModalDetail = detail;
+        _globalModalTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         IsGlobalModalVisible = true;
 
-        _globalModalTcs = new TaskCompletionSource<bool>();
         return _globalModalTcs.Task;
     }
 
@@ -249,6 +206,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public void HideGlobalModal()
     {
         IsGlobalModalVisible = false;
+        _globalModalTcs?.TrySetResult(false);
+    }
+
+    public async Task StopLinkForExitAsync()
+    {
+        var page = CurrentPage as LinkPage ?? _pageCacheService.GetCachedPage("Link") as LinkPage;
+        if (page?.DataContext is LinkPageViewModel vm)
+            await vm.StopLinkAsync();
     }
 
     [RelayCommand]

@@ -30,9 +30,9 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.067";
+    public static readonly string version = "0.0.7.068";
 
-    // 版本代号
+    // 版本标语
     public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";
 
     // 全局水印配置
@@ -112,6 +112,7 @@ public partial class MainWindow : Window
         ThemeService.Instance.AnimationSpeedChanged += OnAnimationSpeedChanged;
 
         InitializeComponent();
+        Closing += OnWindowClosing;
         
         // 根据平台设置窗口属性
         SetupWindowForPlatform();
@@ -159,6 +160,10 @@ public partial class MainWindow : Window
             UpdateNavigationButtonState(_viewModel);
         }
         UpdateMaximizeIcon();
+
+        if (_windowInitialized)
+            return;
+        _windowInitialized = true;
         
         // 设置标题栏版本号
         var versionTextBlock = this.FindControl<TextBlock>("VersionTextBlock");
@@ -978,6 +983,24 @@ public partial class MainWindow : Window
     
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
+        if (!_allowClose)
+        {
+            if (_closeRequestPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            if (HasActiveCore())
+            {
+                e.Cancel = true;
+                _ = HandleCloseRequestAsync();
+                return;
+            }
+        }
+
+        _trayIcon?.Dispose();
+        _trayIcon = null;
         try
         {
             ConfigService.Delete("Server");
@@ -1035,9 +1058,8 @@ public partial class MainWindow : Window
         
         // 监听停止请求事件
         floatingBtn.StopRequested += OnFloatingStopRequested;
+        floatingBtn.PointerEntered += (_, _) => _viewModel?.UpdateStopButtonToolTip();
         
-        // 窗口关闭时停止监测
-        Closing += OnWindowClosing;
     }
     
     /// <summary>
@@ -1045,29 +1067,10 @@ public partial class MainWindow : Window
     /// </summary>
     private void OnFloatingStopRequested(object? sender, EventArgs e)
     {
-        // 根据当前模式停止对应的核心
-        if (P2PStateService.CurrentMode == CoreMode.Link)
-        {
-            // Link模式 - 通过事件通知Link页面停止
-            LinkStopRequested?.Invoke(this, EventArgs.Empty);
-        }
-        else if (P2PStateService.CurrentMode == CoreMode.ET)
-        {
-            // ET模式
-            _ = ETModeService.Instance.StopETAsync();
-        }
-        else
-        {
-            // P2P模式
-            _ = _p2pService.stopp2p();
-        }
+        if (_viewModel?.StopCoreCommand.CanExecute(null) == true)
+            _viewModel.StopCoreCommand.Execute(null);
     }
 
-    /// <summary>
-    /// Link模式停止请求事件
-    /// </summary>
-    public static event EventHandler? LinkStopRequested;
-    
     /// <summary>
     /// P2P核心停止事件处理 - 更新状态隐藏FloatButton
     /// </summary>
@@ -1145,6 +1148,9 @@ public partial class MainWindow : Window
         if (DataContext is MainWindowViewModel vm)
         {
             _viewModel = vm;
+            vm.StopAllCoresHandler = StopAllCoresFromButtonAsync;
+            vm.ActiveCoreNamesProvider = GetActiveCoreNames;
+            vm.UpdateStopButtonToolTip();
             vm.PropertyChanged += (s, args) =>
             {
                 if (args.PropertyName == nameof(MainWindowViewModel.CurrentPageKey))

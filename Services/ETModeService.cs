@@ -1190,7 +1190,14 @@ public class ETModeService : IDisposable
         {
             foreach (var p in Process.GetProcessesByName("easytier-core"))
             {
-                try { p.Kill(); p.Dispose(); } catch { }
+                using (p)
+                {
+                    try
+                    {
+                        if (CoreProcessOwnership.IsManaged(p)) p.Kill();
+                    }
+                    catch { }
+                }
             }
         }
         catch { }

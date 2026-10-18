@@ -766,7 +766,7 @@
                          FontSize="16"
                          FontWeight="Medium"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
-              <TextBlock Text="启用TL传输模式"
+              <TextBlock Text="启用TL传输模式（泰拉瑞亚专用,仅限P2P）"
                          FontSize="14"
                          Opacity="0.7"
                          Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>

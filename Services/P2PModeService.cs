@@ -76,22 +76,22 @@ public class P2PModeService : IDisposable
     }
     
     // 基础URL
-    private string BaseUrl => "https://api.mct.mczlf.loft.games/Core";
+    private string BaseUrl => "https://api.mct.mczlf.loft.games/Core1018"; //2026.10.18合并最新特性与MCT特性
     
     // Windows MD5校验值
-    private string Md5Win64Admin => "4956da633c933f24d881d24e8d7f4cd7";      // windows_amd64.exe (管理员)
-    private string Md5Win32Admin => "974ffb54c1d70063e0ad01ad18bda921";       // windows_386.exe (管理员)
-    private string Md5WinArm64Admin => "8009b6eccd5245916fa51578c96535db";    // windows_arm64.exe (管理员)
+    private string Md5Win64Admin => "8f2afdcd9ac7510d1c6b52f54c2ab7f1";      // windows_amd64.exe (管理员)
+    private string Md5Win32Admin => "23c5d85e8ae33affa96653dfb48e18b8";       // windows_386.exe (管理员)
+    private string Md5WinArm64Admin => "c4e4dd6e26011d91c18710274dff26cc";    // windows_arm64.exe (管理员)
     private string Md5Win64Normal => "08160296509deac13e7d12c8754de9ef";      // 旧版64位 (无管理员)
     private string Md5Win32Normal => "640ffdaa2a7b249d9c301102419a69cb";      // 旧版32位 (无管理员)
     
     // macOS MD5校验值
-    private string Md5Mac64 => "b62023dfd075f2aee6c8a24314453424";            // darwin_amd64
-    private string Md5MacArm64 => "ff2572742af5db37c03f0bf4dc53f683";         // darwin_arm64
+    private string Md5Mac64 => "40a1c18cd1765fe203ac22919419daa5";            // darwin_amd64
+    private string Md5MacArm64 => "749aac1c3d7ce020dcdcf8a81cc62499";         // darwin_arm64
     
     // Linux MD5校验值
-    private string Md5Linux64 => "87e9e902db0f13084cb354abc07f5e65";          // linux_amd64
-    private string Md5LinuxArm64 => "50140e0a82b5f12334b59f0f4aff104a";       // linux_arm64
+    private string Md5Linux64 => "33649a41333ecd103df082dbc6cc2402";          // linux_amd64
+    private string Md5LinuxArm64 => "6e4b8b100697858af2338f0da4504a0b";       // linux_arm64
     
     // 当前进程
     private Process? _currentProcess;
@@ -119,6 +119,7 @@ public class P2PModeService : IDisposable
             { "{tokenNormal}", "MinecraftConnectTool" },
             { "16947733", "690625244" },
             { "openp2p.cn@gmail.com", "admin@mczlf.xyz" },
+            { "ERROR c.Network.Token == 0 skip save", "Mode:Join" },
             { "openp2p start", "Powered by OpenP2P" }
         };
         foreach (var pair in replacements)
@@ -287,11 +288,14 @@ public class P2PModeService : IDisposable
         }
         
         // 检查长度要求
-        if (tsm.Length <= 8)
+        if (tsm.Length < 10)
         {
-            int threeDigitRandom = random.Next(100, 1000);
-            tsm += threeDigitRandom.ToString();
-            log("提示码不满足要求,已自动加入三位随机数字");
+            int digitsToAppend = 10 - tsm.Length + 1;
+            for (int i = 0; i < digitsToAppend; i++)
+            {
+                tsm += random.Next(i == 0 ? 1 : 0, 10).ToString();
+            }
+            log($"提示码不满足要求,已自动加入{digitsToAppend}位随机数字");
         }
         
         // OLAN兼容模式

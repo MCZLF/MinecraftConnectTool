@@ -30,14 +30,14 @@ namespace MinecraftConnectTool.Views;
 public partial class MainWindow : Window
 {
     // 版本号
-    public static readonly string version = "0.0.7.068";
+    public static readonly string version = "0.0.7.070";
 
     // 版本标语
     public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";
 
     // 全局水印配置
-    public static readonly bool EnableWatermark = false;
-    public static readonly string WatermarkText = "ET模式测试版本🤔";
+    public static readonly bool EnableWatermark = true;
+    public static readonly string WatermarkText = "070先行测试版本1";
 
     // 初次启动向导配置
     public static readonly bool EnableFirstLaunchWizard = true;

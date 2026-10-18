@@ -186,9 +186,9 @@ public partial class PanelInviteEditViewModel : ObservableObject
         }
 
         // 验证长度
-        if (CustomNode.Length < 8)
+        if (CustomNode.Length < 10 || CustomNode.Length > 16)
         {
-            CustomCodeStatusText = "提示码过短，需要至少8位";
+            CustomCodeStatusText = "提示码长度须为10至16字符";
             IsCustomCodeStatusVisible = true;
             return;
         }

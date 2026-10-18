@@ -21,16 +21,21 @@
     </Grid.RowDefinitions>
 
     <!-- 顶部进度条 -->
-    <ProgressBar Grid.Row="0"
+    <StackPanel Grid.Row="0" Spacing="8">
+      <TextBlock Text="{Binding UpdateSourceStatus}" TextWrapping="Wrap" FontSize="12"
+                 Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+    <ProgressBar
                  Value="{Binding ProgressValue}"
                  Maximum="100"
                  IsVisible="{Binding IsProgressVisible}"
                  Height="4"
                  Margin="0,0,0,16"/>
+    </StackPanel>
 
     <!-- 标题区域 -->
     <Grid Grid.Row="1" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
@@ -53,8 +58,20 @@
                    Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
       </StackPanel>
 
+      <Border Grid.Column="1" IsVisible="{Binding IsEmergencyUpdate}"
+              Background="{DynamicResource MaterialErrorContainerBrush}"
+              CornerRadius="8" Padding="12,8" Margin="16,0" VerticalAlignment="Center">
+        <StackPanel Spacing="4">
+          <TextBlock Text="⚠ 警告：已启用紧急更新 API" FontWeight="Bold" FontSize="14"
+                     TextWrapping="Wrap" Foreground="{DynamicResource MaterialErrorBrush}"/>
+          <TextBlock Text="主 API 连续失败 10 次且已确认联网，已回退至 emergency.mct.mczlf.loft.games。"
+                     FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource MaterialOnErrorContainerBrush}"/>
+        </StackPanel>
+      </Border>
+
       <!-- 调试按钮 -->
-      <Button Grid.Column="1"
+      <Button Grid.Column="2"
               Command="{Binding DebugActionCommand}"
               Height="40"
               VerticalAlignment="Top"

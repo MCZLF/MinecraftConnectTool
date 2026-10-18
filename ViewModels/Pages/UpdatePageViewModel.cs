@@ -22,47 +22,53 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
     #region 跨平台更新API配置
 
     // ==================== 新API基础URL ====================
-    private const string Api_Base_Url = "https://api.mct.mczlf.loft.games/007";
+    private string Api_Base_Url = "https://api.mct.mczlf.loft.games/007";
+
+    [ObservableProperty]
+    private bool _isEmergencyUpdate;
+
+    [ObservableProperty]
+    private string _updateSourceStatus = "";
 
     // ==================== Windows 平台 ====================
     // Windows x86
-    private const string Windows_X86_Version_Api = $"{Api_Base_Url}/Win_X86/version";      // Windows x86 版本检测
-    private const string Windows_X86_Download_Api = $"{Api_Base_Url}/Win_X86/Latest.zip";     // Windows x86 下载地址 (ZIP格式)
+    private string Windows_X86_Version_Api => $"{Api_Base_Url}/Win_X86/version";      // Windows x86 版本检测
+    private string Windows_X86_Download_Api => $"{Api_Base_Url}/Win_X86/Latest.zip";     // Windows x86 下载地址 (ZIP格式)
 
     // Windows x64 (AMD64) - 默认回退平台
-    private const string Windows_X64_Version_Api = $"{Api_Base_Url}/Win_X64/version";
-    private const string Windows_X64_Download_Api = $"{Api_Base_Url}/Win_X64/Latest.zip";
+    private string Windows_X64_Version_Api => $"{Api_Base_Url}/Win_X64/version";
+    private string Windows_X64_Download_Api => $"{Api_Base_Url}/Win_X64/Latest.zip";
 
     // Windows ARM64
-    private const string Windows_Arm64_Version_Api = $"{Api_Base_Url}/Win_Arm64/version";    // Windows ARM64 版本检测
-    private const string Windows_Arm64_Download_Api = $"{Api_Base_Url}/Win_Arm64/Latest.zip";   // Windows ARM64 下载地址 (ZIP格式)
+    private string Windows_Arm64_Version_Api => $"{Api_Base_Url}/Win_Arm64/version";    // Windows ARM64 版本检测
+    private string Windows_Arm64_Download_Api => $"{Api_Base_Url}/Win_Arm64/Latest.zip";   // Windows ARM64 下载地址 (ZIP格式)
 
     // ==================== Linux 平台 ====================
     // Linux x64
-    private const string Linux_X64_Version_Api = $"{Api_Base_Url}/Linux_X64/version";        // Linux x64 版本检测
-    private const string Linux_X64_Download_Api = $"{Api_Base_Url}/Linux_X64/Latest.zip";       // Linux x64 下载地址 (ZIP格式)
+    private string Linux_X64_Version_Api => $"{Api_Base_Url}/Linux_X64/version";        // Linux x64 版本检测
+    private string Linux_X64_Download_Api => $"{Api_Base_Url}/Linux_X64/Latest.zip";       // Linux x64 下载地址 (ZIP格式)
 
     // Linux ARM //暂不支持
     private const string Linux_Arm_Version_Api = null;        // Linux ARM 版本检测
     private const string Linux_Arm_Download_Api = null;       // Linux ARM 下载地址
 
     // Linux ARM64
-    private const string Linux_Arm64_Version_Api = $"{Api_Base_Url}/Linux_Arm64/version";      // Linux ARM64 版本检测
-    private const string Linux_Arm64_Download_Api = $"{Api_Base_Url}/Linux_Arm64/Latest.zip";     // Linux ARM64 下载地址 (ZIP格式)
+    private string Linux_Arm64_Version_Api => $"{Api_Base_Url}/Linux_Arm64/version";      // Linux ARM64 版本检测
+    private string Linux_Arm64_Download_Api => $"{Api_Base_Url}/Linux_Arm64/Latest.zip";     // Linux ARM64 下载地址 (ZIP格式)
 
     // ==================== macOS 平台 ====================
     // macOS x64 (Intel)
-    private const string MacOS_X64_Version_Api = $"{Api_Base_Url}/MacOS_X64/version";        // macOS x64 版本检测
-    private const string MacOS_X64_Download_Api = $"{Api_Base_Url}/MacOS_X64/Latest.zip";       // macOS x64 下载地址 (ZIP格式)
+    private string MacOS_X64_Version_Api => $"{Api_Base_Url}/MacOS_X64/version";        // macOS x64 版本检测
+    private string MacOS_X64_Download_Api => $"{Api_Base_Url}/MacOS_X64/Latest.zip";       // macOS x64 下载地址 (ZIP格式)
 
     // macOS ARM64 (Apple Silicon)
-    private const string MacOS_Arm64_Version_Api = $"{Api_Base_Url}/MacOS_Arm64/version";      // macOS ARM64 版本检测
-    private const string MacOS_Arm64_Download_Api = $"{Api_Base_Url}/MacOS_Arm64/Latest.zip";     // macOS ARM64 下载地址 (ZIP格式)
+    private string MacOS_Arm64_Version_Api => $"{Api_Base_Url}/MacOS_Arm64/version";      // macOS ARM64 版本检测
+    private string MacOS_Arm64_Download_Api => $"{Api_Base_Url}/MacOS_Arm64/Latest.zip";     // macOS ARM64 下载地址 (ZIP格式)
 
     // ==================== 正式版 API (默认Windows x64) ====================
-    private const string Stable_Version_Api = $"{Api_Base_Url}/Win_X64/version";
-    private const string Stable_Download_Api = $"{Api_Base_Url}/Win_X64/Latest.zip";
-    private const string Stable_UpdateLog_Api = $"{Api_Base_Url}/updatelog";
+    private string Stable_Version_Api => $"{Api_Base_Url}/Win_X64/version";
+    private string Stable_Download_Api => $"{Api_Base_Url}/Win_X64/Latest.zip";
+    private string Stable_UpdateLog_Api => $"{Api_Base_Url}/updatelog";
 
     // ==================== GitHub Actions API ====================
     private const string GitHub_Api_Base = "https://api.github.com";
@@ -213,7 +219,7 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
         // 使用 Task.Run 避免阻塞 UI 线程，并确保进度条正确显示
         _ = Task.Run(async () =>
         {
-            await CheckUpdateAsync();
+            await CheckUpdateCoreAsync();
             await CheckGitHubActionsVersionAsync();
         });
     }
@@ -409,8 +415,11 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
     #region 命令
 
     [RelayCommand]
-    private async Task CheckUpdateAsync()
+    private Task CheckUpdateAsync() => CheckUpdateCoreAsync(resetSource: true);
+
+    private async Task CheckUpdateCoreAsync(bool resetSource = false)
     {
+        if (IsChecking) return;
         // 防重复点击检查
         TimeSpan timeSinceLastClick = DateTime.Now - _lastClickTime;
         if (timeSinceLastClick.TotalSeconds > 60)
@@ -428,6 +437,18 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
         _lastClickTime = DateTime.Now;
         
         IsChecking = true;
+        if (resetSource)
+        {
+            IsActionsChannel = false;
+            SwitchChannelButtonText = "切换至Action版本";
+            SwitchChannelButtonIcon = "Github";
+            Api_Base_Url = "https://api.mct.mczlf.loft.games/007";
+            IsEmergencyUpdate = false;
+            UpdateSourceStatus = "";
+            InitializeUrls();
+            CanUpdate = false;
+            HasNewUpdate = false;
+        }
         IsProgressVisible = true;
         ProgressValue = 30;
         
@@ -470,6 +491,9 @@ public partial class UpdatePageViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"检查更新失败: {ex.Message}");
+            CanUpdate = false;
+            HasNewUpdate = false;
+            CloudVersion = "云端版本: 获取失败";
             UpdateLogContent = $"检查更新失败: {ex.Message}";
         }
         finally
@@ -1303,49 +1327,67 @@ del /f /q ""%~nx0""";
 
     private async Task<string> FetchCloudVersionAsync()
     {
-        try
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync(_versionUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                // 读取字节数组并正确处理编码，避免中文乱码
-                byte[] bytes = await response.Content.ReadAsByteArrayAsync();
-                string content = Encoding.UTF8.GetString(bytes);
-                return content.Trim();
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"获取云端版本失败: {ex.Message}");
-            return string.Empty;
-        }
+        return (await FetchStableContentAsync(() => _versionUrl, true)).Trim();
     }
 
     private async Task<string> FetchUpdateLogAsync()
     {
-        try
+        return await FetchStableContentAsync(() => _updateLogUrl, false);
+    }
+
+    private async Task<string> FetchStableContentAsync(Func<string> getUrl, bool isVersion)
+    {
+        for (int failures = 0; ;)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync(_updateLogUrl);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // 读取字节数组并正确处理编码，避免中文乱码
-                byte[] bytes = await response.Content.ReadAsByteArrayAsync();
-                // 尝试 UTF-8 编码
-                string content = Encoding.UTF8.GetString(bytes);
+                using var response = await _httpClient.GetAsync(getUrl());
+                response.EnsureSuccessStatusCode();
+                string content = Encoding.UTF8.GetString(await response.Content.ReadAsByteArrayAsync());
+                if (isVersion && !Version.TryParse(content.Trim(), out _))
+                    throw new HttpRequestException("更新接口返回了空白或无效版本号。");
+                UpdateSourceStatus = IsEmergencyUpdate ? "当前使用紧急更新源" : "主更新源连接正常";
                 return content;
             }
-            else
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
             {
-                return $"Error: {response.StatusCode} || 可能是服务正在维护中...";
+                if (IsEmergencyUpdate) throw;
+                failures++;
+                UpdateSourceStatus = $"主更新 API 连续失败 {failures}/10 次，正在确认是否不可用…";
+                if (failures < 10)
+                {
+                    await Task.Delay(1000);
+                    continue;
+                }
+
+                UpdateSourceStatus = "主更新 API 连续失败 10 次，正在独立确认网络连接…";
+                using var probeClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                bool online = false;
+                foreach (string url in new[] { "https://www.baidu.com/", "https://www.microsoft.com/" })
+                {
+                    try
+                    {
+                        using var probe = await probeClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                        if (probe.IsSuccessStatusCode && probe.RequestMessage?.RequestUri?.Scheme == "https")
+                        {
+                            online = true;
+                            break;
+                        }
+                    }
+                    catch (HttpRequestException) { }
+                    catch (TaskCanceledException) { }
+                }
+                if (!online)
+                {
+                    UpdateSourceStatus = "无法确认互联网连接，未启用紧急更新";
+                    throw new HttpRequestException("无法确认互联网连接，未启用紧急更新。", ex);
+                }
+
+                Api_Base_Url = "https://emergency.mct.mczlf.loft.games/007";
+                InitializeUrls();
+                IsEmergencyUpdate = true;
+                UpdateSourceStatus = "当前使用紧急更新源";
             }
-        }
-        catch (Exception ex)
-        {
-            return $"Error: {ex.Message}";
         }
     }
 

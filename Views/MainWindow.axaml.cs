@@ -36,7 +36,7 @@ public partial class MainWindow : Window
     public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";
 
     // 全局水印配置
-    public static readonly bool EnableWatermark = true;
+    public static readonly bool EnableWatermark = false;
     public static readonly string WatermarkText = "070先行测试版本1";
 
     // 初次启动向导配置
@@ -1175,30 +1175,37 @@ public partial class MainWindow : Window
 
     private void UpdateNavigationButtonState(MainWindowViewModel vm)
     {
+        if (!IsLoaded)
+            return;
+
+        var nameScope = NameScope.GetNameScope(this);
+        if (nameScope == null)
+            return;
+
         var pageKey = vm.CurrentPageKey;
 
         // 获取所有导航控件
-        var homeIndicator = this.FindControl<Border>("HomeIndicator");
-        var homeIcon = this.FindControl<MaterialIcon>("HomeIcon");
-        var homeText = this.FindControl<TextBlock>("HomeText");
-        var p2pIndicator = this.FindControl<Border>("P2PIndicator");
-        var p2pIcon = this.FindControl<MaterialIcon>("P2PIcon");
-        var p2pText = this.FindControl<TextBlock>("P2PText");
-        var linkIndicator = this.FindControl<Border>("LinkIndicator");
-        var linkIcon = this.FindControl<MaterialIcon>("LinkIcon");
-        var linkText = this.FindControl<TextBlock>("LinkText");
-        var etIndicator = this.FindControl<Border>("ETIndicator");
-        var etIcon = this.FindControl<MaterialIcon>("ETIcon");
-        var etText = this.FindControl<TextBlock>("ETText");
-        var optimizeIndicator = this.FindControl<Border>("OptimizeIndicator");
-        var optimizeIcon = this.FindControl<MaterialIcon>("OptimizeIcon");
-        var optimizeText = this.FindControl<TextBlock>("OptimizeText");
-        var updateIndicator = this.FindControl<Border>("UpdateIndicator");
-        var updateIcon = this.FindControl<MaterialIcon>("UpdateIcon");
-        var updateText = this.FindControl<TextBlock>("UpdateText");
-        var settingsIndicator = this.FindControl<Border>("SettingsIndicator");
-        var settingsIcon = this.FindControl<MaterialIcon>("SettingsIcon");
-        var settingsText = this.FindControl<TextBlock>("SettingsText");
+        var homeIndicator = nameScope.Find<Border>("HomeIndicator");
+        var homeIcon = nameScope.Find<MaterialIcon>("HomeIcon");
+        var homeText = nameScope.Find<TextBlock>("HomeText");
+        var p2pIndicator = nameScope.Find<Border>("P2PIndicator");
+        var p2pIcon = nameScope.Find<MaterialIcon>("P2PIcon");
+        var p2pText = nameScope.Find<TextBlock>("P2PText");
+        var linkIndicator = nameScope.Find<Border>("LinkIndicator");
+        var linkIcon = nameScope.Find<MaterialIcon>("LinkIcon");
+        var linkText = nameScope.Find<TextBlock>("LinkText");
+        var etIndicator = nameScope.Find<Border>("ETIndicator");
+        var etIcon = nameScope.Find<MaterialIcon>("ETIcon");
+        var etText = nameScope.Find<TextBlock>("ETText");
+        var optimizeIndicator = nameScope.Find<Border>("OptimizeIndicator");
+        var optimizeIcon = nameScope.Find<MaterialIcon>("OptimizeIcon");
+        var optimizeText = nameScope.Find<TextBlock>("OptimizeText");
+        var updateIndicator = nameScope.Find<Border>("UpdateIndicator");
+        var updateIcon = nameScope.Find<MaterialIcon>("UpdateIcon");
+        var updateText = nameScope.Find<TextBlock>("UpdateText");
+        var settingsIndicator = nameScope.Find<Border>("SettingsIndicator");
+        var settingsIcon = nameScope.Find<MaterialIcon>("SettingsIcon");
+        var settingsText = nameScope.Find<TextBlock>("SettingsText");
 
         // Reset all buttons
         ResetButtonStyle(homeIndicator, homeIcon, homeText);

@@ -281,23 +281,36 @@ namespace MinecraftConnectTool
         {
             try
             {
-                Process process = new Process();
+                using (Process process = new Process())
+                {
                 process.StartInfo.FileName = "dotnet";
-                process.StartInfo.Arguments = "--version";
+                process.StartInfo.Arguments = "--list-runtimes";
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
 
-                if (process.ExitCode == 0 && !string.IsNullOrEmpty(output))
+                if (!process.WaitForExit(5000))
                 {
-                    Version version;
-                    if (Version.TryParse(output.Trim(), out version))
+                    try { process.Kill(); } catch { }
+                    return false;
+                }
+
+                if (process.ExitCode == 0)
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string[] lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string line in lines)
                     {
-                        return version.Major >= 8;
+                        string[] parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                        Version version;
+                        if (parts.Length >= 2 && parts[0] == "Microsoft.NETCore.App" &&
+                            Version.TryParse(parts[1], out version) && version.Major == 8)
+                        {
+                            return true;
+                        }
                     }
+                }
                 }
             }
             catch

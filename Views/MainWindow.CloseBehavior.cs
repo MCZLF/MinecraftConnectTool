@@ -239,6 +239,9 @@ public partial class MainWindow
 
         P2PStateService.SetRunning(false);
         if (_viewModel != null)
+        {
+            _viewModel.ResetStoppedCorePageStates();
             _viewModel.IsP2PRunning = false;
+        }
     }
 }

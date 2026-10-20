@@ -216,6 +216,21 @@ public partial class MainWindowViewModel : ViewModelBase
             await vm.StopLinkAsync();
     }
 
+    public void ResetStoppedCorePageStates()
+    {
+        var p2pPage = CurrentPage as P2PPage ?? _pageCacheService.GetCachedPage("P2P") as P2PPage;
+        if (p2pPage?.DataContext is P2PPageViewModel p2p)
+            p2p.IsPlayerListConnected = false;
+
+        var linkPage = CurrentPage as LinkPage ?? _pageCacheService.GetCachedPage("Link") as LinkPage;
+        if (linkPage?.DataContext is LinkPageViewModel link)
+            link.ResetStoppedState();
+
+        var etPage = CurrentPage as ETPage ?? _pageCacheService.GetCachedPage("ET") as ETPage;
+        if (etPage?.DataContext is ETPageViewModel et)
+            et.IsETRunningForPanel = false;
+    }
+
     [RelayCommand]
     private void GlobalModalConfirm()
     {

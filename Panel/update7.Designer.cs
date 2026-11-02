@@ -162,6 +162,7 @@
             this.Controls.Add(this.alert1);
             this.Name = "update7";
             this.Size = new System.Drawing.Size(762, 455);
+            this.Load += new System.EventHandler(this.update7_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -26,7 +26,7 @@ namespace MinecraftConnectTool
             this.FormClosing += MainForm_FormClosing;
             AntdUI.Config.ShowInWindow = true;
         }
-        public static readonly string version = "0.0.6.130";
+        public static readonly string version = "0.0.6.150";
         public static readonly string designation = "我们终将重逢 _摘自«有兽焉»第1000话";
         //地址github.com/MCZLF/MinecraftConnectTool 
         //Version放开头的传统不能变

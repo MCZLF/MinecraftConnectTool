@@ -289,7 +289,7 @@ namespace MinecraftConnectTool
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.Start();
-
+                
                 if (!process.WaitForExit(5000))
                 {
                     try { process.Kill(); } catch { }
@@ -445,7 +445,12 @@ namespace MinecraftConnectTool
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Process.Start("https://mct.mczlf.loft.games/function/download");
+            Process.Start("https://mct.loft.games/download");
+        }
+
+        private void update7_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

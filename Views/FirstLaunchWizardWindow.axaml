@@ -629,15 +629,19 @@
         </ScrollViewer>
       </Grid>
 
-      <!-- 用户须知（暂时隐藏） -->
-      <!--
-      <Grid IsVisible="{Binding IsPage4Visible}"
-            RowDefinitions="Auto,*,Auto"
+      <!-- 第五页：模组上传授权 -->
+      <Grid IsVisible="{Binding IsModCheckConsentPageVisible}"
+            RowDefinitions="Auto,*"
             Margin="48,32">
         <StackPanel Grid.Row="0" Spacing="8">
-          <TextBlock Text="{Binding UserNoticeTitle}"
+          <TextBlock Text="{Binding ModCheckConsentTitle}"
                      FontSize="28"
                      FontWeight="Bold"
+                     Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
+          <TextBlock Text="可在设置中更改此选项。"
+                     FontSize="14"
+                     Opacity="0.7"
+                     TextWrapping="Wrap"
                      Foreground="{DynamicResource MaterialOnBackgroundBrush}"/>
         </StackPanel>
 
@@ -647,15 +651,22 @@
                 Padding="24"
                 Margin="0,16,0,0">
           <ScrollViewer>
-            <TextBlock Text="{Binding UserNoticeContent}"
-                       FontSize="14"
-                       TextWrapping="Wrap"
-                       LineHeight="24"
-                       Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            <StackPanel Spacing="14">
+              <TextBlock Text="{Binding ModCheckConsentPurpose}"
+                         FontSize="18"
+                         FontWeight="Bold"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="{Binding ModCheckConsentDisclosure}"
+                         FontSize="14"
+                         Opacity="0.75"
+                         TextWrapping="Wrap"
+                         LineHeight="20"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
           </ScrollViewer>
         </Border>
       </Grid>
-      -->
     </Grid>
 
     <!-- 底部导航栏 -->
@@ -708,8 +719,19 @@
                 IsVisible="{Binding CurrentPage, Converter={StaticResource IntGreaterThanOneConverter}}"
                 Classes="outlined"
                 Padding="20,10"/>
-        <Button Content="{Binding NextButtonText}"
+        <Button Content="Next→"
                 Command="{Binding NextPageCommand}"
+                IsVisible="{Binding !IsModCheckConsentPageVisible}"
+                Classes="filled"
+                Padding="20,10"/>
+        <Button Content="不同意并继续"
+                Command="{Binding DeclineModCheckUploadCommand}"
+                IsVisible="{Binding IsModCheckConsentPageVisible}"
+                Classes="outlined"
+                Padding="20,10"/>
+        <Button Content="同意并继续"
+                Command="{Binding AcceptModCheckUploadCommand}"
+                IsVisible="{Binding IsModCheckConsentPageVisible}"
                 Classes="filled"
                 Padding="20,10"/>
       </StackPanel>

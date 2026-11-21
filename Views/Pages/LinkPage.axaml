@@ -149,7 +149,7 @@
     </Grid>
 
     <!-- 信息栏/副标题 重叠区域 -->
-    <Grid Grid.Row="1" Margin="0,0,0,16">
+    <Grid Grid.Row="1" Margin="0,0,0,16" RowDefinitions="Auto,Auto">
       <!-- 副标题 - 底层 -->
       <TextBlock Text="您正在使用Link模式进行联机ヾ(≧▽≦*)o"
                  FontSize="16"
@@ -159,12 +159,24 @@
                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
       
       <!-- 进度条 -->
-      <ProgressBar Value="{Binding ProgressValue}"
+      <ProgressBar Grid.Row="1"
+                   Value="{Binding ProgressValue}"
                    Maximum="100"
                    IsVisible="{Binding IsProgressVisible}"
                    Height="4"
-                   Margin="0,24,0,0"
+                   Margin="0,4,0,0"
                    VerticalAlignment="Top"/>
+
+      <Grid Grid.Row="1" IsVisible="{Binding !IsProgressVisible}">
+        <StackPanel Spacing="6" Margin="0,4,0,0"
+                    IsVisible="{Binding ModCheckProgress.IsVisible}">
+          <ProgressBar Value="{Binding ModCheckProgress.Value}"
+                       IsIndeterminate="{Binding ModCheckProgress.IsIndeterminate}"
+                       Height="4" Maximum="100"/>
+          <TextBlock Text="{Binding ModCheckProgress.Text}" FontSize="13"
+                     HorizontalAlignment="Center" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Grid>
       
       <!-- 常驻信息栏 - 显示提示码 - 顶层 -->
       <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"

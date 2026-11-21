@@ -7,7 +7,7 @@ namespace MinecraftConnectTool.Services;
 public static class TempRunLogService
 {
     private static readonly object SyncRoot = new();
-    private static string BaseDirectory => Path.Combine(LocalStorageService.TempDirectory, "TempRunLog");
+    internal static string BaseDirectory => Path.Combine(LocalStorageService.TempDirectory, "TempRunLog");
 
     public static void Initialize()
     {

@@ -286,6 +286,19 @@ public partial class SettingsPageViewModel : ViewModelBase
     [ObservableProperty]
     private bool _autoReportCrashLog = true;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsModCheckDisplayOptionVisible))]
+    private bool _allowModCheckUpload;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsModCheckDisplayOptionVisible))]
+    private bool _isModCheckConsentPending;
+
+    [ObservableProperty]
+    private bool _showFullModCheckReport;
+
+    public bool IsModCheckDisplayOptionVisible => AllowModCheckUpload && !IsModCheckConsentPending;
+
     /// <summary>
     /// 是否显示镜像源选择器
     /// </summary>
@@ -627,6 +640,8 @@ public partial class SettingsPageViewModel : ViewModelBase
         IsMirrorTypeSelectorVisible = false;
         AllowProbe = ConfigService.Read<bool>("AllowProbe", true);
         AutoReportCrashLog = ConfigService.Read<bool>("AutoReportCrashLog", true);
+        AllowModCheckUpload = ModCheckConsent.IsAllowed;
+        ShowFullModCheckReport = ConfigService.Read(ModCheckSession.FullReportSettingKey, false);
 
         // 自定义设置
         CodeUpdate = ConfigService.Read<int>("codeupdate", 1);
@@ -828,6 +843,44 @@ public partial class SettingsPageViewModel : ViewModelBase
 
         ShowToast(value ? "自动上报崩溃日志已开启" : "自动上报崩溃日志已关闭");
         ConfigService.Write("AutoReportCrashLog", value);
+    }
+
+    partial void OnAllowModCheckUploadChanged(bool value)
+    {
+        if (_isLoadingSettings || IsModCheckConsentPending || value == ModCheckConsent.IsAllowed)
+            return;
+
+        if (value)
+            _ = RequestModCheckConsentAsync();
+        else
+            ModCheckConsent.Revoke();
+    }
+
+    partial void OnShowFullModCheckReportChanged(bool value)
+    {
+        if (!_isLoadingSettings)
+            ConfigService.Write(ModCheckSession.FullReportSettingKey, value);
+    }
+
+    private async Task RequestModCheckConsentAsync()
+    {
+        IsModCheckConsentPending = true;
+        try
+        {
+            if ((Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow is not { } window)
+                return;
+
+            await ModCheckConsent.RequestAsync(window);
+        }
+        catch (InvalidOperationException)
+        {
+            ShowToast("无法打开模组上传授权窗口");
+        }
+        finally
+        {
+            AllowModCheckUpload = ModCheckConsent.IsAllowed;
+            IsModCheckConsentPending = false;
+        }
     }
 
     partial void OnCodeUpdateChanged(int value)

@@ -259,6 +259,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     
     // 玩家列表服务
     private readonly PlayerListService _playerListService;
+    private readonly ModCheckSession _modCheck = new(CoreMode.P2P);
+    public ModCheckProgress ModCheckProgress => _modCheck.Progress;
 
     /// <summary>
     /// 指示灯状态枚举
@@ -296,6 +298,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
         // 订阅玩家列表服务事件
         _playerListService.Kicked += OnPlayerKicked;
+        _playerListService.RoomClosed += OnRoomClosed;
         _playerListService.LogMessage += OnPlayerListLogMessage;
 
         // 执行P2P页面加载逻辑（对应原P2PMode_Load）
@@ -361,6 +364,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     {
         if (!isRunning && IsP2PRunning)
         {
+            _modCheck.EndHost();
             // 核心被停止（可能从FloatButton触发），更新页面状态
             IsP2PRunning = false;
             CanStartP2P = true;
@@ -383,6 +387,22 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
         // 模拟floatbutton点击 - 直接调用停止命令
         await StopP2PCommand.ExecuteAsync(null);
+    }
+
+    private void OnRoomClosed(object? sender, ConfirmedRoomClosure closure)
+    {
+        if (closure.Mode != CoreMode.P2P)
+            return;
+
+        Dispatcher.UIThread.Post(async () =>
+        {
+            if (_disposed || P2PStateService.CurrentMode != CoreMode.P2P || _p2pService.role != "2"
+                || StopP2PCommand.IsRunning || !_playerListService.IsCurrentClosure(closure.Revision))
+                return;
+
+            AddLog("服务端确认房主已关闭房间，正在自动退出联机。");
+            await StopP2PCommand.ExecuteAsync(null);
+        });
     }
 
     /// <summary>
@@ -547,7 +567,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     {
         if (_playerListService.IsHost)
         {
-            await _playerListService.CloseRoomAsync();
+            await _playerListService.CloseRoomAsync(notifyGuests: false);
         }
         else
         {
@@ -587,6 +607,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         else
         {
             AlertText = $"提示码→ {tsm}";
+            _modCheck.SetHostCode(tsm);
         }
         _currentInfoText = tsm;
         IsAlertVisible = true;
@@ -608,6 +629,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
 
     private void OnCoreStopped(object? sender, EventArgs e)
     {
+        _modCheck.EndHost();
         IsP2PRunning = false;
         CanStartP2P = true;
         CanStopP2P = false;
@@ -682,6 +704,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         
         // 同步配置到服务
         _p2pService.useoldway = UseLegacyMode;
+        _modCheck.BeginHost(AddLog);
         
         bool success;
         try
@@ -690,6 +713,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
+            _modCheck.EndHost();
             AddLog($"开启房间失败: {ex.Message}");
             IsProgressVisible = false;
             ProgressValue = 0;
@@ -720,6 +744,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         }
         else
         {
+            _modCheck.EndHost();
             AddLog("开启房间失败");
         }
     }
@@ -749,6 +774,11 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
             AddLog("错误：端口不合法 [1-65535]");
             return;
         }
+
+        var roomCode = RoomCode;
+        var targetPort = TargetPort;
+        if (!await _modCheck.CheckJoinAsync(roomCode, AddLog))
+            return;
 
         // 获取昵称：优先从配置文件读取，如果没有则弹出对话框
         string? nickname = null;
@@ -791,7 +821,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         }
 
         AddLog("=== 开始加入联机房间 ===");
-        AddLog($"提示码: {RoomCode}");
+        AddLog($"提示码: {roomCode}");
         AddLog($"目标端口: {TargetPort}");
         AddLog($"昵称: {nickname}");
         
@@ -801,7 +831,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         bool success;
         try
         {
-            success = await _p2pService.StartJoinAsync(RoomCode, TargetPort);
+            success = await _p2pService.StartJoinAsync(roomCode, targetPort);
         }
         catch (Exception ex)
         {
@@ -818,7 +848,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         if (success)
         {
             // 加入玩家管理房间
-            var playerListSuccess = await _playerListService.JoinRoomAsync(RoomCode, nickname, port);
+            var playerListSuccess = await _playerListService.JoinRoomAsync(roomCode, nickname, port, CoreMode.P2P);
             IsPlayerListConnected = playerListSuccess;
             if (playerListSuccess)
             {
@@ -987,6 +1017,7 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _modCheck.EndHost();
 
         // 取消所有事件订阅
         _p2pService.LogMessage -= OnLogMessage;
@@ -1001,6 +1032,8 @@ public partial class P2PPageViewModel : ViewModelBase, IDisposable
         P2PStateService.StateChanged -= OnP2PStateChanged;
         
         // 取消玩家列表服务事件订阅
+        _playerListService.Kicked -= OnPlayerKicked;
+        _playerListService.RoomClosed -= OnRoomClosed;
         _playerListService.LogMessage -= OnPlayerListLogMessage;
 
         // 释放P2P服务资源

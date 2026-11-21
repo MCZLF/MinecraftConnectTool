@@ -51,7 +51,7 @@ public partial class HomePage : UserControl
         }
     }
 
-    private void OnCloudAlertPointerPressed(object? sender, PointerPressedEventArgs e)
+    private async void OnCloudAlertPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.Pointer.Type == PointerType.Mouse)
         {
@@ -63,7 +63,7 @@ public partial class HomePage : UserControl
         if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             && desktop.MainWindow is MainWindow mainWindow)
         {
-            mainWindow.ShowPanelAlert();
+            await mainWindow.ShowPanelAlertAsync();
         }
     }
 

@@ -18,7 +18,9 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using MinecraftConnectTool.Services;
 using MinecraftConnectTool.ViewModels;
+using MinecraftConnectTool.ViewModels.Pages;
 using MinecraftConnectTool.Views;
+using MinecraftConnectTool.Views.Pages;
 
 namespace MinecraftConnectTool;
 
@@ -70,10 +72,10 @@ public partial class App : Application, IDisposable
                 ThemeService.ApplyFirstLaunchPreviewTheme();
                 var wizardWindow = new FirstLaunchWizardWindow();
                 desktop.MainWindow = wizardWindow;
+                if (migratedLegacyStorage)
+                    ScheduleStartupDialogs(wizardWindow, migratedLegacyStorage);
                 wizardWindow.Show();
                 desktop.Exit += OnApplicationExit;
-                if (migratedLegacyStorage)
-                    ShowLegacyStorageMigratedDialog(wizardWindow);
             }
         }
         else
@@ -107,28 +109,59 @@ public partial class App : Application, IDisposable
 
                 // 应用退出时清理资源
                 desktop.Exit += OnApplicationExit;
-                if (migratedLegacyStorage)
-                    ShowLegacyStorageMigratedDialog(desktop.MainWindow);
+                ScheduleStartupDialogs(desktop.MainWindow, migratedLegacyStorage);
             }
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static void ShowLegacyStorageMigratedDialog(Window parent)
+    private static void ScheduleStartupDialogs(Window owner, bool migratedLegacyStorage)
     {
-        Dispatcher.UIThread.Post(async () =>
+        owner.Opened += OnOpened;
+
+        void OnOpened(object? sender, EventArgs e)
         {
-            try
+            owner.Opened -= OnOpened;
+            Dispatcher.UIThread.Post(async () =>
             {
-                await ExtensionUI.MD3MessageDialog.ShowAsync(
-                    parent,
-                    "已自动迁移旧版MCT存储配置\n您可以在[设置>核心数据存放目录]中进行修改",
-                    "自动迁移成功",
-                    Material.Icons.MaterialIconKind.InformationCircle);
-            }
-            catch { }
-        }, DispatcherPriority.Background);
+                if (migratedLegacyStorage && owner.IsVisible)
+                    await ShowLegacyStorageMigratedDialogAsync(owner);
+
+                if (owner is not MainWindow mainWindow)
+                    return;
+
+                await mainWindow.CheckAnnouncementAsync();
+                await mainWindow.CheckVersionAsync();
+                if (!mainWindow.IsVisible)
+                    return;
+
+                try
+                {
+                    await ModCheckConsent.PromptIfUnconfiguredAsync(mainWindow);
+                    if (mainWindow.DataContext is MainWindowViewModel
+                        { CurrentPage: SettingsPage { DataContext: SettingsPageViewModel settings } })
+                        settings.AllowModCheckUpload = ModCheckConsent.IsAllowed;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Debug.WriteLine($"无法打开模组上传授权窗口: {ex.Message}");
+                }
+            });
+        }
+    }
+
+    private static async Task ShowLegacyStorageMigratedDialogAsync(Window parent)
+    {
+        try
+        {
+            await ExtensionUI.MD3MessageDialog.ShowAsync(
+                parent,
+                "已自动迁移旧版MCT存储配置\n您可以在[设置>核心数据存放目录]中进行修改",
+                "自动迁移成功",
+                Material.Icons.MaterialIconKind.InformationCircle);
+        }
+        catch { }
     }
 
     /// <summary>
@@ -211,6 +244,7 @@ public partial class App : Application, IDisposable
     /// </summary>
     private void OnApplicationExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
+        ModMd5DiskCache.Cleanup();
         // 取消订阅事件
         if (_isThemeServiceInitialized)
             ThemeService.Instance.GlobalBoldTextChanged -= OnGlobalBoldTextChanged;

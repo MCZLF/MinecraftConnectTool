@@ -689,6 +689,47 @@
                           VerticalAlignment="Center"/>
           </Grid>
 
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock Text="允许上传模组列表用于校对信息"
+                         TextWrapping="Wrap"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="开房或加入时上传模组文件名、MD5 和可识别的版本信息，由服务器比对。"
+                         TextWrapping="Wrap"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="允许上传模组列表用于校对信息"
+                          IsChecked="{Binding AllowModCheckUpload, Mode=TwoWay}"
+                          IsEnabled="{Binding !IsModCheckConsentPending}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto"
+                IsVisible="{Binding IsModCheckDisplayOptionVisible}"
+                Margin="16,0,0,0">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock Text="展示完整比对内容"
+                         TextWrapping="Wrap"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+              <TextBlock Text="开启后额外显示一致项、加入方多出的模组、MD5 和版本详情。"
+                         TextWrapping="Wrap"
+                         FontSize="14"
+                         Opacity="0.7"
+                         Foreground="{DynamicResource MaterialOnSurfaceBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          AutomationProperties.Name="展示完整比对内容"
+                          IsChecked="{Binding ShowFullModCheckReport, Mode=TwoWay}"
+                          VerticalAlignment="Center"/>
+          </Grid>
+
         </StackPanel>
       </Border>
 

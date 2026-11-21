@@ -52,6 +52,7 @@
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <AvaloniaResource Include="IconGroup3000.ico" />
+    <EmbeddedResource Include="Controls\Icons\LICENSE.*.txt" />
   </ItemGroup>
 
   <!-- 排除 temp 文件夹中的 WinForm 参考文件 -->
@@ -82,8 +83,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Material.Avalonia" Version="3.10.1" />
     <PackageReference Include="Material.Avalonia.DataGrid" Version="3.10.1" />
-    <PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

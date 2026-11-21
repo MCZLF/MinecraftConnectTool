@@ -69,6 +69,8 @@ public partial class MainWindow : Window
     private readonly P2PModeService _p2pService;
     private readonly MemoryMonitorService? _memoryMonitorService;
     private MainWindowViewModel? _viewModel;
+    private bool _isClosing;
+    private Task<bool>? _announcementDrawerTask;
     private bool _isPerformanceModeEnabled;
     private string _aiServerUrl = string.Empty;
     private int _aiTimeoutSeconds = 120;
@@ -184,12 +186,6 @@ public partial class MainWindow : Window
         {
             ShowGreeting();
         }
-        
-        // 检查公告
-        _ = CheckAnnouncementAsync();
-        
-        // 检查版本更新
-        _ = CheckVersionAsync();
         
         // 检查核心是否已在运行 - 参考P2P页面逻辑
         CheckCoreRunningStatus();
@@ -818,20 +814,22 @@ public partial class MainWindow : Window
     /// <summary>
     /// 检查公告
     /// </summary>
-    private async Task CheckAnnouncementAsync()
+    internal async Task CheckAnnouncementAsync()
     {
         const string CloudConfigUrl = "https://api.mct.mczlf.loft.games/PanelAlert";
+        if (_isClosing || !IsVisible)
+            return;
+
         try
         {
-            using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
             string jsonContent = await httpClient.GetStringAsync(CloudConfigUrl);
             var cloudConfig = JsonNode.Parse(jsonContent);
             bool show = cloudConfig?["Show"]?.GetValue<bool>() ?? false;
             string tagId = cloudConfig?["TagID"]?.ToString() ?? "";
-            string text = cloudConfig?["Text"]?.ToString() ?? "";
 
             // 如果Show为false，直接返回（不显示任何内容）
-            if (!show)
+            if (!show || _isClosing || !IsVisible)
             {
                 return;
             }
@@ -850,19 +848,9 @@ public partial class MainWindow : Window
             var button2 = this.FindControl<Button>("button2");
             if (button2 == null) return;
 
-            // 二. 判断是否是首次查看
-            if (localTagId == tagId)
-            {
-                // 已查看过，只显示按钮
-                button2.IsVisible = true;
-            }
-            else
-            {
-                // 首次查看，显示PanelAlert并显示按钮
-                ShowPanelAlert();
-                button2.IsVisible = true;
+            button2.IsVisible = true;
+            if (localTagId != tagId && await ShowPanelAlertAsync())
                 ConfigService.Write("PanelAlertID", tagId);
-            }
         }
         catch (HttpRequestException ex)
         {
@@ -872,20 +860,25 @@ public partial class MainWindow : Window
         {
             Console.WriteLine($"公告检查异常: {ex.Message}");
         }
+        finally
+        {
+            if (_announcementDrawerTask is { IsCompleted: false } openDrawer)
+                await openDrawer;
+        }
     }
     
     /// <summary>
     /// 检查版本更新和支持状态
     /// </summary>
-    private async Task CheckVersionAsync()
+    internal async Task CheckVersionAsync()
     {
         bool enableCheck = ConfigService.Read("EnableVersionCheck", true);
-        if (!enableCheck) return;
+        if (!enableCheck || _isClosing || !IsVisible) return;
         
         try
         {
-            // 检查版本支持状态
-            await CheckVersionSupportAsync();
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            await CheckVersionSupportAsync(client);
             Debug.WriteLine("版本检查完成");
         }
         catch (Exception ex)
@@ -897,12 +890,14 @@ public partial class MainWindow : Window
     /// <summary>
     /// 检查版本是否在支持列表中
     /// </summary>
-    private async Task CheckVersionSupportAsync()
+    private async Task CheckVersionSupportAsync(HttpClient client)
     {
         try
         {
-            using var client = new HttpClient();
             var supportList = await client.GetStringAsync("https://api.mct.mczlf.loft.games/007/SupportVer");
+            if (_isClosing || !IsVisible)
+                return;
+
             var versions = supportList.Split('\n');
             
             foreach (var v in versions)
@@ -916,7 +911,7 @@ public partial class MainWindow : Window
             }
             
             // 版本不在支持列表中
-            await ShowNotSupportWarningAsync();
+            await ShowNotSupportWarningAsync(client);
         }
         catch (Exception ex)
         {
@@ -927,13 +922,14 @@ public partial class MainWindow : Window
     /// <summary>
     /// 显示版本不支持警告
     /// </summary>
-    private async Task ShowNotSupportWarningAsync()
+    private async Task ShowNotSupportWarningAsync(HttpClient client)
     {
         try
         {
-            using var client = new HttpClient();
             string versionUrl = $"https://api.mct.mczlf.loft.games/007/{GetPlatformName()}_{GetArchitectureName()}/version";
             var cloudVersion = (await client.GetStringAsync(versionUrl)).Trim();
+            if (_isClosing || !IsVisible)
+                return;
 
             LogSupportStatus("NotSupportNow");
 
@@ -999,6 +995,7 @@ public partial class MainWindow : Window
             }
         }
 
+        _isClosing = true;
         _trayIcon?.Dispose();
         _trayIcon = null;
         try
@@ -1625,10 +1622,9 @@ public partial class MainWindow : Window
         return fallbackLog;
     }
 
-    private void button2_Click(object? sender, RoutedEventArgs e)
+    private async void button2_Click(object? sender, RoutedEventArgs e)
     {
-        // 显示云公告 - 使用PanelAlert页面
-        ShowPanelAlert();
+        await ShowPanelAlertAsync();
     }
 
     /// <summary>
@@ -1636,8 +1632,10 @@ public partial class MainWindow : Window
     /// </summary>
     /// <param name="content">Drawer内容控件</param>
     /// <param name="width">Drawer宽度，默认350</param>
+    /// <param name="configureWindow">显示前配置窗口</param>
     /// <returns>Drawer窗口实例，可用于手动关闭</returns>
-    private async Task<Window> ShowRightDrawerAsync(Control content, double width = 350)
+    private async Task<Window> ShowRightDrawerAsync(Control content, double width = 350,
+        Action<Window>? configureWindow = null)
     {
         // 创建遮罩层
         var overlayGrid = new Grid
@@ -1693,6 +1691,7 @@ public partial class MainWindow : Window
         };
 
         // 显示窗口
+        configureWindow?.Invoke(popupWindow);
         popupWindow.Show(this);
 
         // 动画：遮罩淡入 + Drawer滑入
@@ -1743,21 +1742,40 @@ public partial class MainWindow : Window
     /// <summary>
     /// 显示云公告PanelAlert
     /// </summary>
-    public async void ShowPanelAlert()
+    internal Task<bool> ShowPanelAlertAsync()
+    {
+        if (_isClosing || !IsVisible)
+            return Task.FromResult(false);
+
+        if (_announcementDrawerTask is { IsCompleted: false } openDrawer)
+            return openDrawer;
+
+        return _announcementDrawerTask = OpenAnnouncementDrawerAsync();
+    }
+
+    private async Task<bool> OpenAnnouncementDrawerAsync()
     {
         var panelAlert = new RightPage.PanelAlert();
-        var drawerWindow = await ShowRightDrawerAsync(panelAlert, 350);
+        var dismissed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        await ShowRightDrawerAsync(panelAlert, 350, ConfigureWindow);
+        await dismissed.Task;
 
-        // 绑定关闭事件
-        panelAlert.CloseRequested += async (s, e) =>
+        return !_isClosing && IsVisible;
+
+        void ConfigureWindow(Window window)
         {
-            if (drawerWindow.Content is Grid grid &&
-                grid.Children.Count > 1 &&
-                grid.Children[1] is Border border)
+            window.Closed += (_, _) => dismissed.TrySetResult();
+
+            panelAlert.CloseRequested += async (s, e) =>
             {
-                await CloseRightDrawerAsync(drawerWindow, grid, border, 350);
-            }
-        };
+                if (window.Content is Grid grid &&
+                    grid.Children.Count > 1 &&
+                    grid.Children[1] is Border border)
+                {
+                    await CloseRightDrawerAsync(window, grid, border, 350);
+                }
+            };
+        }
     }
 
     /// <summary>

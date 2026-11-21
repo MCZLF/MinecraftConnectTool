@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -57,10 +58,48 @@ public partial class MD3MessageDialog : UserControl
     /// <param name="message">消息内容</param>
     /// <param name="title">标题</param>
     /// <param name="icon">图标类型</param>
-    public static async Task ShowAsync(Window parent, string message, string title = "提示", MaterialIconKind icon = MaterialIconKind.InformationCircle)
+    public static async Task ShowAsync(Window parent, string message, string title = "提示",
+        MaterialIconKind icon = MaterialIconKind.InformationCircle)
+    {
+        await ShowCoreAsync(parent, message, title, icon);
+    }
+
+    public static Task<bool> ConfirmAsync(Window parent, string message, string title, string confirmText,
+        bool expanded = false, string? cancelText = null, bool isCloseButtonEnabled = true, string? emphasisText = null)
+        => ShowCoreAsync(parent, message, title, MaterialIconKind.InformationCircle, confirmText,
+            expanded: expanded, cancelText: cancelText, isCloseButtonEnabled: isCloseButtonEnabled, emphasisText: emphasisText);
+
+    internal static Task<bool> ShowJoinReportAsync(Window parent, string title, string summary,
+        IReadOnlyList<MD3MessageSection> sections, bool warning)
+    {
+        var icon = warning ? MaterialIconKind.AlertCircle : MaterialIconKind.InformationCircle;
+        return ShowCoreAsync(parent, summary, title, icon, "继续加入", sections, expanded: true, cancelText: "取消加入");
+    }
+
+    private static async Task<bool> ShowCoreAsync(Window parent, string message, string title,
+        MaterialIconKind icon, string? confirmText = null, IReadOnlyList<MD3MessageSection>? sections = null,
+        bool expanded = false, string? cancelText = null, bool isCloseButtonEnabled = true, string? emphasisText = null)
     {
         // 计算对话框尺寸 - 宽度为父窗口的37.8%（总共缩小37%），最小302最大454
         double dialogWidth = Math.Max(302, Math.Min(454, parent.Width * 0.378));
+        double dialogMaxHeight = 315;
+        if (expanded)
+        {
+            var isReport = sections != null;
+            dialogWidth = isReport
+                ? Math.Clamp(parent.Bounds.Width * 0.86, 580, 760)
+                : Math.Clamp(parent.Bounds.Width * 0.70, 540, 640);
+            dialogMaxHeight = isReport ? 680 : 480;
+
+            var screen = parent.Screens.ScreenFromWindow(parent) ?? parent.Screens.Primary;
+            if (screen != null)
+            {
+                var workingWidth = screen.WorkingArea.Width / screen.Scaling;
+                var workingHeight = screen.WorkingArea.Height / screen.Scaling;
+                dialogWidth = Math.Clamp(workingWidth - 48, 302, dialogWidth);
+                dialogMaxHeight = Math.Clamp(workingHeight - 64, 230, dialogMaxHeight);
+            }
+        }
         
         // 根据主题设置背景色
         var backgroundColor = ThemeService.Instance.IsDarkMode 
@@ -72,7 +111,8 @@ public partial class MD3MessageDialog : UserControl
             Width = dialogWidth,
             Height = double.NaN, // Auto
             MinHeight = 126,
-            MaxHeight = 315,
+            MaxHeight = dialogMaxHeight,
+            SizeToContent = expanded ? SizeToContent.Height : SizeToContent.Manual,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
             SystemDecorations = SystemDecorations.None,
@@ -89,24 +129,57 @@ public partial class MD3MessageDialog : UserControl
             IconKind = icon
         };
 
+        if (expanded && dialogContent.FindControl<ScrollViewer>("MessageScrollViewer") is { } messageScroll)
+            messageScroll.MaxHeight = dialogMaxHeight - 144;
+
+        if (!string.IsNullOrWhiteSpace(emphasisText) && dialogContent.FindControl<TextBlock>("EmphasisText") is { } emphasis)
+        {
+            emphasis.Text = emphasisText;
+            emphasis.IsVisible = true;
+        }
+
+        if (sections != null)
+        {
+            var messageText = dialogContent.FindControl<TextBlock>("MessageText")!;
+            var reportSections = dialogContent.FindControl<ItemsControl>("ReportSections")!;
+            messageText.IsVisible = message.Length != 0;
+            reportSections.ItemsSource = sections;
+            reportSections.IsVisible = true;
+        }
+
         // 关闭按钮事件
         var closeButton = dialogContent.FindControl<Button>("CloseButton");
         if (closeButton != null)
         {
-            closeButton.Click += (_, _) => dialogWindow.Close();
+            closeButton.IsEnabled = isCloseButtonEnabled;
+            if (isCloseButtonEnabled)
+                closeButton.Click += (_, _) => dialogWindow.Close(false);
+            else
+                closeButton.Opacity = 0.45;
         }
 
         // 确定按钮事件
         var confirmButton = dialogContent.FindControl<Button>("ConfirmButton");
         if (confirmButton != null)
         {
-            confirmButton.Click += (_, _) => dialogWindow.Close();
+            if (confirmText != null)
+                confirmButton.Content = confirmText;
+            confirmButton.Click += (_, _) => dialogWindow.Close(true);
+        }
+
+        if (confirmText != null && dialogContent.FindControl<Button>("CancelButton") is { } cancelButton)
+        {
+            if (cancelText != null)
+                cancelButton.Content = cancelText;
+            cancelButton.IsVisible = true;
+            cancelButton.Click += (_, _) => dialogWindow.Close(false);
+            dialogWindow.Opened += (_, _) => cancelButton.Focus();
         }
 
         dialogWindow.Content = dialogContent;
         dialogWindow.Icon = parent.Icon;
 
-        await dialogWindow.ShowDialog(parent);
+        return await dialogWindow.ShowDialog<bool?>(parent) == true;
     }
 
     /// <summary>
@@ -140,4 +213,11 @@ public partial class MD3MessageDialog : UserControl
     {
         return ShowAsync(parent, message, title, MaterialIconKind.CloseCircle);
     }
+}
+
+internal sealed record MD3MessageSection(string Title, IReadOnlyList<MD3MessageRow> Rows);
+
+internal sealed record MD3MessageRow(string Text, string? Details = null)
+{
+    public bool HasDetails => !string.IsNullOrEmpty(Details);
 }

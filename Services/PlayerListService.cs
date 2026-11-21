@@ -34,6 +34,7 @@ public class CreateRoomResponse
 {
     public string RoomCode { get; set; } = string.Empty;
     public string HostPlayerId { get; set; } = string.Empty;
+    public string? CloseToken { get; set; }
 }
 
 /// <summary>
@@ -45,6 +46,8 @@ public class ApiResponse<T>
     public string? Message { get; set; }
     public T? Data { get; set; }
 }
+
+internal sealed record ConfirmedRoomClosure(CoreMode Mode, long Revision);
 
 /// <summary>
 /// 玩家列表服务 - 与MCTListServer通信
@@ -70,7 +73,13 @@ public class PlayerListService
     }
 
     private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "http://room2.mct.mczlf.loft.games";//对,就是rom/room2,为了防止旧版本发生崩溃,直接该地址屏蔽旧地址请求
+    internal const string ServerBaseUrl = "http://room2.mct.mczlf.loft.games";
+    private readonly string _baseUrl;
+    private static readonly JsonSerializerOptions ResponseOptions = new(JsonSerializerDefaults.Web);
+    private readonly object _sessionGate = new();
+    private long _sessionRevision;
+    private CoreMode _guestMode;
+    private string? _hostCloseToken;
     private System.Timers.Timer? _heartbeatTimer;
     
     // 容错机制相关字段
@@ -145,18 +154,28 @@ public class PlayerListService
     /// 被踢出事件
     /// </summary>
     public event EventHandler<string>? Kicked;
+
+    internal event EventHandler<ConfirmedRoomClosure>? RoomClosed;
+
+    internal bool IsCurrentClosure(long revision)
+    {
+        lock (_sessionGate)
+            return _sessionRevision == revision;
+    }
     
     /// <summary>
     /// 日志事件 - 用于输出到UI日志区
     /// </summary>
     public event EventHandler<string>? LogMessage;
 
-    private PlayerListService()
+    private PlayerListService() : this(new HttpClient { Timeout = TimeSpan.FromSeconds(10) }, ServerBaseUrl)
     {
-        _httpClient = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(10)
-        };
+    }
+
+    internal PlayerListService(HttpClient httpClient, string baseUrl)
+    {
+        _httpClient = httpClient;
+        _baseUrl = baseUrl;
     }
     
     /// <summary>
@@ -185,13 +204,19 @@ public class PlayerListService
 
             if (result?.Success == true && result.Data != null)
             {
-                CurrentRoomCode = roomCode;
-                IsHost = true;
-                IsConnected = true;
-                CurrentPlayerId = result.Data.HostPlayerId; // 房主也有玩家ID
-                CurrentNickname = "房主";
-                CurrentPort = 0;
-                StartHeartbeat();
+                lock (_sessionGate)
+                {
+                    ++_sessionRevision;
+                    CurrentRoomCode = roomCode;
+                    IsHost = true;
+                    IsConnected = true;
+                    CurrentPlayerId = result.Data.HostPlayerId;
+                    _hostCloseToken = result.Data.CloseToken;
+                    _guestMode = CoreMode.None;
+                    CurrentNickname = "房主";
+                    CurrentPort = 0;
+                    StartHeartbeat();
+                }
                 JoinedRoom?.Invoke(this, true);
                 return true;
             }
@@ -210,7 +235,7 @@ public class PlayerListService
     /// <summary>
     /// 房客加入房间
     /// </summary>
-    public async Task<bool> JoinRoomAsync(string roomCode, string nickname, int port)
+    public async Task<bool> JoinRoomAsync(string roomCode, string nickname, int port, CoreMode mode)
     {
         try
         {
@@ -226,18 +251,21 @@ public class PlayerListService
 
             if (result?.Success == true && result.Data != null)
             {
-                CurrentRoomCode = roomCode;
-                IsHost = false;
-                IsConnected = true;
-                CurrentPlayerId = result.Data.Id;
-                CurrentNickname = nickname;
-                CurrentPort = port;
-                _currentJoinedAt = result.Data.JoinedAt == default ? DateTime.Now : result.Data.JoinedAt;
-                SetLastKnownPlayers(new List<PlayerInfo>
+                lock (_sessionGate)
                 {
-                    CreateCurrentPlayerInfo()
-                });
-                StartHeartbeat();
+                    ++_sessionRevision;
+                    CurrentRoomCode = roomCode;
+                    IsHost = false;
+                    IsConnected = true;
+                    CurrentPlayerId = result.Data.Id;
+                    _hostCloseToken = null;
+                    _guestMode = mode;
+                    CurrentNickname = nickname;
+                    CurrentPort = port;
+                    _currentJoinedAt = result.Data.JoinedAt == default ? DateTime.Now : result.Data.JoinedAt;
+                    SetLastKnownPlayers(new List<PlayerInfo> { CreateCurrentPlayerInfo() });
+                    StartHeartbeat();
+                }
                 JoinedRoom?.Invoke(this, false);
                 return true;
             }
@@ -258,63 +286,65 @@ public class PlayerListService
     /// </summary>
     public async Task LeaveRoomAsync()
     {
+        string roomCode, playerId;
+        lock (_sessionGate)
+        {
+            roomCode = CurrentRoomCode;
+            playerId = IsKicked ? string.Empty : CurrentPlayerId;
+            StopHeartbeat();
+            ClearState();
+        }
+
         try
         {
-            // 如果被踢出，不再发送离开请求，直接清理状态
-            if (IsKicked)
+            if (roomCode.Length != 0 && playerId.Length != 0)
             {
-                System.Diagnostics.Debug.WriteLine("已被踢出，跳过发送离开请求");
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(CurrentRoomCode) && !string.IsNullOrEmpty(CurrentPlayerId))
-            {
-                await _httpClient.PostAsync($"{_baseUrl}/api/room/{CurrentRoomCode}/player/{CurrentPlayerId}/leave", null);
+                using var response = await _httpClient.PostAsync($"{_baseUrl}/api/room/{roomCode}/player/{playerId}/leave", null);
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"离开房间失败: {ex.Message}");
         }
-        finally
-        {
-            StopHeartbeat();
-            ClearState();
-        }
     }
 
     /// <summary>
     /// 关闭房间（房主）
     /// </summary>
-    public async Task CloseRoomAsync()
+    public async Task CloseRoomAsync(bool notifyGuests = true)
     {
+        string roomCode;
+        string? closeToken;
+        lock (_sessionGate)
+        {
+            roomCode = IsHost && !IsKicked ? CurrentRoomCode : string.Empty;
+            closeToken = notifyGuests ? _hostCloseToken : null;
+            StopHeartbeat();
+            ClearState();
+        }
+
         try
         {
-            // 如果被踢出，不再发送关闭请求
-            if (IsKicked)
+            if (roomCode.Length != 0)
             {
-                System.Diagnostics.Debug.WriteLine("已被踢出，跳过发送关闭请求");
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(CurrentRoomCode) && IsHost)
-            {
-                await _httpClient.PostAsync($"{_baseUrl}/api/room/{CurrentRoomCode}/close", null);
+                using var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/room/{roomCode}/close");
+                if (!string.IsNullOrEmpty(closeToken))
+                    request.Headers.Add("X-Room-Close-Token", closeToken);
+                using var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"关闭房间失败: {ex.Message}");
         }
-        finally
-        {
-            StopHeartbeat();
-            ClearState();
-        }
     }
 
     private void ClearState()
     {
+        ++_sessionRevision;
+        _hostCloseToken = null;
+        _guestMode = CoreMode.None;
         _heartbeatInRecoveryMode = false;
         CurrentRoomCode = string.Empty;
         CurrentPlayerId = string.Empty;
@@ -447,10 +477,16 @@ public class PlayerListService
     /// <summary>
     /// 发送心跳
     /// </summary>
-    private async Task SendHeartbeatAsync()
+    internal async Task SendHeartbeatAsync()
     {
-        var roomCode = CurrentRoomCode;
-        var playerId = CurrentPlayerId;
+        string roomCode, playerId;
+        long revision;
+        lock (_sessionGate)
+        {
+            roomCode = CurrentRoomCode;
+            playerId = CurrentPlayerId;
+            revision = _sessionRevision;
+        }
 
         try
         {
@@ -460,13 +496,16 @@ public class PlayerListService
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_baseUrl}/api/room/{roomCode}/player/heartbeat", content);
+            using var response = await _httpClient.PostAsync($"{_baseUrl}/api/room/{roomCode}/player/heartbeat", content);
 
-            if (roomCode != CurrentRoomCode || playerId != CurrentPlayerId || !IsConnected)
+            if (!IsCurrentRegistration(roomCode, playerId, revision))
             {
                 Log($"[容错] 忽略过期心跳响应，Room={roomCode}");
                 return;
             }
+
+            if (await TryHandleConfirmedCloseAsync(response, roomCode, playerId, revision))
+                return;
 
             if (response.IsSuccessStatusCode)
             {
@@ -492,11 +531,19 @@ public class PlayerListService
 
                 if (result?.Message == "KICKED" && !IsHost)
                 {
+                    if (!IsCurrentRegistration(roomCode, playerId, revision))
+                        return;
                     Log($"[容错] 收到踢出指令，房客被踢出，Room={roomCode}");
                     IsKicked = true;
                     Kicked?.Invoke(this, "已被房主踢出房间");
-                    StopHeartbeat();
-                    ClearState();
+                    lock (_sessionGate)
+                    {
+                        if (IsCurrentRegistration(roomCode, playerId, revision))
+                        {
+                            StopHeartbeat();
+                            ClearState();
+                        }
+                    }
                 }
                 else if (result?.Message == "KICKED" && IsHost)
                 {
@@ -507,7 +554,7 @@ public class PlayerListService
             {
                 if (response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    if (await RecoverRegistrationAsync(roomCode))
+                    if (await RecoverRegistrationAsync(roomCode, playerId, revision))
                     {
                         _heartbeatInRecoveryMode = false;
                         _heartbeatFailureCount = 0;
@@ -521,23 +568,62 @@ public class PlayerListService
                     }
                 }
 
-                HandleHeartbeatFailure($"StatusCode={(int)response.StatusCode}", roomCode);
+                if (IsCurrentRegistration(roomCode, playerId, revision))
+                    HandleHeartbeatFailure($"StatusCode={(int)response.StatusCode}", roomCode);
             }
         }
         catch (Exception ex)
         {
-            HandleHeartbeatFailure($"Exception={ex.GetType().Name}", roomCode);
+            if (IsCurrentRegistration(roomCode, playerId, revision))
+                HandleHeartbeatFailure($"Exception={ex.GetType().Name}", roomCode);
         }
     }
 
-    private async Task<bool> RecoverRegistrationAsync(string roomCode)
+    private bool IsCurrentRegistration(string roomCode, string playerId, long revision)
+    {
+        lock (_sessionGate)
+            return revision == _sessionRevision && roomCode == CurrentRoomCode && playerId == CurrentPlayerId && IsConnected;
+    }
+
+    private sealed record ClosedRegistration(string RoomCode, string PlayerId);
+    private sealed record CloseConfirmation(bool? Success, string? Message, ClosedRegistration? Data);
+
+    private async Task<bool> TryHandleConfirmedCloseAsync(HttpResponseMessage response, string roomCode, string playerId, long revision)
+    {
+        if (response.StatusCode != HttpStatusCode.Gone || IsHost)
+            return false;
+
+        var json = await response.Content.ReadAsStringAsync();
+        var confirmation = JsonSerializer.Deserialize<CloseConfirmation>(json, ResponseOptions);
+        if (confirmation is not { Success: false, Message: "ROOM_CLOSED", Data: { } data }
+            || data.RoomCode != roomCode || data.PlayerId != playerId)
+            return false;
+
+        ConfirmedRoomClosure closure;
+        lock (_sessionGate)
+        {
+            if (IsHost || !IsCurrentRegistration(roomCode, playerId, revision))
+                return false;
+
+            var mode = _guestMode;
+            StopHeartbeat();
+            ClearState();
+            closure = new(mode, _sessionRevision);
+        }
+
+        RoomClosed?.Invoke(this, closure);
+        PlayersChanged?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    private async Task<bool> RecoverRegistrationAsync(string roomCode, string playerId, long revision)
     {
         try
         {
             if (IsHost)
             {
-                var response = await _httpClient.GetAsync($"{_baseUrl}/api/room/{roomCode}");
-                if (response.StatusCode != HttpStatusCode.NotFound)
+                using var response = await _httpClient.GetAsync($"{_baseUrl}/api/room/{roomCode}");
+                if (response.StatusCode != HttpStatusCode.NotFound || !IsCurrentRegistration(roomCode, playerId, revision))
                 {
                     return false;
                 }
@@ -546,33 +632,50 @@ public class PlayerListService
                 var request = new { RoomCode = roomCode, Version = GetFormattedVersion() };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var createResponse = await _httpClient.PostAsync($"{_baseUrl}/api/room/create", content);
+                using var createResponse = await _httpClient.PostAsync($"{_baseUrl}/api/room/create", content);
                 var createJson = await createResponse.Content.ReadAsStringAsync();
                 var createResult = JsonSerializer.Deserialize<ApiResponse<CreateRoomResponse>>(createJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (createResult?.Success == true && createResult.Data != null)
                 {
-                    CurrentPlayerId = createResult.Data.HostPlayerId;
-                    CurrentPort = 0;
-                    return true;
+                    lock (_sessionGate)
+                    {
+                        if (!IsCurrentRegistration(roomCode, playerId, revision))
+                            return false;
+
+                        CurrentPlayerId = createResult.Data.HostPlayerId;
+                        _hostCloseToken = createResult.Data.CloseToken;
+                        CurrentPort = 0;
+                        return true;
+                    }
                 }
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(CurrentNickname)) return false;
+                if (string.IsNullOrWhiteSpace(CurrentNickname) || !IsCurrentRegistration(roomCode, playerId, revision))
+                    return false;
 
                 Log($"[容错] 房间管理服务玩家丢失，尝试重新加入房间，Room={roomCode}");
-                var request = new { Nickname = CurrentNickname, RoomCode = roomCode, Port = CurrentPort, Version = GetFormattedVersion() };
+                var request = new { Nickname = CurrentNickname, RoomCode = roomCode, Port = CurrentPort,
+                    Version = GetFormattedVersion(), PreviousPlayerId = playerId };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var joinResponse = await _httpClient.PostAsync($"{_baseUrl}/api/room/{roomCode}/player/join", content);
+                using var joinResponse = await _httpClient.PostAsync($"{_baseUrl}/api/room/{roomCode}/player/join", content);
+                if (await TryHandleConfirmedCloseAsync(joinResponse, roomCode, playerId, revision))
+                    return false;
                 var joinJson = await joinResponse.Content.ReadAsStringAsync();
                 var joinResult = JsonSerializer.Deserialize<ApiResponse<PlayerInfo>>(joinJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (joinResult?.Success == true && joinResult.Data != null)
                 {
-                    CurrentPlayerId = joinResult.Data.Id;
-                    return true;
+                    lock (_sessionGate)
+                    {
+                        if (!IsCurrentRegistration(roomCode, playerId, revision))
+                            return false;
+
+                        CurrentPlayerId = joinResult.Data.Id;
+                        return true;
+                    }
                 }
             }
         }

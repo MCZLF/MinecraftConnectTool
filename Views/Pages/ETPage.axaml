@@ -117,7 +117,7 @@
     </Grid>
 
     <!-- 信息栏：提示码/加入地址 -->
-    <Grid Grid.Row="1" Margin="0,0,0,16">
+    <Grid Grid.Row="1" Margin="0,0,0,16" RowDefinitions="Auto,Auto">
       <TextBlock Text="使用 EasyTier 的去中心化虚拟网络进行联机"
                  FontSize="16"
                  FontWeight="Medium"
@@ -125,11 +125,12 @@
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource MaterialPrimaryBrush}"/>
 
-      <ProgressBar Value="{Binding ProgressValue}"
+      <ProgressBar Grid.Row="1"
+                   Value="{Binding ProgressValue}"
                    Maximum="100"
                    IsVisible="{Binding IsProgressVisible}"
                    Height="4"
-                   Margin="0,24,0,0"
+                   Margin="0,4,0,0"
                    VerticalAlignment="Top"
                    IsIndeterminate="False">
         <ProgressBar.Transitions>
@@ -138,6 +139,17 @@
           </Transitions>
         </ProgressBar.Transitions>
       </ProgressBar>
+
+      <Grid Grid.Row="1" IsVisible="{Binding !IsProgressVisible}">
+        <StackPanel Spacing="6" Margin="0,4,0,0"
+                    IsVisible="{Binding ModCheckProgress.IsVisible}">
+          <ProgressBar Value="{Binding ModCheckProgress.Value}"
+                       IsIndeterminate="{Binding ModCheckProgress.IsIndeterminate}"
+                       Height="4" Maximum="100"/>
+          <TextBlock Text="{Binding ModCheckProgress.Text}" FontSize="13"
+                     HorizontalAlignment="Center" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Grid>
 
       <Border Background="{DynamicResource MaterialPrimaryContainerBrush}"
               CornerRadius="12"

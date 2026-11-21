@@ -27,19 +27,15 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [ObservableProperty]
     private int _currentPage = 1;
 
-    [ObservableProperty]
-    private int _totalPages = 4;
-
-    [ObservableProperty]
-    private string _nextButtonText = "Next→";
+    public int TotalPages => 5;
 
     partial void OnCurrentPageChanged(int value)
     {
-        UpdateNextButtonText();
         OnPropertyChanged(nameof(IsPage1Visible));
         OnPropertyChanged(nameof(IsPage2Visible));
         OnPropertyChanged(nameof(IsPage3Visible));
         OnPropertyChanged(nameof(IsPage4Visible));
+        OnPropertyChanged(nameof(IsModCheckConsentPageVisible));
         OnPropertyChanged(nameof(ProgressValue));
     }
 
@@ -47,13 +43,12 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     public bool IsPage2Visible => CurrentPage == 2;
     public bool IsPage3Visible => CurrentPage == 3;
     public bool IsPage4Visible => CurrentPage == 4;
+    public bool IsModCheckConsentPageVisible => CurrentPage == TotalPages;
+    public string ModCheckConsentTitle => ModCheckConsent.Title;
+    public string ModCheckConsentPurpose => ModCheckConsent.Purpose;
+    public string ModCheckConsentDisclosure => ModCheckConsent.GetDisclosure();
 
     public double ProgressValue => (double)CurrentPage / TotalPages * 100;
-
-    private void UpdateNextButtonText()
-    {
-        NextButtonText = CurrentPage == TotalPages ? "开启联机之旅" : "Next→";
-    }
 
     #endregion
 
@@ -246,18 +241,26 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private void NextPage()
     {
-        // 保存当前页数据
-        SaveCurrentPageData();
+        if (CurrentPage >= TotalPages)
+            return;
 
-        if (CurrentPage < TotalPages)
-        {
-            CurrentPage++;
-        }
-        else
-        {
-            // 完成向导
-            CompleteWizard();
-        }
+        SaveCurrentPageData();
+        CurrentPage++;
+    }
+
+    [RelayCommand]
+    private void DeclineModCheckUpload() => FinishWithModCheckDecision(false);
+
+    [RelayCommand]
+    private void AcceptModCheckUpload() => FinishWithModCheckDecision(true);
+
+    private void FinishWithModCheckDecision(bool allowed)
+    {
+        if (!IsModCheckConsentPageVisible)
+            return;
+
+        ModCheckConsent.SetDecision(allowed);
+        CompleteWizard();
     }
 
     [RelayCommand]
@@ -411,8 +414,8 @@ public partial class FirstLaunchWizardViewModel : ViewModelBase
     [RelayCommand]
     private void SkipThemeSetup()
     {
-        ApplyThemeSettings();
-        CompleteWizard();
+        if (IsPage4Visible)
+            NextPage();
     }
 
     [RelayCommand]

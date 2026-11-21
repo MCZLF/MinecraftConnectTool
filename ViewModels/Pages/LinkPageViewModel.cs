@@ -28,6 +28,8 @@ public partial class LinkPageViewModel : ViewModelBase
 
     // 玩家列表服务
     private readonly PlayerListService _playerListService;
+    private readonly ModCheckSession _modCheck = new(CoreMode.Link);
+    public ModCheckProgress ModCheckProgress => _modCheck.Progress;
     private bool _hasShownPlayerListDegraded;
 
     // ========== 事件 ==========
@@ -352,6 +354,7 @@ public partial class LinkPageViewModel : ViewModelBase
 
         // 订阅玩家列表服务事件
         _playerListService.Kicked += OnPlayerKicked;
+        _playerListService.RoomClosed += OnRoomClosed;
         _playerListService.LogMessage += OnPlayerListLogMessage;
         P2PStateService.StateChanged += OnCoreRunningStateChanged;
 
@@ -422,6 +425,22 @@ public partial class LinkPageViewModel : ViewModelBase
         StopLink();
     }
 
+    private void OnRoomClosed(object? sender, ConfirmedRoomClosure closure)
+    {
+        if (closure.Mode != CoreMode.Link)
+            return;
+
+        Dispatcher.UIThread.Post(async () =>
+        {
+            if (P2PStateService.CurrentMode != CoreMode.Link || role != "2"
+                || !_playerListService.IsCurrentClosure(closure.Revision))
+                return;
+
+            log("服务端确认房主已关闭房间，正在自动退出联机。");
+            await StopLinkAsync();
+        });
+    }
+
     private void InitializeLog()
     {
         log("MinecraftConnectTool Network Core | Tunneling via MCILM-Link | Adapted by MCZLF_Studio");
@@ -464,6 +483,8 @@ public partial class LinkPageViewModel : ViewModelBase
                 IsAlertVisible = true;
                 IsInfoButtonVisible = true;
                 string code = ExtractPromptCode(message);
+                if (role == "1")
+                    _modCheck.SetHostCode(code);
                 InfoButtonText = code;
                 AlertText = $"提示码: {code}";
                 // 尝试复制到剪贴板
@@ -494,11 +515,11 @@ public partial class LinkPageViewModel : ViewModelBase
                 StatusBadgeState = BadgeState.Error;
                 StatusBadgeText = "请先启动游戏后再开启房间";
                 ShowErrorToast("请先启动游戏再启动房间");
-                stoplink();
+                stoplink(notifyGuests: false);
             }},
             { "解析响应失败", () => {
                 log("与服务器的连接受阻，可能是服务器被攻击造成离线，建议再试试呢");
-                stoplink();
+                stoplink(notifyGuests: false);
             }},
             { "NAT detect error", () => log("NAT类型探测失败 i/o timeout") },
             { "LISTEN ON PORT", () => {
@@ -532,7 +553,7 @@ public partial class LinkPageViewModel : ViewModelBase
                 StatusBadgeText = "对方不在线";
             }},
             { "Usage:", () => {
-                stoplink();
+                stoplink(notifyGuests: false);
                 StatusBadgeState = BadgeState.Error;
                 StatusBadgeText = "触发Usage_Bug";
             }},
@@ -795,6 +816,7 @@ public partial class LinkPageViewModel : ViewModelBase
         if (!await ValidateCoreBeforeStartAsync(fileName))
             return;
 
+        _modCheck.BeginHost(AppendLogDirect);
         try
         {
             Process process = new Process();
@@ -845,10 +867,15 @@ public partial class LinkPageViewModel : ViewModelBase
             };
 
             process.Start();
+            _linkProcess = process;
+            process.Exited += (_, _) =>
+            {
+                if (ReferenceEquals(_linkProcess, process))
+                    _modCheck.EndHost();
+            };
+            process.EnableRaisingEvents = true;
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
-
-            _linkProcess = process;
 
             log($"{coreFileName} 启动成功~");
             IsStatusBadgeVisible = true;
@@ -863,6 +890,7 @@ public partial class LinkPageViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _modCheck.EndHost();
             log($"启动失败：{ex.Message}");
             role = "0";
             IsStatusBadgeVisible = false;
@@ -887,7 +915,6 @@ public partial class LinkPageViewModel : ViewModelBase
             return;
         }
 
-        role = "2";
         string processName = GetProcessName();
 
         if (Process.GetProcessesByName(processName).Length > 0)
@@ -895,6 +922,10 @@ public partial class LinkPageViewModel : ViewModelBase
             AlreadyCore();
             return;
         }
+
+        if (!await _modCheck.CheckJoinAsync(user, AppendLogDirect))
+            return;
+        role = "2";
 
         // 获取昵称：优先从配置文件读取，如果没有则弹出对话框
         string? nickname = null;
@@ -1015,7 +1046,7 @@ public partial class LinkPageViewModel : ViewModelBase
             StatusBadgeText = "Online";
 
             // 加入玩家管理房间（Link模式使用提示码作为房间代码，端口设为0）
-            var playerListSuccess = await _playerListService.JoinRoomAsync(user, nickname, 0);
+            var playerListSuccess = await _playerListService.JoinRoomAsync(user, nickname, 0, CoreMode.Link);
             IsPlayerListConnected = playerListSuccess;
             if (playerListSuccess)
             {
@@ -1042,9 +1073,9 @@ public partial class LinkPageViewModel : ViewModelBase
     }
 
     // ========== 停止和清理 ==========
-    public async void stoplink()
+    public async void stoplink(bool notifyGuests = true)
     {
-        await StopLinkAsync();
+        await StopLinkAsync(notifyGuests);
     }
 
     private void OnCoreRunningStateChanged(object? sender, bool isRunning)
@@ -1064,6 +1095,7 @@ public partial class LinkPageViewModel : ViewModelBase
 
     public void ResetStoppedState()
     {
+        _modCheck.EndHost();
         role = "0";
 
         ClearAllFloatButtons();
@@ -1081,14 +1113,14 @@ public partial class LinkPageViewModel : ViewModelBase
         StopStatusPolling();
     }
 
-    public async Task StopLinkAsync()
+    public async Task StopLinkAsync(bool notifyGuests = true)
     {
         ResetStoppedState();
 
         // 清理玩家管理房间
         if (_playerListService.IsHost)
         {
-            await _playerListService.CloseRoomAsync();
+            await _playerListService.CloseRoomAsync(notifyGuests);
             log("玩家管理房间已关闭");
         }
         else

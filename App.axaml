@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:MinecraftConnectTool"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
-             xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="using:MinecraftConnectTool.Converters"
              x:Class="MinecraftConnectTool.App"
              RequestedThemeVariant="Dark">
@@ -14,7 +13,6 @@
   <Application.Styles>
     <FluentTheme />
     <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Teal" />
-    <icons:MaterialIconStyles />
 
     <Style Selector="ContextMenu">
       <Setter Property="Background" Value="{DynamicResource MaterialSurfaceBrush}"/>
@@ -53,6 +51,11 @@
   </Application.Styles>
 
   <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Controls/Icons/MaterialIcon.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+
     <!-- Material Design 3 颜色资源 -->
     <SolidColorBrush x:Key="MaterialPrimaryBrush" Color="#D0BCFF"/>
     <SolidColorBrush x:Key="MaterialOnPrimaryBrush" Color="#381E72"/>
@@ -118,5 +121,6 @@
     <converters:BoolToPresetBorderConverter x:Key="BoolToPresetBorderConverter"/>
     <converters:BoolToDarkModeTextConverter x:Key="BoolToDarkModeTextConverter"/>
     <converters:IntGreaterThanOneConverter x:Key="IntGreaterThanOneConverter"/>
+    </ResourceDictionary>
   </Application.Resources>
 </Application>

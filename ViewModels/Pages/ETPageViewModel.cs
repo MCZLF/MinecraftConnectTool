@@ -238,6 +238,8 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     // ET服务
     private readonly ETModeService _etService;
+    private readonly ModCheckSession _modCheck = new(CoreMode.ET);
+    public ModCheckProgress ModCheckProgress => _modCheck.Progress;
     private string _currentInfoText = "";
 
     // 房间列表连接状态
@@ -392,6 +394,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     {
         if (!isRunning && IsETRunning)
         {
+            _modCheck.EndHost();
             IsETRunning = false;
             CanStartET = true;
             CanStopET = false;
@@ -435,6 +438,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     private void OnCoreStopped(object? sender, EventArgs e)
     {
+        _modCheck.EndHost();
         IsETRunning = false;
         IsETRunningForPanel = false;
         CanStartET = true;
@@ -449,6 +453,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
     private void OnPromptCodeGenerated(object? sender, string code)
     {
+        _modCheck.SetHostCode(code);
         PromptCode = code;
         AlertText = $"提示码 → {code}";
         _currentInfoText = code;
@@ -558,6 +563,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         ResetErrorDeduplication();
 
         AddLog("=== 开始创建 ET 联机房间 ===");
+        _modCheck.BeginHost(AddLog);
 
         // 立即显示关闭按钮
         CanStartET = false;
@@ -579,6 +585,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
 
         if (!success)
         {
+            _modCheck.EndHost();
             IsETRunning = false;
             IsETRunningForPanel = false;
             CanStartET = true;
@@ -605,6 +612,10 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
             return;
         }
 
+        var joinCode = JoinPromptCode;
+        if (ScfLobbyCodeGenerator.TryParse(joinCode, out _) && !await _modCheck.CheckJoinAsync(joinCode, AddLog))
+            return;
+
         var playerName = await GetPlayerName();
         if (playerName == null) return;
 
@@ -616,12 +627,12 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
         P2PStateService.SetRunning(true, CoreMode.ET);
 
         AddLog("=== 开始加入 ET 联机房间 ===");
-        AddLog($"提示码: {JoinPromptCode}");
+        AddLog($"提示码: {joinCode}");
         ResetErrorDeduplication();
         bool success;
         try
         {
-            success = await _etService.StartJoinAsync(JoinPromptCode, playerName);
+            success = await _etService.StartJoinAsync(joinCode, playerName);
         }
         catch (Exception ex)
         {
@@ -823,6 +834,7 @@ public partial class ETPageViewModel : ViewModelBase, IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _modCheck.EndHost();
 
         _etService.LogMessage -= OnLogMessage;
         _etService.ProgressChanged -= OnProgressChanged;

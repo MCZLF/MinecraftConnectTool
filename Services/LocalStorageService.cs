@@ -24,6 +24,7 @@ public static class LocalStorageService
     private const string BootstrapFileName = "MCTStorage.json";
 
     private static readonly object SyncRoot = new();
+    private static readonly Encoding AppLogEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
     private static LocalStorageSettings? _settings;
 
     public static string BootstrapDirectory => Path.Combine(GetUserHomeDirectory(), "MCTStorageConfig");
@@ -293,20 +294,28 @@ public static class LocalStorageService
         {
             lock (SyncRoot)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(AppLogPath)!);
-                var bytes = Encoding.UTF8.GetBytes(message);
+                var logPath = AppLogPath;
+                Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
                 for (var attempt = 0; attempt < 3; attempt++)
                 {
+                    FileStream stream;
                     try
                     {
-                        using var stream = new FileStream(AppLogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-                        stream.Write(bytes, 0, bytes.Length);
-                        return;
+                        stream = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
                     }
                     catch (IOException) when (attempt < 2)
                     {
                         Thread.Sleep(20);
+                        continue;
                     }
+
+                    // Retry opening only, since a failed write may already have appended data.
+                    using (stream)
+                    using (var writer = new StreamWriter(stream, AppLogEncoding))
+                    {
+                        writer.Write(message);
+                    }
+                    return;
                 }
             }
         }

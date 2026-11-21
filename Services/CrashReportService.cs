@@ -22,6 +22,7 @@ public static class CrashReportService
     private const int FatalExitTimeout = 5000;
     private const int MaxReportBytes = 1024 * 256;
     private const int MaxCrashReportBuilderCapacity = 512 * 1024;
+    private const int MaxLogStatsBytes = 1024 * 1024;
     private static readonly string CrashReportsDirectory;
     private static readonly object LockObject = new();
     private static int _fatalExitWatchdogStarted;
@@ -498,12 +499,17 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
         }
 
         var fileInfo = new FileInfo(path);
-        var lineCount = CountFileLines(path);
-        var charCount = CountFileChars(path);
         sb.AppendLine($"  路径: {path}");
         sb.AppendLine($"  大小: {FormatBytes(fileInfo.Length)}");
-        sb.AppendLine($"  字符数: {charCount}");
-        sb.AppendLine($"  行数: {lineCount}");
+        if (TryCountLogText(fileInfo, out var charCount, out var lineCount))
+        {
+            sb.AppendLine($"  字符数: {charCount}");
+            sb.AppendLine($"  行数: {lineCount}");
+        }
+        else
+        {
+            sb.AppendLine("  日志大小超过统计上限，已跳过行数和字符数统计");
+        }
         sb.AppendLine($"  修改时间: {fileInfo.LastWriteTime:yyyy-MM-dd HH:mm:ss}");
     }
 
@@ -517,56 +523,50 @@ ContentLength = {Encoding.UTF8.GetByteCount(report)}
         }
 
         var fileInfo = new FileInfo(path);
-        var charCount = CountFileChars(path);
-        sb.AppendLine($"  大小/字符数: {FormatBytes(fileInfo.Length)}/{charCount}字符");
+        if (TryCountLogText(fileInfo, out var charCount, out _))
+            sb.AppendLine($"  大小/字符数: {FormatBytes(fileInfo.Length)}/{charCount}字符");
+        else
+            sb.AppendLine($"  大小: {FormatBytes(fileInfo.Length)}（超过统计上限）");
     }
 
-    private static long CountFileLines(string path)
+    private static bool TryCountLogText(FileInfo fileInfo, out int charCount, out int lineCount)
     {
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-        var buffer = new byte[8192];
-        long lineCount = 0;
-        var hasAnyByte = false;
-        var lastByte = (byte)0;
+        charCount = 0;
+        lineCount = 0;
+        if (fileInfo.Length > MaxLogStatsBytes)
+            return false;
 
-        while (true)
-        {
-            var read = stream.Read(buffer, 0, buffer.Length);
-            if (read == 0)
-                break;
+        using var stream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        if (stream.Length > MaxLogStatsBytes)
+            return false;
 
-            hasAnyByte = true;
-            for (var i = 0; i < read; i++)
-            {
-                if (buffer[i] == (byte)'\n')
-                    lineCount++;
-            }
-            lastByte = buffer[read - 1];
-        }
-
-        if (hasAnyByte && lastByte != (byte)'\n')
-            lineCount++;
-
-        return lineCount;
-    }
-
-    private static long CountFileChars(string path)
-    {
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 8192);
         var buffer = new char[8192];
-        long charCount = 0;
+        var lastChar = '\0';
 
-        while (true)
+        // A writer may keep appending while the crash report is being collected.
+        while (charCount < MaxLogStatsBytes)
         {
-            var read = reader.Read(buffer, 0, buffer.Length);
+            var read = reader.Read(buffer, 0, Math.Min(buffer.Length, MaxLogStatsBytes - charCount));
             if (read == 0)
                 break;
 
             charCount += read;
+            for (var i = 0; i < read; i++)
+            {
+                if (buffer[i] == '\n')
+                    lineCount++;
+            }
+            lastChar = buffer[read - 1];
         }
 
-        return charCount;
+        if (stream.Length > MaxLogStatsBytes)
+            return false;
+
+        if (charCount > 0 && lastChar != '\n')
+            lineCount++;
+
+        return true;
     }
 
     private static string MaskSensitiveText(string text)

@@ -9,7 +9,7 @@ namespace MinecraftConnectTool.Services;
 
 internal static class ModCheckConsent
 {
-    public const string Title = "允许上传模组列表用于比对客户端差异";
+    public const string Title = "允许上传模组列表并对比客户端差异";
     public const string Purpose = "开启后，加入房间时将会自动上传模组列表，用于比对联机加入方客户端模组及版本是否相同。";
 
     private const string ConfigKey = "AllowModCheckUpload";

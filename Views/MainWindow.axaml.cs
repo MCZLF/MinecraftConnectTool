@@ -32,8 +32,8 @@ public partial class MainWindow : Window
     // 版本号
     public static readonly string version = "0.0.7.071";
 
-    // 版本标语
-    public static readonly string designation = "我等过很久,我不会再等了 -弗洛洛";
+    // 版本标语或者一言
+    public static readonly string designation = "我真的,很高兴,我的作品,真的有人在用,谢谢你  -开发者linfon18/Ad1va,26年11月21日深夜失眠留";
 
     // 全局水印配置
     public static readonly bool EnableWatermark = false;

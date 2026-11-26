@@ -149,7 +149,7 @@ namespace MinecraftConnectTool
                 if (Environment.Is64BitOperatingSystem)
                 {
                     if (admin)
-                    { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                    { url = "https://api.mct.mczlf.loft.games/Core1018/windows_amd64.exe"; }
                     else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
                 }
                 else
@@ -158,7 +158,7 @@ namespace MinecraftConnectTool
                 }
                 string fileName = Path.Combine(customDirectory, "main.exe");
                 string fileMd5;
-                if (admin) { fileMd5 = "29d76fc2626c66925621d475f3a6827a"; } else { fileMd5 = "08160296509deac13e7d12c8754de9ef"; };
+                if (admin) { fileMd5 = "8f2afdcd9ac7510d1c6b52f54c2ab7f1"; } else { fileMd5 = "08160296509deac13e7d12c8754de9ef"; };
                 string fileMd532 = "640ffdaa2a7b249d9c301102419a69cb";
                 bool needsDownload = false;
                 if (File.Exists(fileName))
@@ -343,6 +343,10 @@ namespace MinecraftConnectTool
                 }
             }
         }
+
+
+
+
         private async void Joiner_Click(object sender, EventArgs e)
         {
             role = "2";  //加入
@@ -416,7 +420,7 @@ namespace MinecraftConnectTool
             if (Environment.Is64BitOperatingSystem)
             {
                 if (admin)
-                { url = "https://api.mct.mczlf.loft.games/main32413.exe"; }
+                { url = "https://api.mct.mczlf.loft.games/Core1018/windows_amd64.exe"; }
                 else { url = "https://api.mct.mczlf.loft.games/mainnew.exe"; }//new  
             }
             else
@@ -425,7 +429,7 @@ namespace MinecraftConnectTool
             }
             string fileName = Path.Combine(customDirectory, "main.exe");
             string fileMd5;
-            if (admin) { fileMd5 = "29d76fc2626c66925621d475f3a6827a"; } else { fileMd5 = "08160296509deac13e7d12c8754de9ef"; }
+            if (admin) { fileMd5 = "8f2afdcd9ac7510d1c6b52f54c2ab7f1"; } else { fileMd5 = "08160296509deac13e7d12c8754de9ef"; }
             ;
             string fileMd532 = "640ffdaa2a7b249d9c301102419a69cb";
 
